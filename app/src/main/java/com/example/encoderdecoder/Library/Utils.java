@@ -1,4 +1,4 @@
-package com.example.encoderdecoder;
+package com.example.encoderdecoder.Library;
 
 import android.media.MediaCodec;
 import android.media.MediaExtractor;
@@ -12,8 +12,9 @@ import java.io.IOException;
 public class Utils {
     public static String TAG = "Utils";
 
-    public static void configCodecWithMimeType(String type, MediaExtractor extractor, MediaCodec codec, Surface surface) throws IOException {
+    public static MediaCodec configCodecWithMimeType(String type, MediaExtractor extractor,  Surface surface) throws IOException {
         String mimeType = "";
+        MediaCodec codec = null;
         for (int i = 0; i < extractor.getTrackCount(); i++) {
             MediaFormat format = extractor.getTrackFormat(i);
             mimeType = format.getString(MediaFormat.KEY_MIME);
@@ -26,7 +27,18 @@ public class Utils {
 
             }
         }
+        return codec;
     }
+
+    public static MediaCodec createNewCodect(VCodec vCodec, Surface surface)  {
+        return null;
+    }
+
+    public static void stopMediaCodec(MediaCodec mediaCodec) {
+
+    }
+
+
 
 
 }

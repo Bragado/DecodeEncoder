@@ -1,4 +1,4 @@
-package com.example.encoderdecoder;
+package com.example.encoderdecoder.Library;
 
 import android.media.MediaCodec;
 import android.media.MediaCodecList;
@@ -8,6 +8,8 @@ import android.media.MediaPlayer;
 import android.util.Log;
 import android.view.Surface;
 import android.widget.Toast;
+
+import com.example.encoderdecoder.Library.Utils;
 
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -22,9 +24,6 @@ public class Decoder extends  Thread {
     private boolean initialized = false;
     private long timeoutUs = 10000;
 
-    private boolean SAVEFILE = true;
-    private static final String DEBUG_FILE_NAME_BASE = "/storage/emulated/0/Download/Decoded.mp4";
-
 
     public boolean DecodeVideoFile(String path, Surface surface) throws Exception {
         this.extractor = new MediaExtractor();
@@ -35,7 +34,7 @@ public class Decoder extends  Thread {
             // Read the file with a MediaExtractor
             this.extractor.setDataSource(path);
 
-            Utils.configCodecWithMimeType("video/", this.extractor, this.codec, surface);
+            this.codec = Utils.configCodecWithMimeType("video/", this.extractor, surface);
             codec.start();
 
             if(this.codec == null)
@@ -107,13 +106,9 @@ public class Decoder extends  Thread {
                     Log.d(TAG, "INFO_OUTPUT_FORMAT_CHANGED");
                     break;
                 case MediaCodec.INFO_TRY_AGAIN_LATER:
-				    Log.d(TAG, "INFO_TRY_AGAIN_LATER");
+                    Log.d(TAG, "INFO_TRY_AGAIN_LATER");
                     break;
                 default:            // in case index is correct
-
-
-                    //outputBuffers = codec.getOutputBuffers();
-
                     codec.releaseOutputBuffer(outputBufferIndex, true );
                     break;
 
