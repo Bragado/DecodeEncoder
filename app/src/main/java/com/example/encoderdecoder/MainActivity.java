@@ -1,62 +1,79 @@
 package com.example.encoderdecoder;
 
-import android.os.Environment;
+import android.content.Context;
+import android.content.Intent;
+import android.media.MediaCodecInfo;
+import android.media.MediaCodecList;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.SurfaceHolder;
-import android.view.SurfaceView;
+import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.ListView;
 
-import java.io.File;
+import java.util.ArrayList;
 
-public class MainActivity extends AppCompatActivity implements SurfaceHolder.Callback {
+public class MainActivity extends AppCompatActivity  {
 
     public final String TAG = "ACTIVITY MAIN";
-
-    SurfaceView surfaceView;
-    SurfaceHolder surfaceHolder;
-    Decoder decoder ;
-    String PATH = "/storage/emulated/0/Download/The Simpsons Movie - Trailer.mp4";
+    Context This;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        surfaceView = findViewById(R.id.surfaceView);
-        surfaceHolder = surfaceView.getHolder();
-        surfaceHolder.addCallback(this);
+        Button decoderEncoder = findViewById(R.id.button3);
+        final Intent intent = new Intent(this, DecoderEncoderActivity.class);
+        final ListView listView = (ListView) findViewById(R.id.list);
+
+        This = this;
+
+        decoderEncoder.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(intent);
+            }
+        });
 
 
-        decoder = new Decoder();
+        Button listCodecs = findViewById(R.id.button2);
+
+        listCodecs.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                int numCodecs = MediaCodecList.getCodecCount();
+                ArrayList<String> codecs = new ArrayList<>();
+
+                for (int i = 0; i < numCodecs; i++) {
+                    MediaCodecInfo codecInfo = MediaCodecList.getCodecInfoAt(i);
 
 
-        Log.e(TAG, "Path : " + PATH);
-    }
+                    String name =  "" ;
 
 
-    @Override
-    public void surfaceCreated(SurfaceHolder holder) {
+                    if (codecInfo.isEncoder()) {
+                        name = "encoder : " + codecInfo.getName();
+                    }else
+                        name = "decoder : "  + codecInfo.getName();
 
-    }
-
-    @Override
-    public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
-            if(decoder != null) {
-                try {
-                    if(decoder.DecodeVideoFile(PATH, holder.getSurface()))
-                        decoder.start();
-                } catch (Exception e) {
-                    decoder = null;
-                    e.printStackTrace();
+                    codecs.add(name);
                 }
 
+                String[] codecsArr = new String[codecs.size()];
+                codecsArr = codecs.toArray(codecsArr);
+                ArrayAdapter<String> adapter = new ArrayAdapter<String>(This,
+                        android.R.layout.simple_list_item_1, android.R.id.text1, codecsArr);
+
+                listView.setAdapter(adapter);
             }
+        });
+
+
+
+
     }
 
-    @Override
-    public void surfaceDestroyed(SurfaceHolder holder) {
-        if(decoder != null)
-            decoder.close();
-    }
+
 }
