@@ -1,11 +1,15 @@
 package com.example.encoderdecoder.Library;
 
+
 import android.media.MediaCodec;
 import android.media.MediaExtractor;
 import android.media.MediaFormat;
 import android.media.MediaMuxer;
 import android.util.Log;
 import android.view.Surface;
+
+import com.example.encoderdecoder.OpenGL.InputSurface;
+import com.example.encoderdecoder.OpenGL.OutputSurface;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -26,7 +30,7 @@ public class DecoderEncoder {
     private CodecWorkerThread worker;  // it should not be the responsible of the main class to create a thread
     private VCodec vCodecEncoder = null;          // all needed configuration for encoding or decoding
     private VCodec vCodecDecoder = null;
-    private InputSurface inputSurface = null ;
+    private InputSurfaceCallback inputSurface = null ;
 
 
 
@@ -68,7 +72,7 @@ public class DecoderEncoder {
 
 
 
-    public interface InputSurface   {
+    public interface InputSurfaceCallback   {
 
         /**
          * The encoder's input surface cannot be specified unless we use API lvl > 23, this interface must be implemented by the object that wants to encode some raw data in order to receive the appropriated stream
@@ -84,6 +88,13 @@ public class DecoderEncoder {
         private boolean enabled = false;
         private boolean pause = false;              // TODO: implement it
         private boolean endOfStream = true;
+
+
+        // TODO: Test
+        InputSurface mInputSurface;
+        OutputSurface mOutputSurface;
+        boolean decodeEncode = false;
+
 
         MediaCodec decoder = null;
         MediaCodec encoder = null;
@@ -104,6 +115,11 @@ public class DecoderEncoder {
          @Override
         public void run() {
              Surface surface = null;
+
+             // TODO: Test
+             if(vCodecEncoder != null && vCodecDecoder != null)
+                 decodeEncode = false;
+
 
             // < Encoder and decoder configurations >
              if(vCodecEncoder != null)  {
@@ -182,11 +198,18 @@ public class DecoderEncoder {
             this.encoder.configure(format, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE);
 
             try {
-
+                if(!decodeEncode) {
                     surface = this.encoder.createInputSurface();
                     vCodecEncoder.setEncoderInputSurface(surface);
-                    if(inputSurface != null) // for decoding-encoding there's no need for a call
-                        inputSurface.onSurfaceCreated(surface);
+                }else {
+                    surface = this.encoder.createInputSurface();
+                    mInputSurface = new InputSurface( surface );
+                    mInputSurface.makeCurrent();
+                }
+
+                if(inputSurface != null) // for decoding-encoding there's no need for a call
+                    inputSurface.onSurfaceCreated(surface);
+
             }catch(Exception e)  {
                 throw e;
             }
@@ -209,7 +232,11 @@ public class DecoderEncoder {
                 // Read the file with a MediaExtractor
                 this.extractor.setDataSource(vCodec.getURLForDecoder());
 
-                this.decoder = VCodec.configCodecWithMimeType("video/", this.extractor, vCodecDecoder.getDecoderSurface());
+                if(decodeEncode ) {
+                    mOutputSurface = new OutputSurface();
+                    this.decoder = VCodec.configCodecWithMimeType("video/", this.extractor, mOutputSurface.getSurface());
+                }else
+                    this.decoder = VCodec.configCodecWithMimeType("video/", this.extractor, vCodecDecoder.getDecoderSurface());
 
                 if(this.decoder == null)
                     throw new Exception("Could not create codec");
@@ -399,6 +426,9 @@ public class DecoderEncoder {
          *  The decoder must be configured with an output surface, and the encoder with an input surface. We used the inputSurface returned by the encoder to create que output surface of the decoder
          * @throws Exception
          */
+
+
+        // TODO: this method is too long
         public void decodeAndEncode() throws Exception{
 
             Log.e(TAG, "Transcoder not implemented");
@@ -420,7 +450,7 @@ public class DecoderEncoder {
             while(enabled) {
 
                 /* < Decoder > */
-                if(decoderEnabled) {
+                if(decoderEnabled) { // feeds information to the decoder
                     int inputBufferId = decoder.dequeueInputBuffer(vCodecDecoder.getTimeOUT());
 
                     if( inputBufferId >= 0) {
@@ -439,54 +469,109 @@ public class DecoderEncoder {
                         }
                     }
 
-                    int outputBufferIndex = decoder.dequeueOutputBuffer(decoderBufferInfo, vCodecDecoder.getTimeOUT());
+                    //int outputBufferIndex = decoder.dequeueOutputBuffer(decoderBufferInfo, vCodecDecoder.getTimeOUT());
+/*
+                    // TODO : check the order of this statements
                     if(outputBufferIndex > -1)
-                        decoder.releaseOutputBuffer(outputBufferIndex, true /* TODO: ?? */);
+                        decoder.releaseOutputBuffer(outputBufferIndex, true );
+                    // TODO: presentation time is set automatically
+
+                    if(decodeEncode)
+                        mInputSurface.swapBuffers();
+*/
                 }
 
 
                 /* < /Decoder > */
 
                 /* < Encoder > */
-                int encoderStatus = this.encoder.dequeueOutputBuffer(encoderBufferInfo, vCodecEncoder.getTimeOUT());
+                boolean encoderDone = false;
+                while(!encoderDone) {   // to ensure no information is lost
+                    int encoderStatus = this.encoder.dequeueOutputBuffer(encoderBufferInfo, vCodecEncoder.getTimeOUT());
 
+                    // TODO: check all possible outcomes of encoderStatus
+                    if(encoderStatus == MediaCodec.INFO_OUTPUT_BUFFERS_CHANGED) {
+                        outputBuffers = this.encoder.getOutputBuffers();
+                    }else if(encoderStatus ==  MediaCodec.INFO_OUTPUT_FORMAT_CHANGED) {
+                        MediaFormat newFormat = this.encoder.getOutputFormat();
+                        if(mediaMuxerStarted) {
+                            Log.e(TAG, "Media Muxer has already started, this should have not happened");
 
-                if(encoderStatus == MediaCodec.INFO_OUTPUT_BUFFERS_CHANGED) {
-                    outputBuffers = this.encoder.getOutputBuffers();
-                }else if(encoderStatus ==  MediaCodec.INFO_OUTPUT_FORMAT_CHANGED) {
-                    MediaFormat newFormat = this.encoder.getOutputFormat();
-                    if(mediaMuxerStarted) {
-                        Log.e(TAG, "Media Muxer has already started, this should have not happened");
-                        break;
-                    }
-                    mediaMuxerTrackIndex = mediaMuxer.addTrack(newFormat);
-                    mediaMuxer.start();
-                    mediaMuxerStarted = true;
-
-                }else if(encoderStatus < 0) {
-                    Log.d(TAG, "Encoder status error");
-                }else { // success
-                    Log.d(TAG, "Encoder Status success");
-                    ByteBuffer encodedData = outputBuffers[encoderStatus];
-                    if(encodedData == null) {
-                        Log.e(TAG, "Encoded data is null, something went wrong");
-                    }
-
-                    if ((encoderBufferInfo.flags & MediaCodec.BUFFER_FLAG_CODEC_CONFIG) != 0) { encoderBufferInfo.size = 0; } // ignore data
-
-                    if (encoderBufferInfo.size != 0) {
-                        if (!mediaMuxerStarted) {
-                            Log.e(TAG, "MediaMuxer should have been started, something went wrong");
                         }
+                        mediaMuxerTrackIndex = mediaMuxer.addTrack(newFormat);
+                        mediaMuxer.start();
+                        mediaMuxerStarted = true;
+
+                    }else if(encoderStatus == MediaCodec.INFO_TRY_AGAIN_LATER) {
+                        Log.d(TAG, "Encoder status try again");
+                        encoderDone = true;      // ensures we are not stuck in an infinite loop
+                    }else if(encoderStatus >= 0) { // success encoder status >= 0 ; let's catch the information from the encoder
+                        Log.d(TAG, "Encoder Status success");
+                        ByteBuffer encodedData = outputBuffers[encoderStatus];
+                        if (encodedData == null) {
+                            Log.e(TAG, "Encoded data is null, something went wrong");
+                        }
+
+                        if ((encoderBufferInfo.flags & MediaCodec.BUFFER_FLAG_CODEC_CONFIG) != 0) {
+                            encoderBufferInfo.size = 0;
+                        } // ignore data
+
+                        if (encoderBufferInfo.size != 0) {
+                            Log.e(TAG, "Let's see if the problem is in here");
+                            if (!mediaMuxerStarted) {
+                                Log.e(TAG, "MediaMuxer should have been started, something went wrong");
+                            }
+                        }
+
+                        // TODO: get this out of here
+                        // MediaMuxer to save track as mp4
+
+                        encodedData.position(encoderBufferInfo.offset);
+                        encodedData.limit(encoderBufferInfo.offset + encoderBufferInfo.size);
+                        mediaMuxer.writeSampleData(mediaMuxerTrackIndex, encodedData, encoderBufferInfo);
+
+                        encoder.releaseOutputBuffer(encoderStatus, false);
+
+                    }
+                    if (encoderStatus != MediaCodec.INFO_TRY_AGAIN_LATER) {
+                        // Continue attempts to drain output.
+                        Log.e(TAG, "Continue");
+                        continue;
+                    }
+                    if(encoderDone) {       // no information in encoder input surface, so let's get him new data throw decoder output surface
+                        Log.e(TAG, "Information was pass to the decoder");
+                        // catches information from the decoder
+                        int outputBufferIndex = decoder.dequeueOutputBuffer(decoderBufferInfo, vCodecDecoder.getTimeOUT() + 1000);
+                        if(outputBufferIndex == MediaCodec.INFO_TRY_AGAIN_LATER) {
+                            encoderDone = true;
+                        }else if( outputBufferIndex >= 0) {
+
+                            boolean render = (info.size != 0);
+                            Log.e(TAG, "Rendering decoder output buffer: " + render);
+                            decoder.releaseOutputBuffer(outputBufferIndex, true);
+
+                            if(render) {
+                                // This waits for the image and renders it after it arrives.
+                                mOutputSurface.awaitNewImage();
+                                mOutputSurface.drawImage();
+                                // Send it to the encoder.
+                                mInputSurface.setPresentationTime(info.presentationTimeUs * 1000);
+                                mInputSurface.swapBuffers();
+
+
+                            }
+
+                        }
+
                     }
 
-                    // MediaMuxer to save track as mp4
-                    encodedData.position(encoderBufferInfo.offset);
-                    encodedData.limit(encoderBufferInfo.offset + encoderBufferInfo.size);
-                    mediaMuxer.writeSampleData(mediaMuxerTrackIndex, encodedData, encoderBufferInfo);
-                    encoder.releaseOutputBuffer(encoderStatus, false);
-                }
 
+
+
+
+
+
+                }
                 /* < /Encoder > */
 
                 /* < End of stream > */

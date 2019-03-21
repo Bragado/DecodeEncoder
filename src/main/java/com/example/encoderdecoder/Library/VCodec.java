@@ -35,11 +35,11 @@ public class VCodec {
 
     // parameters for the encoder
     private String MIME_TYPE = "video/avc";    // H.264 Advanced Video Coding
-    private int FRAME_RATE = 15;               // 15fps
-    private int IFRAME_INTERVAL = 10;          // 10 seconds between I-frames
-    private int mWidth = 320;
-    private int mHeight = 240;
-    private int mBitRate = 2000000;
+    private int FRAME_RATE = 24;               // 24fps
+    private int IFRAME_INTERVAL = 5;          // 10 seconds between I-frames
+    private int mWidth = 1280;
+    private int mHeight = 544;
+    private int mBitRate = 4221440;             // 2000000
     private Surface encoderSurface;
     private String encoderOutputPath = "/storage/emulated/0/Download/testX.mp4";
     private MediaMuxer mediaMuxer = null;
@@ -146,6 +146,8 @@ public class VCodec {
         MediaCodec codec = null;
         for (int i = 0; i < extractor.getTrackCount(); i++) {
             MediaFormat format = extractor.getTrackFormat(i);
+            Log.e(TAG, "Bit Rate: " + format.toString());
+
             mimeType = format.getString(MediaFormat.KEY_MIME);
             Log.e(TAG, "MimeType found : " + mimeType);
             if(mimeType.startsWith(type)) {
@@ -158,7 +160,27 @@ public class VCodec {
         }
         return codec;
     }
+
+    public static MediaFormat getTrackFormat(String type, MediaExtractor extractor, Surface surface) throws IOException {
+        String mimeType = "";
+        MediaCodec codec = null;
+        for (int i = 0; i < extractor.getTrackCount(); i++) {
+            MediaFormat format = extractor.getTrackFormat(i);
+            Log.e(TAG, "Bit Rate: " + format.toString());
+
+            mimeType = format.getString(MediaFormat.KEY_MIME);
+            Log.e(TAG, "MimeType found : " + mimeType);
+            if(mimeType.startsWith(type)) {
+               return format;
+
+
+            }
+        }
+        return null;
+    }
+
     // < /Static functions to support DecoderEncoder >
+
 
 
 

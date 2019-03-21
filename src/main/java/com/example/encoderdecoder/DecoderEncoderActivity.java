@@ -15,9 +15,10 @@ public class DecoderEncoderActivity extends AppCompatActivity implements Surface
     SurfaceView surfaceView;
     SurfaceHolder surfaceHolder;
     com.example.encoderdecoder.Library.DecoderEncoder decoderEncoder;
-    //String PATH2 = "/storage/emulated/0/Download/The Simpsons Movie - Trailer.mp4";
+    //String PATH2 = "/storage/emulated/0/Download/video1080p.mp4";
+    String PATH2 = "/storage/emulated/0/Download/The Simpsons Movie - Trailer.mp4";
     //String PATH2 = "http://playready.directtaps.net/smoothstreaming/SSWSS720H264/SuperSpeedway_720_1427.ismv";
-    String PATH2 = "http://playready.directtaps.net/smoothstreaming/TTLSS720VC1/To_The_Limit_720_1427.ismv";
+    //String PATH2 = "http://playready.directtaps.net/smoothstreaming/TTLSS720VC1/To_The_Limit_720_1427.ismv";
     //String PATH2 = "https://streaming-ondemand.rtp.pt/nas2.share/h264/512x384/p5488/asset-audio=1024-video=1024-9.ts?tlm=hls&streams=p5488_1_201902120000000981.mp4.m3u8:1024&AliasPass=streaming-ondemand.rtp.pt&aa=11";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
