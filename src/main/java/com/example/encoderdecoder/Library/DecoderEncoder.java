@@ -118,7 +118,7 @@ public class DecoderEncoder {
 
              // TODO: Test
              if(vCodecEncoder != null && vCodecDecoder != null)
-                 decodeEncode = false;
+                 decodeEncode = true;
 
 
             // < Encoder and decoder configurations >
@@ -233,8 +233,8 @@ public class DecoderEncoder {
                 this.extractor.setDataSource(vCodec.getURLForDecoder());
 
                 if(decodeEncode ) {
-                    mOutputSurface = new OutputSurface();
-                    this.decoder = VCodec.configCodecWithMimeType("video/", this.extractor, mOutputSurface.getSurface());
+                    this.mOutputSurface = new OutputSurface();
+                    this.decoder = VCodec.configCodecWithMimeType("video/", this.extractor, this.mOutputSurface.getSurface());
                 }else
                     this.decoder = VCodec.configCodecWithMimeType("video/", this.extractor, vCodecDecoder.getDecoderSurface());
 
@@ -435,7 +435,6 @@ public class DecoderEncoder {
 
             ByteBuffer[] outputBuffers = encoder.getOutputBuffers();
             ByteBuffer[] inputBuffers = decoder.getInputBuffers();
-            MediaCodec.BufferInfo info = new MediaCodec.BufferInfo();
 
             MediaCodec.BufferInfo encoderBufferInfo = new MediaCodec.BufferInfo();
             MediaCodec.BufferInfo decoderBufferInfo = new MediaCodec.BufferInfo();
@@ -468,17 +467,6 @@ public class DecoderEncoder {
                             encoder.signalEndOfInputStream();
                         }
                     }
-
-                    //int outputBufferIndex = decoder.dequeueOutputBuffer(decoderBufferInfo, vCodecDecoder.getTimeOUT());
-/*
-                    // TODO : check the order of this statements
-                    if(outputBufferIndex > -1)
-                        decoder.releaseOutputBuffer(outputBufferIndex, true );
-                    // TODO: presentation time is set automatically
-
-                    if(decodeEncode)
-                        mInputSurface.swapBuffers();
-*/
                 }
 
 
@@ -486,7 +474,7 @@ public class DecoderEncoder {
 
                 /* < Encoder > */
                 boolean encoderDone = false;
-                while(!encoderDone) {   // to ensure no information is lost
+                while(!encoderDone) {   // to ensure no information is not lost, let's assume the decoder is always full
                     int encoderStatus = this.encoder.dequeueOutputBuffer(encoderBufferInfo, vCodecEncoder.getTimeOUT());
 
                     // TODO: check all possible outcomes of encoderStatus
@@ -504,7 +492,7 @@ public class DecoderEncoder {
 
                     }else if(encoderStatus == MediaCodec.INFO_TRY_AGAIN_LATER) {
                         Log.d(TAG, "Encoder status try again");
-                        encoderDone = true;      // ensures we are not stuck in an infinite loop
+                        encoderDone = true;      // the decoder output buffer was drain
                     }else if(encoderStatus >= 0) { // success encoder status >= 0 ; let's catch the information from the encoder
                         Log.d(TAG, "Encoder Status success");
                         ByteBuffer encodedData = outputBuffers[encoderStatus];
@@ -517,45 +505,42 @@ public class DecoderEncoder {
                         } // ignore data
 
                         if (encoderBufferInfo.size != 0) {
-                            Log.e(TAG, "Let's see if the problem is in here");
                             if (!mediaMuxerStarted) {
                                 Log.e(TAG, "MediaMuxer should have been started, something went wrong");
                             }
+                            // MediaMuxer to save track as mp4
+                            encodedData.position(encoderBufferInfo.offset);
+                            encodedData.limit(encoderBufferInfo.offset + encoderBufferInfo.size);
+                            mediaMuxer.writeSampleData(mediaMuxerTrackIndex, encodedData, encoderBufferInfo);
                         }
-
-                        // TODO: get this out of here
-                        // MediaMuxer to save track as mp4
-
-                        encodedData.position(encoderBufferInfo.offset);
-                        encodedData.limit(encoderBufferInfo.offset + encoderBufferInfo.size);
-                        mediaMuxer.writeSampleData(mediaMuxerTrackIndex, encodedData, encoderBufferInfo);
 
                         encoder.releaseOutputBuffer(encoderStatus, false);
 
                     }
                     if (encoderStatus != MediaCodec.INFO_TRY_AGAIN_LATER) {
-                        // Continue attempts to drain output.
                         Log.e(TAG, "Continue");
                         continue;
                     }
-                    if(encoderDone) {       // no information in encoder input surface, so let's get him new data throw decoder output surface
+                    if(encoderDone) {   // TODO: try a if(true)    // no information in encoder input surface, so let's get him new data throw decoder output surface
                         Log.e(TAG, "Information was pass to the decoder");
                         // catches information from the decoder
                         int outputBufferIndex = decoder.dequeueOutputBuffer(decoderBufferInfo, vCodecDecoder.getTimeOUT() + 1000);
                         if(outputBufferIndex == MediaCodec.INFO_TRY_AGAIN_LATER) {
-                            encoderDone = true;
+                            encoderDone = true; // TODO: check this out
                         }else if( outputBufferIndex >= 0) {
 
-                            boolean render = (info.size != 0);
+
+                            boolean render = (decoderBufferInfo.size != 0);
+
                             Log.e(TAG, "Rendering decoder output buffer: " + render);
-                            decoder.releaseOutputBuffer(outputBufferIndex, true);
+                            decoder.releaseOutputBuffer(outputBufferIndex, render);
 
                             if(render) {
                                 // This waits for the image and renders it after it arrives.
-                                mOutputSurface.awaitNewImage();
-                                mOutputSurface.drawImage();
+                                this.mOutputSurface.awaitNewImage();
+                                this.mOutputSurface.drawImage();
                                 // Send it to the encoder.
-                                mInputSurface.setPresentationTime(info.presentationTimeUs * 1000);
+                                mInputSurface.setPresentationTime(decoderBufferInfo.presentationTimeUs * 1000);
                                 mInputSurface.swapBuffers();
 
 

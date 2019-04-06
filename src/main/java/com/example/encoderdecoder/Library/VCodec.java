@@ -35,10 +35,10 @@ public class VCodec {
 
     // parameters for the encoder
     private String MIME_TYPE = "video/avc";    // H.264 Advanced Video Coding
-    private int FRAME_RATE = 24;               // 24fps
-    private int IFRAME_INTERVAL = 5;          // 10 seconds between I-frames
-    private int mWidth = 1280;
-    private int mHeight = 544;
+    private int FRAME_RATE = 25;               // 24fps
+    private int IFRAME_INTERVAL = 10;          // 10 seconds between I-frames
+    private int mWidth = 600;
+    private int mHeight = 280;
     private int mBitRate = 4221440;             // 2000000
     private Surface encoderSurface;
     private String encoderOutputPath = "/storage/emulated/0/Download/testX.mp4";
