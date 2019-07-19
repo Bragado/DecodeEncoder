@@ -23,24 +23,34 @@ import java.nio.ByteBuffer;
 // TODO: difference between shutdown and stop ?? one should do the effect of pause and de other stop! the release of resources should be this class' responsible whenever the user calls stop
 // TODO: run lint
 // TODO: use API 23
-
+// TODO: ability to only encode/decode audio
+// TODO: ability to encode/decode audio and video
 
 public class DecoderEncoder {
 
     public final String TAG = "DECODER-ENCODER";
     public boolean DEBUG = true;
-    private CodecWorkerThread worker;  // it should not be the responsible of the main class to create a thread
+    private CodecWorkerThread worker;               // it should not be the responsible of the main class to create a thread
     private VCodec vCodecEncoder = null;          // all needed configuration for encoding or decoding
     private VCodec vCodecDecoder = null;
     private InputSurfaceCallback inputSurface = null ;
 
+    /* Audio support */
+    private ACodec aCodecEncoder = null;
+    private ACodec aCodecDecoder = null;
 
 
-    public DecoderEncoder (VCodec vCodecEncoder, VCodec vCodecDecoder) {
+
+
+    public DecoderEncoder (VCodec vCodecEncoder, VCodec vCodecDecoder) {      // TODO: change this to support audio
         this.vCodecEncoder = vCodecEncoder;
         this.vCodecDecoder = vCodecDecoder;
         worker = new CodecWorkerThread();
         worker.start();
+    }
+
+    public DecoderEncoder(VCodec cCodecEncoder, ACodec aCodecEncoder, VCodec vCodecDecoder, ACodec ACodecDecoder) {
+        
     }
 
 
@@ -73,11 +83,8 @@ public class DecoderEncoder {
     }
 
 
-
     public interface InputSurfaceCallback   {
-
         /**
-         * The encoder's input surface cannot be specified unless we use API lvl > 23, this interface must be implemented by the object that wants to encode some raw data in order to receive the appropriated stream
          * @param surface   generated Input Surface
          */
         public void onSurfaceCreated(Surface surface);
@@ -85,30 +92,33 @@ public class DecoderEncoder {
 
 
 
-    private class CodecWorkerThread extends Thread {
+    private class CodecWorkerThread extends Thread {       // TODO: remove extends Thread
 
-        private boolean enabled = false;
-        private boolean pause = false;              // TODO: implement it
-        private boolean endOfStream = true;
+        boolean enabled = false;
+        boolean pause = false;              // TODO: implement it
+        boolean endOfStream = true;
 
+        boolean decodeEncode = false;
+        boolean decodeEncodeWithAudio  = false;
 
-        // TODO: Test
+        // For Video
         InputSurface mInputSurface;
         OutputSurface mOutputSurface;
-        boolean decodeEncode = false;
-
-
         MediaCodec decoder = null;
         MediaCodec encoder = null;
 
-        /* Decoder */
+        // For Audio
+        MediaCodec aDecoder = null;
+        MediaCodec aEncoder = null;
+
+        // Both video and audio extractor
         MediaExtractor extractor = null;
+
 
         public void setEnabled() {
             this.enabled = true;
         }
         public void setDisabled() { this.enabled = false; }
-
 
         /**
          * Generic function to decode, encode or decode-encode
@@ -482,14 +492,7 @@ public class DecoderEncoder {
                 while(!encoderDone) {   // to ensure no information is lost, let's assume the decoder is always full
 
                     int encoderStatus = MediaCodec.INFO_TRY_AGAIN_LATER;
-                    //try {
-                        encoderStatus = this.encoder.dequeueOutputBuffer(encoderBufferInfo, vCodecEncoder.getTimeOUT());
-                    //}catch(Exception e) {
-                     //   e.printStackTrace();
-                      //  continue;
-                    //}
-
-
+                    encoderStatus = this.encoder.dequeueOutputBuffer(encoderBufferInfo, vCodecEncoder.getTimeOUT());
                     // TODO: check all possible outcomes of encoderStatus
                     if(encoderStatus == MediaCodec.INFO_OUTPUT_BUFFERS_CHANGED) {
                         outputBuffers = this.encoder.getOutputBuffers();
