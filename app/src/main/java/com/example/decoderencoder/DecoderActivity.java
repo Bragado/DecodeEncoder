@@ -6,8 +6,8 @@ import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
-import com.example.decoderencoder.Library.DecoderEncoder;
-import com.example.decoderencoder.Library.VCodec;
+import com.example.decoderencoder.library.core.DecoderEncoder;
+import com.example.decoderencoder.library.support.VCodec;
 
 public class DecoderActivity  extends AppCompatActivity implements SurfaceHolder.Callback {
 
@@ -16,7 +16,9 @@ public class DecoderActivity  extends AppCompatActivity implements SurfaceHolder
     SurfaceView surfaceView;
     SurfaceHolder surfaceHolder;
     DecoderEncoder decoder ;
-    String PATH = "/storage/emulated/0/Download/The Simpsons Movie - Trailer.mp4";
+    //String PATH = "/storage/emulated/0/Download/The Simpsons Movie - Trailer.mp4";
+    String PATH = "udp://@239.192.2.16:1234";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
