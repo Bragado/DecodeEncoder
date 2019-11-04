@@ -9,7 +9,6 @@ import android.os.Build;
 import android.util.Log;
 import android.view.Surface;
 
-import com.example.decoderencoder.library.extractor.AVDemuxer;
 import com.example.decoderencoder.library.AVMuxer;
 import com.example.decoderencoder.library.support.VCodec;
 import com.example.decoderencoder.OpenGL.InputSurface;

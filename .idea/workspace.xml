@@ -9,12 +9,114 @@
     <option name="TOOL_WINDOW_CONFIGURED_FILTER" value="Show only selected application" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="a68bb5ce-65af-47fc-a939-56f372b226e1" name="Default Changelist" comment="" />
+    <list default="true" id="a68bb5ce-65af-47fc-a939-56f372b226e1" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/Format.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/audio/Ac3Util.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/audio/Ac4Util.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/audio/DtsUtil.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/drm/DrmInitData.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/extractor/BinarySearchSeeker.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/extractor/ChunkIndex.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/extractor/ConstantBitrateSeekMap.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/extractor/DefaultExtractorInput.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/extractor/DefaultExtractorsFactory.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/extractor/DummyExtractorOutput.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/extractor/DummyTrackOutput.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/extractor/ExtractorInput.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/extractor/ExtractorOutput.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/extractor/ExtractorsFactory.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/extractor/GaplessInfoHolder.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/extractor/Id3Peeker.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/extractor/MpegAudioHeader.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/extractor/PositionHolder.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/extractor/SeekMap.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/extractor/SeekPoint.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/extractor/TrackOutput.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/extractor/amr/AmrExtractor.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/extractor/flv/FlvExtractor.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/extractor/mkv/MatroskaExtractor.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/extractor/mp4/FragmentedMp4Extractor.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/extractor/mp4/Mp4Extractor.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/extractor/ogg/OggExtractor.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/extractor/ts/Ac3Extractor.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/extractor/ts/Ac3Reader.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/extractor/ts/Ac4Extractor.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/extractor/ts/Ac4Reader.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/extractor/ts/AdtsExtractor.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/extractor/ts/AdtsReader.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/extractor/ts/DefaultTsPayloadReaderFactory.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/extractor/ts/DtsReader.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/extractor/ts/DvbSubtitleReader.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/extractor/ts/ElementaryStreamReader.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/extractor/ts/H262Reader.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/extractor/ts/H264Reader.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/extractor/ts/H265Reader.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/extractor/ts/Id3Reader.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/extractor/ts/LatmReader.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/extractor/ts/MpegAudioReader.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/extractor/ts/NalUnitTargetBuffer.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/extractor/ts/PesReader.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/extractor/ts/PsBinarySearchSeeker.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/extractor/ts/PsDurationReader.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/extractor/ts/PsExtractor.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/extractor/ts/SectionPayloadReader.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/extractor/ts/SectionReader.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/extractor/ts/SeiReader.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/extractor/ts/SpliceInfoSectionReader.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/extractor/ts/TsBinarySearchSeeker.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/extractor/ts/TsDurationReader.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/extractor/ts/TsExtractor.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/extractor/ts/TsPayloadReader.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/extractor/ts/TsUtil.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/extractor/ts/UserDataReader.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/extractor/wav/WavExtractor.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/metadata/Metadata.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/metadata/MetadataDecoder.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/metadata/MetadataInputBuffer.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/metadata/id3/CommentFrame.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/metadata/id3/Id3Decoder.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/metadata/id3/Id3Frame.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/metadata/id3/InternalFrame.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/network/DefaultSource.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/network/HttpSource.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/network/utils/StreamDescriptor.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/network/utils/TransferListener.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/source/BaseSource.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/text/cea/Cea708InitializationData.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/text/cea/CeaUtil.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/util/Assertions.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/util/BinarySearchSeeker.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/util/C.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/util/CodecSpecificDataUtil.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/util/Log.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/util/MimeTypes.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/util/NalUnitUtil.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/util/ParsableBitArray.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/util/ParsableByteArray.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/util/ParsableNalUnitBitArray.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/util/ParserException.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/util/TimestampAdjuster.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/util/Util.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/test/java/com/example/decoderencoder/UdpStreamTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/codeStyles/Project.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/codeStyles/Project.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/app.iml" beforeDir="false" afterPath="$PROJECT_DIR$/app/app.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/app/build.gradle" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/core/DecoderEncoder.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/core/DecoderEncoder.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/extractor/AVDemuxer.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/extractor/Extractor.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/extractor/Extractor.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/extractor/ExtractorManager.java" beforeDir="false" />
+    </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="DefaultGradleProjectSettings">
+    <option name="isMigrated" value="true" />
   </component>
   <component name="ExternalProjectsManager">
     <system id="GRADLE">
@@ -36,65 +138,22 @@
       </state>
     </system>
   </component>
-  <component name="FUSProjectUsageTrigger">
-    <session id="-1694312585">
-      <usages-collector id="statistics.lifecycle.project">
-        <counts>
-          <entry key="project.closed" value="11" />
-          <entry key="project.open.time.16" value="1" />
-          <entry key="project.open.time.18" value="1" />
-          <entry key="project.open.time.19" value="2" />
-          <entry key="project.open.time.20" value="2" />
-          <entry key="project.open.time.22" value="1" />
-          <entry key="project.open.time.26" value="1" />
-          <entry key="project.open.time.27" value="1" />
-          <entry key="project.open.time.28" value="1" />
-          <entry key="project.open.time.3" value="2" />
-          <entry key="project.open.time.32" value="1" />
-          <entry key="project.open.time.4" value="1" />
-          <entry key="project.opened" value="14" />
-        </counts>
-      </usages-collector>
-      <usages-collector id="statistics.file.extensions.open">
-        <counts>
-          <entry key="gradle" value="3" />
-          <entry key="java" value="35" />
-          <entry key="xml" value="10" />
-        </counts>
-      </usages-collector>
-      <usages-collector id="statistics.file.types.open">
-        <counts>
-          <entry key="Groovy" value="3" />
-          <entry key="JAVA" value="35" />
-          <entry key="XML" value="10" />
-        </counts>
-      </usages-collector>
-      <usages-collector id="statistics.file.extensions.edit">
-        <counts>
-          <entry key="dummy" value="21" />
-          <entry key="gradle" value="21" />
-          <entry key="java" value="2515" />
-          <entry key="txt" value="8" />
-          <entry key="xml" value="68" />
-        </counts>
-      </usages-collector>
-      <usages-collector id="statistics.file.types.edit">
-        <counts>
-          <entry key="Groovy" value="21" />
-          <entry key="JAVA" value="2515" />
-          <entry key="PLAIN_TEXT" value="29" />
-          <entry key="XML" value="68" />
-        </counts>
-      </usages-collector>
-    </session>
-  </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/core/DecoderEncoder.java">
+        <entry file="file://$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/extractor/GaplessInfoHolder.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="481">
-              <caret line="301" column="66" selection-start-line="301" selection-start-column="58" selection-end-line="301" selection-end-column="66" />
+            <state relative-caret-position="-645">
+              <caret line="19" column="59" lean-forward="true" selection-start-line="19" selection-start-column="59" selection-end-line="19" selection-end-column="59" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/metadata/id3/Id3Decoder.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="139">
+              <caret line="104" column="37" selection-start-line="104" selection-start-column="37" selection-end-line="104" selection-end-column="37" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -103,94 +162,72 @@
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/extractor/AVDemuxer.java">
+        <entry file="file://$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/metadata/MetadataInputBuffer.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="60">
-              <caret line="10" column="45" selection-start-line="10" selection-start-column="45" selection-end-line="10" selection-end-column="45" />
+            <state relative-caret-position="225">
+              <caret line="29" column="19" selection-start-line="29" selection-start-column="19" selection-end-line="29" selection-end-column="19" />
+              <folding>
+                <element signature="imports" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/extractor/ExtractorManager.java">
+        <entry file="file://$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/audio/Ac3Util.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="210">
-              <caret line="16" column="39" lean-forward="true" selection-start-line="16" selection-start-column="39" selection-end-line="16" selection-end-column="39" />
+            <state relative-caret-position="60">
+              <caret line="218" column="24" selection-start-line="218" selection-start-column="24" selection-end-line="218" selection-end-column="24" />
             </state>
           </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/muxer/Muxer.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="300">
-              <caret line="20" lean-forward="true" selection-start-line="20" selection-end-line="20" />
-              <folding>
-                <element signature="imports" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/AVMuxer.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="75">
-              <caret line="13" column="8" lean-forward="true" selection-start-line="13" selection-start-column="8" selection-end-line="13" selection-end-column="8" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$USER_HOME$/Android/Sdk/sources/android-28/android/media/MediaMuxer.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="380">
-              <caret line="691" column="4" lean-forward="true" selection-start-line="691" selection-start-column="4" selection-end-line="691" selection-end-column="25" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/DecoderEncoderActivity.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="165">
-              <caret line="18" column="4" selection-start-line="18" selection-start-column="4" selection-end-line="18" selection-end-column="4" />
-              <folding>
-                <element signature="imports" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/support/ACodec.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="30">
-              <caret line="2" column="13" selection-start-line="2" selection-start-column="13" selection-end-line="2" selection-end-column="13" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/MainActivity.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="195">
-              <caret line="26" selection-start-line="26" selection-end-line="26" />
-              <folding>
-                <element signature="imports" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/support/VCodec.java">
+        <entry file="file://$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/Format.java">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="180">
-              <caret line="18" column="13" selection-start-line="18" selection-start-column="13" selection-end-line="18" selection-end-column="13" />
-              <folding>
-                <element signature="imports" expanded="true" />
-              </folding>
+              <caret line="26" column="44" selection-start-line="26" selection-start-column="44" selection-end-line="26" selection-end-column="44" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/metadata/MetadataDecoder.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="120">
+              <caret line="22" column="17" selection-start-line="22" selection-start-column="17" selection-end-line="22" selection-end-column="17" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/metadata/id3/InternalFrame.java">
+          <provider selected="true" editor-type-id="text-editor" />
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/metadata/id3/CommentFrame.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="119">
+              <caret line="22" column="44" selection-start-line="22" selection-start-column="44" selection-end-line="22" selection-end-column="44" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/metadata/id3/Id3Frame.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="45">
+              <caret line="17" column="59" selection-start-line="17" selection-start-column="59" selection-end-line="17" selection-end-column="59" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/extractor/Id3Peeker.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="60">
+              <caret line="18" column="36" lean-forward="true" selection-start-line="18" selection-start-column="36" selection-end-line="18" selection-end-column="36" />
             </state>
           </provider>
         </entry>
@@ -200,15 +237,13 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
-        <option value="Class" />
         <option value="Interface" />
+        <option value="Class" />
       </list>
     </option>
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>layout_constraintTop_toBottomOf</find>
-      <find>InputSurface</find>
       <find>OutputSurface</find>
       <find>drawImage</find>
       <find>Continue</find>
@@ -232,119 +267,143 @@
       <find>read</find>
       <find>advance()</find>
       <find>MediaMuxer</find>
+      <find>com.google.android</find>
+      <find>com.example.decoderencoder</find>
+      <find>com.google.android.exoplayer2</find>
+      <find>ExtractorInputBufferBuffer</find>
+      <find>ExtractorInput</find>
+      <find>createTracks</find>
+      <find>com.google.android.exoplayer2.</find>
     </findStrings>
+    <replaceStrings>
+      <replace>com.example.decoderencoder</replace>
+      <replace>ExtractorInputBuffer</replace>
+      <replace>com.example.decoderencoder.library.</replace>
+    </replaceStrings>
+    <dirStrings>
+      <dir>$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/metadata</dir>
+      <dir>$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder</dir>
+      <dir>$PROJECT_DIR$/app/src</dir>
+    </dirStrings>
   </component>
   <component name="GenerateSignedApkSettings">
     <option name="KEY_STORE_PATH" value="$PROJECT_DIR$/myKey.jks" />
     <option name="KEY_ALIAS" value="key0" />
     <option name="BUILD_TARGET_KEY" value="apk" />
   </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/app/build.gradle" />
-        <option value="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/OpenGL/TextureRenderer.java" />
-        <option value="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/OpenGL/InputSurface.java" />
-        <option value="$PROJECT_DIR$/build.gradle" />
-        <option value="$PROJECT_DIR$/app/src/main/AndroidManifest.xml" />
-        <option value="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/MainActivity.java" />
-        <option value="$PROJECT_DIR$/app/src/main/res/layout/activity_decoder.xml" />
-        <option value="$PROJECT_DIR$/app/src/main/res/layout/activity_main.xml" />
-        <option value="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/OpenGL/OutputSurface.java" />
-        <option value="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/Library/VCodec.java" />
-        <option value="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/DecoderEncoderActivity.java" />
-        <option value="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/Library/DecoderEncoder.java" />
-        <option value="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/Library/AVDemuxer.java" />
-        <option value="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/DecoderActivity.java" />
-        <option value="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/core/DecoderEncoder.java" />
+        <option value="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/extractor/ts/SectionReader.java" />
+        <option value="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/extractor/ts/SpliceInfoSectionReader.java" />
+        <option value="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/extractor/ts/TsBinarySearchSeeker.java" />
+        <option value="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/extractor/ts/TsDurationReader.java" />
+        <option value="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/extractor/ts/TsPayloadReader.java" />
+        <option value="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/extractor/ts/TsUtil.java" />
+        <option value="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/extractor/BinarySearchSeeker.java" />
+        <option value="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/extractor/ConstantBitrateSeekMap.java" />
+        <option value="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/extractor/DefaultExtractorInput.java" />
+        <option value="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/extractor/DummyTrackOutput.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/extractor/Extractor.java" />
-        <option value="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/extractor/AVDemuxer.java" />
-        <option value="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/extractor/Manager.java" />
-        <option value="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/extractor/ExtractorManager.java" />
-        <option value="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/muxer/Muxer.java" />
+        <option value="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/extractor/ExtractorInput.java" />
+        <option value="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/extractor/MpegAudioHeader.java" />
+        <option value="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/extractor/SeekMap.java" />
+        <option value="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/util/MimeTypes.java" />
+        <option value="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/drm/DrmInitData.java" />
+        <option value="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/audio/Ac3Util.java" />
+        <option value="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/audio/Ac4Util.java" />
+        <option value="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/util/CodecSpecificDataUtil.java" />
+        <option value="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/util/Log.java" />
+        <option value="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/extractor/ts/AdtsReader.java" />
+        <option value="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/extractor/ts/DefaultTsPayloadReaderFactory.java" />
+        <option value="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/text/cea/Cea708InitializationData.java" />
+        <option value="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/audio/DtsUtil.java" />
+        <option value="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/util/NalUnitUtil.java" />
+        <option value="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/util/ParsableNalUnitBitArray.java" />
+        <option value="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/extractor/ts/H264Reader.java" />
+        <option value="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/extractor/ts/H265Reader.java" />
+        <option value="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/extractor/ts/LatmReader.java" />
+        <option value="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/extractor/ts/NalUnitTargetBuffer.java" />
+        <option value="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/extractor/ts/PesReader.java" />
+        <option value="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/extractor/ts/SeiReader.java" />
+        <option value="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/text/cea/CeaUtil.java" />
+        <option value="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/util/Assertions.java" />
+        <option value="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/extractor/ts/TsExtractor.java" />
+        <option value="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/extractor/ts/UserDataReader.java" />
+        <option value="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/extractor/amr/AmrExtractor.java" />
+        <option value="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/extractor/flv/FlvExtractor.java" />
+        <option value="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/extractor/mp3/Mp3Extractor.java" />
+        <option value="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/extractor/mp4/FragmentedMp4Extractor.java" />
+        <option value="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/extractor/mp4/Mp4Extractor.java" />
+        <option value="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/extractor/ogg/OggExtractor.java" />
+        <option value="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/extractor/wav/WavExtractor.java" />
+        <option value="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/extractor/DefaultExtractorsFactory.java" />
+        <option value="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/extractor/mkv/MatroskaExtractor.java" />
+        <option value="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/metadata/Metadata.java" />
+        <option value="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/metadata/id3/CommentFrame.java" />
+        <option value="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/metadata/id3/Id3Frame.java" />
+        <option value="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/metadata/MetadataDecoder.java" />
+        <option value="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/metadata/id3/Id3Decoder.java" />
+        <option value="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/metadata/MetadataInputBuffer.java" />
       </list>
     </option>
   </component>
   <component name="ProjectFrameBounds" extendedState="6">
-    <option name="y" value="-2" />
-    <option name="width" value="1920" />
-    <option name="height" value="1082" />
+    <option name="x" value="203" />
+    <option name="y" value="316" />
+    <option name="width" value="1657" />
+    <option name="height" value="941" />
   </component>
   <component name="ProjectView">
     <navigator proportions="" version="1">
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="ProjectPane" />
       <pane id="PackagesPane" />
+      <pane id="ProjectPane" />
       <pane id="Scope" />
       <pane id="AndroidView">
         <subPane>
           <expand>
             <path>
-              <item name="DecoderEncoder" type="1abcf292:AndroidViewProjectNode" />
+              <item name="DecodeEncoder" type="1abcf292:AndroidViewProjectNode" />
               <item name="app" type="feadf853:AndroidModuleNode" />
             </path>
             <path>
-              <item name="DecoderEncoder" type="1abcf292:AndroidViewProjectNode" />
-              <item name="app" type="feadf853:AndroidModuleNode" />
-              <item name="java" type="edd41e36:AndroidSourceTypeNode" />
-            </path>
-            <path>
-              <item name="DecoderEncoder" type="1abcf292:AndroidViewProjectNode" />
+              <item name="DecodeEncoder" type="1abcf292:AndroidViewProjectNode" />
               <item name="app" type="feadf853:AndroidModuleNode" />
               <item name="java" type="edd41e36:AndroidSourceTypeNode" />
-              <item name="decoderencoder" type="cbb59c9e:AndroidPsiDirectoryNode" />
             </path>
             <path>
-              <item name="DecoderEncoder" type="1abcf292:AndroidViewProjectNode" />
+              <item name="DecodeEncoder" type="1abcf292:AndroidViewProjectNode" />
               <item name="app" type="feadf853:AndroidModuleNode" />
               <item name="java" type="edd41e36:AndroidSourceTypeNode" />
               <item name="decoderencoder" type="cbb59c9e:AndroidPsiDirectoryNode" />
-              <item name="library" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
-              <item name="DecoderEncoder" type="1abcf292:AndroidViewProjectNode" />
+              <item name="DecodeEncoder" type="1abcf292:AndroidViewProjectNode" />
               <item name="app" type="feadf853:AndroidModuleNode" />
               <item name="java" type="edd41e36:AndroidSourceTypeNode" />
               <item name="decoderencoder" type="cbb59c9e:AndroidPsiDirectoryNode" />
               <item name="library" type="462c0819:PsiDirectoryNode" />
-              <item name="core" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
-              <item name="DecoderEncoder" type="1abcf292:AndroidViewProjectNode" />
+              <item name="DecodeEncoder" type="1abcf292:AndroidViewProjectNode" />
               <item name="app" type="feadf853:AndroidModuleNode" />
               <item name="java" type="edd41e36:AndroidSourceTypeNode" />
               <item name="decoderencoder" type="cbb59c9e:AndroidPsiDirectoryNode" />
               <item name="library" type="462c0819:PsiDirectoryNode" />
-              <item name="extractor" type="462c0819:PsiDirectoryNode" />
+              <item name="audio" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
-              <item name="DecoderEncoder" type="1abcf292:AndroidViewProjectNode" />
-              <item name="app" type="feadf853:AndroidModuleNode" />
-              <item name="java" type="edd41e36:AndroidSourceTypeNode" />
-              <item name="decoderencoder" type="cbb59c9e:AndroidPsiDirectoryNode" />
-              <item name="library" type="462c0819:PsiDirectoryNode" />
-              <item name="muxer" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="DecoderEncoder" type="1abcf292:AndroidViewProjectNode" />
-              <item name="app" type="feadf853:AndroidModuleNode" />
-              <item name="java" type="edd41e36:AndroidSourceTypeNode" />
-              <item name="decoderencoder" type="cbb59c9e:AndroidPsiDirectoryNode" />
-              <item name="library" type="462c0819:PsiDirectoryNode" />
-              <item name="support" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="DecoderEncoder" type="1abcf292:AndroidViewProjectNode" />
+              <item name="DecodeEncoder" type="1abcf292:AndroidViewProjectNode" />
               <item name="app" type="feadf853:AndroidModuleNode" />
               <item name="java" type="edd41e36:AndroidSourceTypeNode" />
               <item name="decoderencoder" type="cbb59c9e:AndroidPsiDirectoryNode" />
               <item name="OpenGL" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="DecoderEncoder" type="1abcf292:AndroidViewProjectNode" />
-              <item name="Gradle Scripts" type="ae0cef3a:AndroidBuildScriptsGroupNode" />
             </path>
           </expand>
           <select />
@@ -356,19 +415,41 @@
     <property name="ExportApk.ApkPath" value="$PROJECT_DIR$/app" />
     <property name="ExportApk.BuildVariants" value="release" />
     <property name="ExportApk.SignV2" value="true" />
+    <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="android.sdk.path" value="$USER_HOME$/Android/Sdk" />
     <property name="device.picker.selection" value="10.0.6.14:5555" />
     <property name="external.system.task.project.file.to.start" value="$PROJECT_DIR$" />
-    <property name="last_opened_file_path" value="$USER_HOME$/Documents/ExoPlayer" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/metadata/id3" />
+    <property name="project.structure.last.edited" value="Modules" />
+    <property name="project.structure.proportion" value="0.17" />
+    <property name="project.structure.side.proportion" value="0.2" />
     <property name="settings.editor.selected.configurable" value="preferences.lookFeel" />
   </component>
   <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/metadata/id3" />
+      <recent name="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/util" />
+      <recent name="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/extractor" />
+      <recent name="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/extractor/ts" />
+      <recent name="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder" />
+    </key>
+    <key name="MoveClassesOrPackagesDialog.RECENTS_KEY">
+      <recent name="com.example.decoderencoder" />
+    </key>
     <key name="android.template.packageName">
       <recent name="com.example.decoderencoder" />
     </key>
-    <key name="CopyFile.RECENT_KEYS">
-      <recent name="$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder" />
-      <recent name="$PROJECT_DIR$/app/src/main/res" />
+    <key name="CopyClassDialog.RECENTS_KEY">
+      <recent name="com.example.decoderencoder.library.metadata" />
+      <recent name="com.example.decoderencoder.library.metadata.id3" />
+      <recent name="com.example.decoderencoder.library.util" />
+      <recent name="com.example.decoderencoder.library.text.cea" />
+      <recent name="com.example.decoderencoder.library.audio" />
+    </key>
+    <key name="CreateClassDialog.RecentsKey">
+      <recent name="com.example.decoderencoder.library.extractor.ts" />
+      <recent name="com.example.decoderencoder.library.extractor" />
+      <recent name="com.example.decoderencoder.library.util" />
     </key>
   </component>
   <component name="RunDashboard">
@@ -385,6 +466,7 @@
   </component>
   <component name="RunManager" selected="Android App.app">
     <configuration default="true" type="AndroidJUnit" factoryName="Android JUnit">
+      <option name="TEST_OBJECT" value="class" />
       <option name="WORKING_DIRECTORY" value="$MODULE_DIR$" />
       <method v="2">
         <option name="Android.Gradle.BeforeRunTask" enabled="true" />
@@ -459,6 +541,7 @@
         </option>
         <option name="vmOptions" value="" />
       </ExternalSystemSettings>
+      <GradleScriptDebugEnabled>true</GradleScriptDebugEnabled>
       <method v="2" />
     </configuration>
     <list>
@@ -489,26 +572,29 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="0" y="-2" width="1920" height="1082" extended-state="6" />
+    <frame x="67" y="25" width="1853" height="1055" extended-state="6" />
+    <editor active="true" />
     <layout>
       <window_info id="Captures" order="0" side_tool="true" weight="0.25" />
-      <window_info active="true" content_ui="combo" id="Project" order="1" visible="true" weight="0.22091782" />
+      <window_info active="true" content_ui="combo" id="Project" order="1" visible="true" weight="0.22080797" />
       <window_info id="Structure" order="2" side_tool="true" />
       <window_info id="Favorites" order="3" side_tool="true" />
       <window_info id="Build Variants" order="4" side_tool="true" />
       <window_info id="Image Layers" order="5" />
       <window_info id="Designer" order="6" />
       <window_info id="Capture Tool" order="7" />
-      <window_info anchor="bottom" id="Version Control" order="0" show_stripe_button="false" />
+      <window_info id="Resources Explorer" order="8" weight="0.32982844" />
+      <window_info anchor="bottom" id="Version Control" order="0" />
       <window_info anchor="bottom" id="Logcat" order="1" sideWeight="0.49839914" weight="0.32809225" />
       <window_info anchor="bottom" id="TODO" order="2" sideWeight="0.49893278" weight="0.32809225" />
-      <window_info anchor="bottom" id="Event Log" order="3" sideWeight="0.5037353" side_tool="true" visible="true" weight="0.24633123" />
+      <window_info anchor="bottom" id="Event Log" order="3" sideWeight="0.50470394" side_tool="true" weight="0.24568966" />
       <window_info anchor="bottom" id="Terminal" order="4" sideWeight="0.49626467" weight="0.3259958" />
-      <window_info anchor="bottom" id="Build" order="5" sideWeight="0.49626467" visible="true" weight="0.24633123" />
+      <window_info anchor="bottom" id="Build" order="5" sideWeight="0.49529606" visible="true" weight="0.2462203" />
       <window_info anchor="bottom" id="Android Profiler" order="6" show_stripe_button="false" weight="0.32901832" />
       <window_info anchor="bottom" id="Run" order="7" sideWeight="0.4967983" weight="0.3710692" />
       <window_info anchor="bottom" id="Debug" order="8" weight="0.32914045" />
-      <window_info anchor="bottom" id="Find" order="9" />
+      <window_info anchor="bottom" id="Find" order="9" weight="0.32937366" />
+      <window_info anchor="bottom" id="Thumbnails" order="10" weight="0.32937366" />
       <window_info anchor="right" id="Capture Analysis" order="0" />
       <window_info anchor="right" id="Gradle" order="1" weight="0.32982844" />
       <window_info anchor="right" id="Theme Preview" order="2" />
@@ -517,9 +603,6 @@
       <window_info anchor="right" id="Device File Explorer" order="5" side_tool="true" weight="0.32982844" />
       <window_info anchor="right" id="Assistant" order="6" weight="0.32982844" />
     </layout>
-  </component>
-  <component name="VcsContentAnnotationSettings">
-    <option name="myLimit" value="2678400000" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -538,25 +621,25 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/core/DecoderEncoder.java</url>
-          <line>240</line>
+          <line>239</line>
           <properties />
           <option name="timeStamp" value="4" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/core/DecoderEncoder.java</url>
-          <line>242</line>
+          <line>241</line>
           <properties />
           <option name="timeStamp" value="5" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/core/DecoderEncoder.java</url>
-          <line>247</line>
+          <line>246</line>
           <properties />
           <option name="timeStamp" value="6" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/core/DecoderEncoder.java</url>
-          <line>248</line>
+          <line>247</line>
           <properties />
           <option name="timeStamp" value="7" />
         </line-breakpoint>
@@ -578,186 +661,409 @@
     </expressions>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/app/build.gradle">
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/extractor/ts/PesReader.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="390">
-          <caret line="26" column="75" selection-start-line="26" selection-start-column="75" selection-end-line="26" selection-end-column="75" />
+        <state relative-caret-position="300">
+          <caret line="34" column="26" selection-start-line="34" selection-start-column="26" selection-end-line="34" selection-end-column="26" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/build.gradle">
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/extractor/ts/PsBinarySearchSeeker.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="165">
-          <caret line="11" column="77" selection-start-line="11" selection-start-column="77" selection-end-line="11" selection-end-column="77" />
+        <state relative-caret-position="-345">
+          <caret line="34" column="26" selection-start-line="34" selection-start-column="26" selection-end-line="34" selection-end-column="26" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/OpenGL/TextureRenderer.java">
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/extractor/ts/PsDurationReader.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="600">
-          <caret line="64" column="25" selection-start-line="64" selection-start-column="20" selection-end-line="64" selection-end-column="25" />
+        <state relative-caret-position="-48">
+          <caret line="40" column="26" selection-start-line="40" selection-start-column="26" selection-end-line="40" selection-end-column="26" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/OpenGL/InputSurface.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="420">
-          <caret line="49" column="16" selection-start-line="49" selection-start-column="8" selection-end-line="49" selection-end-column="16" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$USER_HOME$/Android/Sdk/sources/android-28/android/media/MediaCodec.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="401">
-          <caret line="2711" column="55" selection-start-line="2711" selection-start-column="29" selection-end-line="2711" selection-end-column="55" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/res/layout/activity_decoder.xml">
-      <provider editor-type-id="android-designer2" />
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="135">
-          <caret line="9" column="43" selection-start-line="9" selection-start-column="25" selection-end-line="9" selection-end-column="43" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/AndroidManifest.xml">
-      <provider editor-type-id="android-manifest" />
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="60">
-          <caret line="4" column="3" selection-start-line="4" selection-start-column="3" selection-end-line="6" selection-end-column="66" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/res/layout/activity_main.xml">
-      <provider selected="true" editor-type-id="android-designer2" />
-      <provider editor-type-id="text-editor">
-        <state relative-caret-position="1035">
-          <caret line="69" column="38" selection-start-line="69" selection-start-column="38" selection-end-line="69" selection-end-column="38" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/OpenGL/OutputSurface.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2460">
-          <caret line="191" column="34" selection-start-line="191" selection-start-column="34" selection-end-line="191" selection-end-column="34" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/res/layout/activity_decoder_encoder.xml">
-      <provider editor-type-id="android-designer2" />
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/extractor/ts/PsExtractor.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="120">
-          <caret line="8" column="16" selection-start-line="8" selection-start-column="16" selection-end-line="8" selection-end-column="16" />
+          <caret line="37" column="19" selection-start-line="37" selection-start-column="19" selection-end-line="37" selection-end-column="19" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/DecoderActivity.java">
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/extractor/ts/SectionPayloadReader.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="285">
-          <caret line="26" selection-start-line="26" selection-end-line="26" />
+        <state relative-caret-position="180">
+          <caret line="26" column="17" selection-start-line="26" selection-start-column="17" selection-end-line="26" selection-end-column="17" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/support/Codec.java">
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/extractor/ts/SectionReader.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="195">
+          <caret line="27" column="19" selection-start-line="27" selection-start-column="19" selection-end-line="27" selection-end-column="19" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/text/cea/CeaUtil.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="120">
+          <caret line="24" column="28" lean-forward="true" selection-start-line="24" selection-start-column="28" selection-end-line="24" selection-end-column="28" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/extractor/ts/SeiReader.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="300">
+          <caret line="52" column="7" lean-forward="true" selection-start-line="52" selection-start-column="7" selection-end-line="52" selection-end-column="7" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/extractor/ts/SpliceInfoSectionReader.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="43">
+          <caret line="28" column="19" selection-start-line="28" selection-start-column="19" selection-end-line="28" selection-end-column="19" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/extractor/ts/TsBinarySearchSeeker.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-885">
+          <caret line="34" column="26" selection-start-line="34" selection-start-column="26" selection-end-line="34" selection-end-column="26" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/extractor/ts/TsDurationReader.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="222">
+          <caret line="37" column="26" selection-start-line="37" selection-start-column="26" selection-end-line="37" selection-end-column="26" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/util/Assertions.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-450">
+          <caret line="23" lean-forward="true" selection-start-line="23" selection-end-line="23" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/extractor/ts/TsPayloadReader.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="120">
+          <caret line="36" column="17" selection-start-line="36" selection-start-column="17" selection-end-line="36" selection-end-column="17" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/extractor/ts/TsUtil.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="105">
+          <caret line="22" column="19" selection-start-line="22" selection-start-column="19" selection-end-line="22" selection-end-column="19" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/extractor/ts/UserDataReader.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="375">
+          <caret line="48" column="14" selection-start-line="48" selection-start-column="14" selection-end-line="48" selection-end-column="14" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/extractor/BinarySearchSeeker.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="222">
+          <caret line="40" column="22" selection-start-line="40" selection-start-column="22" selection-end-line="40" selection-end-column="22" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/extractor/ChunkIndex.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="120">
+          <caret line="24" column="19" selection-start-line="24" selection-start-column="19" selection-end-line="24" selection-end-column="19" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/extractor/ConstantBitrateSeekMap.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="150">
+          <caret line="25" column="13" selection-start-line="25" selection-start-column="13" selection-end-line="25" selection-end-column="13" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/extractor/DefaultExtractorInput.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="120">
+          <caret line="29" column="19" selection-start-line="29" selection-start-column="19" selection-end-line="29" selection-end-column="19" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/extractor/ts/TsExtractor.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="120">
+          <caret line="56" column="52" lean-forward="true" selection-start-line="56" selection-start-column="30" selection-end-line="56" selection-end-column="52" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/extractor/amr/AmrExtractor.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="450">
+          <caret line="30" column="30" selection-start-line="30" selection-start-column="30" selection-end-line="30" selection-end-column="30" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="e#297#298#0" expanded="true" />
+            <element signature="e#330#331#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/extractor/flv/FlvExtractor.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="180">
+          <caret line="12" column="8" selection-start-line="12" selection-start-column="8" selection-end-line="12" selection-end-column="21" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/extractor/mp3/Mp3Extractor.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="538">
+          <caret line="44" lean-forward="true" selection-start-line="44" selection-end-line="44" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/extractor/mp4/FragmentedMp4Extractor.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="270">
+          <caret line="20" column="8" selection-start-line="20" selection-start-column="8" selection-end-line="20" selection-end-column="21" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/extractor/mp4/Mp4Extractor.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="270">
+          <caret line="20" column="8" selection-start-line="20" selection-start-column="8" selection-end-line="20" selection-end-column="21" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/extractor/ogg/OggExtractor.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="195">
+          <caret line="13" column="8" selection-start-line="13" selection-start-column="8" selection-end-line="13" selection-end-column="21" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/extractor/wav/WavExtractor.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="195">
+          <caret line="13" column="8" selection-start-line="13" selection-start-column="8" selection-end-line="13" selection-end-column="21" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/extractor/mkv/MatroskaExtractor.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="150">
+          <caret line="13" column="5" lean-forward="true" selection-start-line="13" selection-start-column="5" selection-end-line="13" selection-end-column="5" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/extractor/DefaultExtractorsFactory.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="133">
+          <caret line="155" column="41" lean-forward="true" selection-start-line="155" selection-start-column="41" selection-end-line="155" selection-end-column="41" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/extractor/DummyExtractorOutput.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="60">
-          <caret line="14" column="13" selection-start-line="14" selection-start-column="13" selection-end-line="14" selection-end-column="13" />
+          <caret line="18" column="19" selection-start-line="18" selection-start-column="19" selection-end-line="18" selection-end-column="19" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/extractor/DummyTrackOutput.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="120">
+          <caret line="29" column="19" selection-start-line="29" selection-start-column="19" selection-end-line="29" selection-end-column="19" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/extractor/Extractor.java">
-      <provider selected="true" editor-type-id="text-editor" />
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="120">
+          <caret line="29" column="17" selection-start-line="29" selection-start-column="17" selection-end-line="29" selection-end-column="17" />
+        </state>
+      </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/extractor/AVDemuxer.java">
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/extractor/ExtractorInput.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="120">
+          <caret line="25" column="17" selection-start-line="25" selection-start-column="17" selection-end-line="25" selection-end-column="17" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/extractor/ExtractorOutput.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="90">
+          <caret line="20" column="17" selection-start-line="20" selection-start-column="17" selection-end-line="20" selection-end-column="17" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/extractor/ExtractorsFactory.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="60">
-          <caret line="10" column="45" selection-start-line="10" selection-start-column="45" selection-end-line="10" selection-end-column="45" />
+          <caret line="18" column="17" selection-start-line="18" selection-start-column="17" selection-end-line="18" selection-end-column="17" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/DecoderEncoderActivity.java">
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/extractor/MpegAudioHeader.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="165">
-          <caret line="18" column="4" selection-start-line="18" selection-start-column="4" selection-end-line="18" selection-end-column="4" />
+        <state relative-caret-position="120">
+          <caret line="23" column="19" selection-start-line="23" selection-start-column="19" selection-end-line="23" selection-end-column="19" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/extractor/PositionHolder.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="90">
+          <caret line="20" column="19" selection-start-line="20" selection-start-column="19" selection-end-line="20" selection-end-column="19" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/extractor/SeekMap.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="120">
+          <caret line="25" column="17" selection-start-line="25" selection-start-column="17" selection-end-line="25" selection-end-column="17" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/extractor/SeekPoint.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="90">
+          <caret line="20" column="19" selection-start-line="20" selection-start-column="19" selection-end-line="20" selection-end-column="19" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/extractor/TrackOutput.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="120">
+          <caret line="30" column="17" selection-start-line="30" selection-start-column="17" selection-end-line="30" selection-end-column="17" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/metadata/Metadata.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="418">
+          <caret line="122" column="4" selection-start-line="122" selection-start-column="4" selection-end-line="122" selection-end-column="4" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/support/ACodec.java">
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/metadata/id3/InternalFrame.java">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/extractor/Id3Peeker.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="30">
-          <caret line="2" column="13" selection-start-line="2" selection-start-column="13" selection-end-line="2" selection-end-column="13" />
+        <state relative-caret-position="60">
+          <caret line="18" column="36" lean-forward="true" selection-start-line="18" selection-start-column="36" selection-end-line="18" selection-end-column="36" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/MainActivity.java">
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/extractor/GaplessInfoHolder.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="195">
-          <caret line="26" selection-start-line="26" selection-end-line="26" />
+        <state relative-caret-position="-645">
+          <caret line="19" column="59" lean-forward="true" selection-start-line="19" selection-start-column="59" selection-end-line="19" selection-end-column="59" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/metadata/id3/CommentFrame.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="119">
+          <caret line="22" column="44" selection-start-line="22" selection-start-column="44" selection-end-line="22" selection-end-column="44" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/metadata/id3/Id3Frame.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="45">
+          <caret line="17" column="59" selection-start-line="17" selection-start-column="59" selection-end-line="17" selection-end-column="59" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/metadata/MetadataDecoder.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="120">
+          <caret line="22" column="17" selection-start-line="22" selection-start-column="17" selection-end-line="22" selection-end-column="17" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/metadata/id3/Id3Decoder.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="139">
+          <caret line="104" column="37" selection-start-line="104" selection-start-column="37" selection-end-line="104" selection-end-column="37" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/support/VCodec.java">
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/metadata/MetadataInputBuffer.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="225">
+          <caret line="29" column="19" selection-start-line="29" selection-start-column="19" selection-end-line="29" selection-end-column="19" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/audio/Ac3Util.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="60">
+          <caret line="218" column="24" selection-start-line="218" selection-start-column="24" selection-end-line="218" selection-end-column="24" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/Format.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="180">
-          <caret line="18" column="13" selection-start-line="18" selection-start-column="13" selection-end-line="18" selection-end-column="13" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$USER_HOME$/Android/Sdk/sources/android-28/android/media/MediaExtractor.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="361">
-          <caret line="623" column="65" lean-forward="true" selection-start-line="623" selection-start-column="65" selection-end-line="623" selection-end-column="65" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/core/DecoderEncoder.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="481">
-          <caret line="301" column="66" selection-start-line="301" selection-start-column="58" selection-end-line="301" selection-end-column="66" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/extractor/ExtractorManager.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="210">
-          <caret line="16" column="39" lean-forward="true" selection-start-line="16" selection-start-column="39" selection-end-line="16" selection-end-column="39" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/AVMuxer.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="75">
-          <caret line="13" column="8" lean-forward="true" selection-start-line="13" selection-start-column="8" selection-end-line="13" selection-end-column="8" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$USER_HOME$/Android/Sdk/sources/android-28/android/media/MediaMuxer.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="380">
-          <caret line="691" column="4" lean-forward="true" selection-start-line="691" selection-start-column="4" selection-end-line="691" selection-end-column="25" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/example/decoderencoder/library/muxer/Muxer.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="300">
-          <caret line="20" lean-forward="true" selection-start-line="20" selection-end-line="20" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
+          <caret line="26" column="44" selection-start-line="26" selection-start-column="44" selection-end-line="26" selection-end-column="44" />
         </state>
       </provider>
     </entry>
