@@ -6,7 +6,7 @@ import android.media.MediaMuxer;
 import android.os.Build;
 import android.view.Surface;
 
-import com.example.decoderencoder.library.AVMuxer;
+import com.example.decoderencoder.Library.AVMuxer;
 
 
 // TODO: extend VCodec into 2 different classes to distinguish between encoder or decoder constructor

@@ -25,7 +25,7 @@ public class DecoderEncoderActivity extends AppCompatActivity implements Surface
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_decoder_encoder);
 
-        surfaceView = findViewById(R.id.surfaceView);
+      //  surfaceView = findViewById(R.id.surfaceView);
         surfaceHolder = surfaceView.getHolder();
         surfaceHolder.addCallback(this);
 

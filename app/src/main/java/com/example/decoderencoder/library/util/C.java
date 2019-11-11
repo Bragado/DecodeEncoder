@@ -25,11 +25,8 @@ import android.view.Surface;
 
 import androidx.annotation.IntDef;
 
-import com.example.decoderencoder.library.PlayerMessage.Target;
-import com.example.decoderencoder.library.audio.AuxEffectInfo;
-import com.example.decoderencoder.library.util.Util;
-import com.example.decoderencoder.library.video.VideoFrameMetadataListener;
-import com.example.decoderencoder.library.video.spherical.CameraMotionListener;
+
+import com.example.decoderencoder.library.Format;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
@@ -144,35 +141,6 @@ public final class C {
    * {@link AudioManager#AUDIO_SESSION_ID_GENERATE}.
    */
   public static final int AUDIO_SESSION_ID_UNSET = AudioManager.AUDIO_SESSION_ID_GENERATE;
-
-  /**
-   * Represents an audio encoding, or an invalid or unset value. One of {@link Format#NO_VALUE},
-   * {@link #ENCODING_INVALID}, {@link #ENCODING_PCM_8BIT}, {@link #ENCODING_PCM_16BIT}, {@link
-   * #ENCODING_PCM_24BIT}, {@link #ENCODING_PCM_32BIT}, {@link #ENCODING_PCM_FLOAT}, {@link
-   * #ENCODING_PCM_MU_LAW}, {@link #ENCODING_PCM_A_LAW}, {@link #ENCODING_AC3}, {@link
-   * #ENCODING_E_AC3}, {@link #ENCODING_E_AC3_JOC}, {@link #ENCODING_AC4}, {@link #ENCODING_DTS},
-   * {@link #ENCODING_DTS_HD} or {@link #ENCODING_DOLBY_TRUEHD}.
-   */
-  @Documented
-  @Retention(RetentionPolicy.SOURCE)
-  @IntDef({
-    Format.NO_VALUE,
-    ENCODING_INVALID,
-    ENCODING_PCM_8BIT,
-    ENCODING_PCM_16BIT,
-    ENCODING_PCM_24BIT,
-    ENCODING_PCM_32BIT,
-    ENCODING_PCM_FLOAT,
-    ENCODING_PCM_MU_LAW,
-    ENCODING_PCM_A_LAW,
-    ENCODING_AC3,
-    ENCODING_E_AC3,
-    ENCODING_E_AC3_JOC,
-    ENCODING_AC4,
-    ENCODING_DTS,
-    ENCODING_DTS_HD,
-    ENCODING_DOLBY_TRUEHD,
-  })
   public @interface Encoding {}
 
   /**
@@ -216,9 +184,9 @@ public final class C {
   /** @see AudioFormat#ENCODING_E_AC3 */
   public static final int ENCODING_E_AC3 = AudioFormat.ENCODING_E_AC3;
   /** @see AudioFormat#ENCODING_E_AC3_JOC */
-  public static final int ENCODING_E_AC3_JOC = AudioFormat.ENCODING_E_AC3_JOC;
+  public static final int ENCODING_E_AC3_JOC = 7;
   /** @see AudioFormat#ENCODING_AC4 */
-  public static final int ENCODING_AC4 = AudioFormat.ENCODING_AC4;
+  public static final int ENCODING_AC4 = 8;
   /** @see AudioFormat#ENCODING_DTS */
   public static final int ENCODING_DTS = AudioFormat.ENCODING_DTS;
   /** @see AudioFormat#ENCODING_DTS_HD */
@@ -390,7 +358,7 @@ public final class C {
   public static final int USAGE_ASSISTANCE_SONIFICATION =
       android.media.AudioAttributes.USAGE_ASSISTANCE_SONIFICATION;
   /** @see android.media.AudioAttributes#USAGE_ASSISTANT */
-  public static final int USAGE_ASSISTANT = android.media.AudioAttributes.USAGE_ASSISTANT;
+  public static final int USAGE_ASSISTANT = 12;
   /**
    * @see android.media.AudioAttributes#USAGE_GAME
    */
@@ -459,7 +427,7 @@ public final class C {
   })
   public @interface AudioFocusGain {}
   /** @see AudioManager#AUDIOFOCUS_NONE */
-  public static final int AUDIOFOCUS_NONE = AudioManager.AUDIOFOCUS_NONE;
+  public static final int AUDIOFOCUS_NONE = 0;
   /** @see AudioManager#AUDIOFOCUS_GAIN */
   public static final int AUDIOFOCUS_GAIN = AudioManager.AUDIOFOCUS_GAIN;
   /** @see AudioManager#AUDIOFOCUS_GAIN_TRANSIENT */

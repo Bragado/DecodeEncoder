@@ -9,7 +9,7 @@ import android.os.Build;
 import android.util.Log;
 import android.view.Surface;
 
-import com.example.decoderencoder.library.AVMuxer;
+import com.example.decoderencoder.Library.AVMuxer;
 import com.example.decoderencoder.library.support.VCodec;
 import com.example.decoderencoder.OpenGL.InputSurface;
 import com.example.decoderencoder.OpenGL.OutputSurface;
@@ -31,7 +31,7 @@ public class DecoderEncoder {
 
     public final String TAG = "DECODER-ENCODER";
     public boolean DEBUG = true;
-    private CodecWorkerThread worker;  // it should not be the responsible of the main class to create a thread
+    //private CodecWorkerThread worker;  // it should not be the responsible of the main class to create a thread
     private VCodec vCodecEncoder = null;          // all needed configuration for encoding or decoding
     private VCodec vCodecDecoder = null;
     private InputSurfaceCallback inputSurface = null ;
@@ -41,8 +41,8 @@ public class DecoderEncoder {
     public DecoderEncoder (VCodec vCodecEncoder, VCodec vCodecDecoder) {
         this.vCodecEncoder = vCodecEncoder;
         this.vCodecDecoder = vCodecDecoder;
-        worker = new CodecWorkerThread();
-        worker.start();
+       // worker = new CodecWorkerThread();
+       // worker.start();
     }
 
 
@@ -50,7 +50,7 @@ public class DecoderEncoder {
      *  Enables de decoder/encoder process
      */
     public void start() {
-        worker.setEnabled();
+       // worker.setEnabled();
 
     }
 
@@ -59,7 +59,7 @@ public class DecoderEncoder {
      */
     public void pause()  {
 
-        worker.setDisabled();
+       // worker.setDisabled();
     }
 
     public void Continue() {
@@ -71,7 +71,8 @@ public class DecoderEncoder {
      *  Stops decoder/encoder process
      */
     public void release()  {
-        worker.shutdown();
+
+        //worker.shutdown();
     }
 
 
@@ -87,7 +88,7 @@ public class DecoderEncoder {
 
 
 
-    private class CodecWorkerThread extends Thread {
+/*    private class CodecWorkerThread extends Thread {
 
         private boolean enabled = false;
         private boolean pause = false;              // TODO: implement it
@@ -104,7 +105,7 @@ public class DecoderEncoder {
         MediaCodec encoder = null;
 
         /* Decoder */
-        AVDemuxer extractor = null;
+ /*       AVDemuxer extractor = null;
 
         public void setEnabled() {
             this.enabled = true;
@@ -116,7 +117,7 @@ public class DecoderEncoder {
          * Generic function to decode, encode or decode-encode
          * Configures the encoder or decoder or both and runs the necessary methods to process the data stream.
          */
-         @Override
+  /*       @Override
         public void run() {
              Surface surface = null;
 
@@ -188,7 +189,7 @@ public class DecoderEncoder {
          * @param vCodec encoder parameters container
          * @throws Exception e when no input surface is passed to the encoder and InputSurface interface was not not implemented by the client
          */
-        @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
+   /*     @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
         public Surface configureEncoder(VCodec vCodec)  throws  Exception{
 
             MediaFormat format = vCodec.getEncoderFormat();
@@ -229,7 +230,7 @@ public class DecoderEncoder {
          * @param vCodec container of parameters necessary to initialize de decoder
          * @throws Exception when: a codec cannot be found; data path is not correct ; internal error due to precedences of calls to mediacodec api
          */
-        @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
+   /*     @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
         public void configureDecoder(VCodec vCodec) throws Exception{
             this.extractor = new AVDemuxer();
             String mimeType = "";
@@ -350,7 +351,7 @@ public class DecoderEncoder {
          * @param vCodec container with the parameters
          * @param render whether the decoded video should be rendered
          */
-        @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
+ /*       @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
         public void decode(VCodec vCodec, boolean render) {
 
             if(!enabled)
@@ -437,7 +438,7 @@ public class DecoderEncoder {
 
 
         // TODO: this method is too long
-        @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
+ /*       @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
         public void decodeAndEncode() throws Exception{
 
             Log.e(TAG, "Transcoder not implemented");
@@ -456,7 +457,7 @@ public class DecoderEncoder {
             while(enabled) {
 
                 /* < Decoder > */
-                if(decoderEnabled) { // feeds information to the decoder
+  /*              if(decoderEnabled) { // feeds information to the decoder
                     int inputBufferId = decoder.dequeueInputBuffer(vCodecDecoder.getTimeOUT());
 
                     if( inputBufferId >= 0) {
@@ -480,7 +481,7 @@ public class DecoderEncoder {
                 /* < /Decoder > */
 
                 /* < Encoder > */
-                boolean encoderDone = false;
+ /*               boolean encoderDone = false;
 
                 while(!encoderDone) {   // to ensure no information is lost, let's assume the decoder is always full
 
@@ -569,10 +570,10 @@ public class DecoderEncoder {
                 /* < /Encoder > */
 
                 /* < End of stream > */
-                if(endOfStream) {
+  /*              if(endOfStream) {
                     decoder.signalEndOfInputStream();
                     /*encoder.signalEndOfInputStream();*/ //TODO : is there a problem?
-                }else if ((encoderBufferInfo.flags & MediaCodec.BUFFER_FLAG_END_OF_STREAM) != 0) {
+ /*               }else if ((encoderBufferInfo.flags & MediaCodec.BUFFER_FLAG_END_OF_STREAM) != 0) {
                     Log.d(TAG, "OutputBuffer BUFFER_FLAG_END_OF_STREAM");
                     break;
 
@@ -582,11 +583,11 @@ public class DecoderEncoder {
                 }
                 /* </ End of stream > */
 
-            }
+  /*          }
         }
 
     }
-
+*/
 
 
 }

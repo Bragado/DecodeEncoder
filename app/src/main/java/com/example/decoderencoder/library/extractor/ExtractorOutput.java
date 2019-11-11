@@ -26,7 +26,7 @@ public interface ExtractorOutput {
    * The same {@link TrackOutput} is returned if multiple calls are made with the same {@code id}.
    *
    * @param id A track identifier.
-   * @param type The type of the track. Typically one of the {@link com.example.decoderencoder.library.C}
+   * @param type The type of the track. Typically one of the {@link com.example.decoderencoder.library.util.C}
    *     {@code TRACK_TYPE_*} constants.
    * @return The {@link TrackOutput} for the given track identifier.
    */

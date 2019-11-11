@@ -1,13 +1,13 @@
 package com.example.decoderencoder;
 
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
-import com.example.decoderencoder.library.core.DecoderEncoder;
 import com.example.decoderencoder.library.support.VCodec;
+import com.example.decoderencoder.library.core.DecoderEncoder;
 
 public class DecoderActivity  extends AppCompatActivity implements SurfaceHolder.Callback {
 
@@ -25,7 +25,7 @@ public class DecoderActivity  extends AppCompatActivity implements SurfaceHolder
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_decoder);
 
-        surfaceView = findViewById(R.id.decoderSurfaceView);
+        //surfaceView = findViewById(R.id.decoderSurfaceView);
         surfaceHolder = surfaceView.getHolder();
         surfaceHolder.addCallback(this);
 

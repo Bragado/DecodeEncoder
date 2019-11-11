@@ -23,6 +23,7 @@ import androidx.annotation.Nullable;
 
 import com.example.decoderencoder.library.util.C;
 import com.example.decoderencoder.library.drm.DrmInitData.SchemeData;
+import com.example.decoderencoder.library.util.Assertions;
 import com.example.decoderencoder.library.util.Util;
 
 import java.util.ArrayList;

@@ -1,4 +1,4 @@
-package com.example.decoderencoder.library;
+package com.example.decoderencoder.Library;
 
 import android.annotation.TargetApi;
 import android.media.MediaCodec;

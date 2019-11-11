@@ -36,8 +36,8 @@ public class DecoderEncoder {
     private InputSurfaceCallback inputSurface = null ;
 
     /* Audio support */
-    private ACodec aCodecEncoder = null;
-    private ACodec aCodecDecoder = null;
+ //   private ACodec aCodecEncoder = null;
+//    private ACodec aCodecDecoder = null;
 
 
 
@@ -49,9 +49,9 @@ public class DecoderEncoder {
         worker.start();
     }
 
-    public DecoderEncoder(VCodec cCodecEncoder, ACodec aCodecEncoder, VCodec vCodecDecoder, ACodec ACodecDecoder) {
+ /*   public DecoderEncoder(VCodec cCodecEncoder, ACodec aCodecEncoder, VCodec vCodecDecoder, ACodec ACodecDecoder) {
         
-    }
+    }*/
 
 
     /**

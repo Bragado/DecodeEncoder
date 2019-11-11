@@ -16,7 +16,7 @@
 package com.example.decoderencoder.library.metadata;
 
 import com.example.decoderencoder.library.Format;
-import com.example.decoderencoder.library.decoder.DecoderInputBuffer;
+import com.example.decoderencoder.library.core.decoder.DecoderInputBuffer;
 
 /**
  * A {@link DecoderInputBuffer} for a {@link MetadataDecoder}.

@@ -20,6 +20,7 @@ import android.os.Parcelable;
 
 import androidx.annotation.Nullable;
 
+import com.example.decoderencoder.library.util.C;
 import com.example.decoderencoder.library.drm.DrmInitData;
 import com.example.decoderencoder.library.metadata.Metadata;
 import com.example.decoderencoder.library.util.MimeTypes;
@@ -324,7 +325,7 @@ public final class Format implements Parcelable {
       int rotationDegrees,
       float pixelWidthHeightRatio,
       byte[] projectionData,
-      @C.StereoMode int stereoMode,
+      int stereoMode,
       @Nullable ColorInfo colorInfo,
       @Nullable DrmInitData drmInitData) {
     return new Format(
@@ -472,10 +473,10 @@ public final class Format implements Parcelable {
       int maxInputSize,
       int channelCount,
       int sampleRate,
-      @C.PcmEncoding int pcmEncoding,
+      int pcmEncoding,
       @Nullable List<byte[]> initializationData,
       @Nullable DrmInitData drmInitData,
-      @C.SelectionFlags int selectionFlags,
+      int selectionFlags,
       @Nullable String language) {
     return createAudioSampleFormat(
         id,
@@ -921,12 +922,12 @@ public final class Format implements Parcelable {
       int rotationDegrees,
       float pixelWidthHeightRatio,
       @Nullable byte[] projectionData,
-      @C.StereoMode int stereoMode,
+      int stereoMode,
       @Nullable ColorInfo colorInfo,
       // Audio specific.
       int channelCount,
       int sampleRate,
-      @C.PcmEncoding int pcmEncoding,
+      int pcmEncoding,
       int encoderDelay,
       int encoderPadding,
       // Audio and text specific.

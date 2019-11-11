@@ -45,23 +45,9 @@ import android.view.WindowManager;
 
 import androidx.annotation.Nullable;
 
-import com.example.decoderencoder.library.ExoPlayerLibraryInfo;
 import com.example.decoderencoder.library.Format;
-import com.example.decoderencoder.library.ParserException;
-import com.example.decoderencoder.library.Renderer;
-import com.example.decoderencoder.library.RendererCapabilities;
-import com.example.decoderencoder.library.RenderersFactory;
-import com.example.decoderencoder.library.SeekParameters;
-import com.example.decoderencoder.library.audio.AudioRendererEventListener;
-import com.example.decoderencoder.library.drm.DrmSessionManager;
-import com.example.decoderencoder.library.drm.FrameworkMediaCrypto;
-import com.example.decoderencoder.library.upstream.DataSource;
-import com.example.decoderencoder.library.video.VideoRendererEventListener;
+import com.example.decoderencoder.library.network.DataSource;
 
-import org.checkerframework.checker.initialization.qual.UnknownInitialization;
-import org.checkerframework.checker.nullness.compatqual.NullableType;
-import org.checkerframework.checker.nullness.qual.EnsuresNonNull;
-import org.checkerframework.checker.nullness.qual.PolyNull;
 
 import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
@@ -163,24 +149,7 @@ public final class Util {
     return outputStream.toByteArray();
   }
 
-  /**
-   * Calls {@link Context#startForegroundService(Intent)} if {@link #SDK_INT} is 26 or higher, or
-   * {@link Context#startService(Intent)} otherwise.
-   *
-   * @param context The context to call.
-   * @param intent The intent to pass to the called method.
-   * @return The result of the called method.
-   */
-  @Nullable
-  public static ComponentName startForegroundService(Context context, Intent intent) {
-    if (Util.SDK_INT >= 26) {
-      return context.startForegroundService(intent);
-    } else {
-      return context.startService(intent);
-    }
-  }
-
-  /**
+   /**
    * Checks whether it's necessary to request the {@link permission#READ_EXTERNAL_STORAGE}
    * permission read the specified {@link Uri}s, requesting the permission if necessary.
    *
@@ -297,15 +266,13 @@ public final class Util {
    * <p>Use {@link Assertions#checkNotNull(Object)} to throw if the value is null.
    */
   @SuppressWarnings({"contracts.postcondition.not.satisfied", "return.type.incompatible"})
-  @EnsuresNonNull("#1")
   public static <T> T castNonNull(@Nullable T value) {
     return value;
   }
 
   /** Casts a nullable type array to a non-null type array without runtime null check. */
   @SuppressWarnings({"contracts.postcondition.not.satisfied", "return.type.incompatible"})
-  @EnsuresNonNull("#1")
-  public static <T> T[] castNonNullTypeArray(@NullableType T[] value) {
+  public static <T> T[] castNonNullTypeArray(T[] value) {
     return value;
   }
 
@@ -354,7 +321,7 @@ public final class Util {
    * @param callback A {@link Handler.Callback}. May be a partially initialized class.
    * @return A {@link Handler} with the specified callback on the current {@link Looper} thread.
    */
-  public static Handler createHandler(Handler.@UnknownInitialization Callback callback) {
+  public static Handler createHandler(Handler.Callback callback) {
     return createHandler(getLooper(), callback);
   }
 
@@ -370,7 +337,7 @@ public final class Util {
    */
   @SuppressWarnings({"nullness:argument.type.incompatible", "nullness:return.type.incompatible"})
   public static Handler createHandler(
-          Looper looper, Handler.@UnknownInitialization Callback callback) {
+          Looper looper, Handler.Callback callback) {
     return new Handler(looper, callback);
   }
 
@@ -454,8 +421,8 @@ public final class Util {
    * @return The all-lowercase normalized code, or null if the input was null, or {@code
    *     language.toLowerCase()} if the language could not be normalized.
    */
-  public static @PolyNull
-  String normalizeLanguageCode(@PolyNull String language) {
+  public static
+  String normalizeLanguageCode( String language) {
     if (language == null) {
       return null;
     }
@@ -561,8 +528,8 @@ public final class Util {
    * @param text The text to convert.
    * @return The lower case text, or null if {@code text} is null.
    */
-  public static @PolyNull
-  String toLowerInvariant(@PolyNull String text) {
+  public static
+  String toLowerInvariant(String text) {
     return text == null ? text : text.toLowerCase(Locale.US);
   }
 
@@ -572,8 +539,8 @@ public final class Util {
    * @param text The text to convert.
    * @return The upper case text, or null if {@code text} is null.
    */
-  public static @PolyNull
-  String toUpperInvariant(@PolyNull String text) {
+  public static
+  String toUpperInvariant(String text) {
     return text == null ? text : text.toUpperCase(Locale.US);
   }
 
@@ -1083,43 +1050,7 @@ public final class Util {
     return Math.round((double) mediaDuration / speed);
   }
 
-  /**
-   * Resolves a seek given the requested seek position, a {@link SeekParameters} and two candidate
-   * sync points.
-   *
-   * @param positionUs The requested seek position, in microseocnds.
-   * @param seekParameters The {@link SeekParameters}.
-   * @param firstSyncUs The first candidate seek point, in micrseconds.
-   * @param secondSyncUs The second candidate seek point, in microseconds. May equal {@code
-   *     firstSyncUs} if there's only one candidate.
-   * @return The resolved seek position, in microseconds.
-   */
-  public static long resolveSeekPositionUs(
-      long positionUs, SeekParameters seekParameters, long firstSyncUs, long secondSyncUs) {
-    if (SeekParameters.EXACT.equals(seekParameters)) {
-      return positionUs;
-    }
-    long minPositionUs =
-        subtractWithOverflowDefault(positionUs, seekParameters.toleranceBeforeUs, Long.MIN_VALUE);
-    long maxPositionUs =
-        addWithOverflowDefault(positionUs, seekParameters.toleranceAfterUs, Long.MAX_VALUE);
-    boolean firstSyncPositionValid = minPositionUs <= firstSyncUs && firstSyncUs <= maxPositionUs;
-    boolean secondSyncPositionValid =
-        minPositionUs <= secondSyncUs && secondSyncUs <= maxPositionUs;
-    if (firstSyncPositionValid && secondSyncPositionValid) {
-      if (Math.abs(firstSyncUs - positionUs) <= Math.abs(secondSyncUs - positionUs)) {
-        return firstSyncUs;
-      } else {
-        return secondSyncUs;
-      }
-    } else if (firstSyncPositionValid) {
-      return firstSyncUs;
-    } else if (secondSyncPositionValid) {
-      return secondSyncUs;
-    } else {
-      return minPositionUs;
-    }
-  }
+
 
   /**
    * Converts a list of integers to a primitive array.
@@ -1127,7 +1058,7 @@ public final class Util {
    * @param list A list of integers.
    * @return The list in array form, or null if the input list was null.
    */
-  public static int @PolyNull [] toArray(@PolyNull List<Integer> list) {
+  public static int [] toArray(List<Integer> list) {
     if (list == null) {
       return null;
     }
@@ -1206,7 +1137,7 @@ public final class Util {
       versionName = "?";
     }
     return applicationName + "/" + versionName + " (Linux;Android " + Build.VERSION.RELEASE
-        + ") " + ExoPlayerLibraryInfo.VERSION_SLASHY;
+        + ") " ;
   }
 
   /**
@@ -1439,7 +1370,6 @@ public final class Util {
       case C.USAGE_NOTIFICATION_EVENT:
         return C.STREAM_TYPE_NOTIFICATION;
       case C.USAGE_ASSISTANCE_ACCESSIBILITY:
-      case C.USAGE_ASSISTANT:
       case C.USAGE_UNKNOWN:
       default:
         return C.STREAM_TYPE_DEFAULT;
@@ -1897,31 +1827,6 @@ public final class Util {
     return displaySize;
   }
 
-  /**
-   * Extract renderer capabilities for the renderers created by the provided renderers factory.
-   *
-   * @param renderersFactory A {@link RenderersFactory}.
-   * @param drmSessionManager An optional {@link DrmSessionManager} used by the renderers.
-   * @return The {@link RendererCapabilities} for each renderer created by the {@code
-   *     renderersFactory}.
-   */
-  public static RendererCapabilities[] getRendererCapabilities(
-      RenderersFactory renderersFactory,
-      @Nullable DrmSessionManager<FrameworkMediaCrypto> drmSessionManager) {
-    Renderer[] renderers =
-        renderersFactory.createRenderers(
-            new Handler(),
-            new VideoRendererEventListener() {},
-            new AudioRendererEventListener() {},
-            (cues) -> {},
-            (metadata) -> {},
-            drmSessionManager);
-    RendererCapabilities[] capabilities = new RendererCapabilities[renderers.length];
-    for (int i = 0; i < renderers.length; i++) {
-      capabilities[i] = renderers[i].getCapabilities();
-    }
-    return capabilities;
-  }
 
   @Nullable
   private static String getSystemProperty(String name) {

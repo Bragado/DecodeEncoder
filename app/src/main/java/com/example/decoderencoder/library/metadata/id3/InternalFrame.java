@@ -20,9 +20,9 @@ import android.os.Parcelable;
 
 import androidx.annotation.Nullable;
 
-import com.google.android.exoplayer2.util.Util;
+import com.example.decoderencoder.library.util.Util;
 
-import static com.google.android.exoplayer2.util.Util.castNonNull;
+import static com.example.decoderencoder.library.util.Util.castNonNull;
 
 /** Internal ID3 frame that is intended for use by the player. */
 public final class InternalFrame extends Id3Frame {

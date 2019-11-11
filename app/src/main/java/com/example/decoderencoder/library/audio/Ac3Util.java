@@ -1,9 +1,10 @@
 package com.example.decoderencoder.library.audio;
 
-import android.media.DrmInitData;
 
 import androidx.annotation.IntDef;
 import androidx.annotation.Nullable;
+
+import com.example.decoderencoder.library.drm.DrmInitData;
 import com.example.decoderencoder.library.util.C;
 import com.example.decoderencoder.library.Format;
 import com.example.decoderencoder.library.audio.Ac3Util.SyncFrameInfo.StreamType;

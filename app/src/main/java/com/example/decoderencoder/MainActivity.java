@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.media.MediaCodecInfo;
 import android.media.MediaCodecList;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -13,6 +14,15 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 
+import com.example.decoderencoder.library.extractor.DefaultExtractorsFactory;
+import com.example.decoderencoder.library.network.Allocator;
+import com.example.decoderencoder.library.network.DataSource;
+import com.example.decoderencoder.library.network.DefaultAllocator;
+import com.example.decoderencoder.library.network.DefaultDataSourceFactory;
+import com.example.decoderencoder.library.source.MediaSource;
+import com.example.decoderencoder.library.util.C;
+
+import java.io.IOException;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity  {
@@ -26,8 +36,8 @@ public class MainActivity extends AppCompatActivity  {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Button decoderEncoder = findViewById(R.id.button3);
-        final Intent intent = new Intent(this, DecoderEncoderActivity.class);
+       // Button decoderEncoder = findViewById(R.id.button3);
+       /* final Intent intent = new Intent(this, DecoderEncoderActivity.class);
         final Intent decodeIntent = new Intent(this, DecoderActivity.class);
         final ListView listView = (ListView) findViewById(R.id.list);
 
@@ -81,10 +91,21 @@ public class MainActivity extends AppCompatActivity  {
             public void onClick(View v) {
                 startActivity(decodeIntent);
             }
-        });
+        });*/
+        DataSource.Factory dataSourceFactory =
+                new DefaultDataSourceFactory(this, "exoplayer-codelab");
+        DataSource dataSource = dataSourceFactory.createDataSource();
+        Allocator allocator = new DefaultAllocator(true, C.DEFAULT_BUFFER_SEGMENT_SIZE);
 
 
-
+        MediaSource mediaSource = new MediaSource(Uri.parse("/storage/emulated/0/Download/kika.ts"), dataSource, new DefaultExtractorsFactory().createExtractors(), allocator, MediaSource.DEFAULT_LOADING_CHECK_INTERVAL_BYTES);
+        try {
+            mediaSource.load();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
 
     }
 

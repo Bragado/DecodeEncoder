@@ -15,8 +15,8 @@
  */
 package com.example.decoderencoder.library.extractor;
 
-import com.example.decoderencoder.library.util.C;
 import com.example.decoderencoder.library.network.DataSource;
+import com.example.decoderencoder.library.util.C;
 import com.example.decoderencoder.library.util.Assertions;
 import com.example.decoderencoder.library.util.Util;
 
