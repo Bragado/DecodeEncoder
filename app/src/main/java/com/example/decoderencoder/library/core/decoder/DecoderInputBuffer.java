@@ -20,6 +20,7 @@ import android.os.Build;
 import androidx.annotation.IntDef;
 import androidx.annotation.RequiresApi;
 
+import com.example.decoderencoder.library.core.Buffer;
 import com.example.decoderencoder.library.util.C;
 
 import java.lang.annotation.Documented;

@@ -39,7 +39,7 @@ import java.util.concurrent.ExecutorService;
 /**
  * Manages the background loading of {@link Loadable}s.
  */
-public final class Loader implements LoaderErrorThrower {
+public final class  Loader implements LoaderErrorThrower {
 
   /**
    * Thrown when an unexpected exception or error is encountered during loading.

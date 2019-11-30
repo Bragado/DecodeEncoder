@@ -459,6 +459,7 @@ public class SampleQueue implements TrackOutput {
       remaining -= toCopy;
       absolutePosition += toCopy;
       if (absolutePosition == readAllocationNode.endPosition) {
+        allocator.release(readAllocationNode.allocation);
         readAllocationNode = readAllocationNode.next;
       }
     }
@@ -482,6 +483,7 @@ public class SampleQueue implements TrackOutput {
       remaining -= toCopy;
       absolutePosition += toCopy;
       if (absolutePosition == readAllocationNode.endPosition) {
+        allocator.release(readAllocationNode.allocation);
         readAllocationNode = readAllocationNode.next;
       }
     }
@@ -678,7 +680,7 @@ public class SampleQueue implements TrackOutput {
   /**
    * A node in a linked list of {@link Allocation}s held by the output.
    */
-  private static final class AllocationNode {
+  public static final class AllocationNode {
 
     /**
      * The absolute position of the start of the data (inclusive).

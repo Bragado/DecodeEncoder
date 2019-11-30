@@ -297,7 +297,7 @@ public class DecoderEncoder {
                     case MediaCodec.INFO_OUTPUT_FORMAT_CHANGED:
                         MediaFormat newFormat = this.encoder.getOutputFormat();
                         if(mediaMuxerStarted) {
-                            Log.e(TAG, "Media Muxer has already started, this should have not happened");
+                            Log.e(TAG, "Media MediaMuxer has already started, this should have not happened");
                         }
                         mediaMuxerTrackIndex = mediaMuxer.addTrack(newFormat);
                         mediaMuxer.start();
@@ -500,7 +500,7 @@ public class DecoderEncoder {
                     }else if(encoderStatus ==  MediaCodec.INFO_OUTPUT_FORMAT_CHANGED) {
                         MediaFormat newFormat = this.encoder.getOutputFormat();
                         if(mediaMuxerStarted) {
-                            Log.e(TAG, "Media Muxer has already started, this should have not happened");
+                            Log.e(TAG, "Media MediaMuxer has already started, this should have not happened");
 
                         }
                         mediaMuxerTrackIndex = mediaMuxer.addTrack(newFormat);

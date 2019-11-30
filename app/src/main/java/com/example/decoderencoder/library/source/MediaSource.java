@@ -26,6 +26,7 @@ import com.example.decoderencoder.library.network.StatsDataSource;
 import com.example.decoderencoder.library.util.Assertions;
 import com.example.decoderencoder.library.util.C;
 import com.example.decoderencoder.library.util.ConditionVariable;
+import com.example.decoderencoder.library.util.Log;
 import com.example.decoderencoder.library.util.MimeTypes;
 import com.example.decoderencoder.library.util.Util;
 
@@ -37,6 +38,7 @@ public class MediaSource implements ExtractorOutput, SampleQueue.UpstreamFormatC
         Loader.Callback<MediaSource.ExtractingLoadable>,
         Loader.ReleaseCallback {
 
+    public static final String TAG = "MEDIASOURCE";
     public static final int DEFAULT_LOADING_CHECK_INTERVAL_BYTES = 1024 * 1024;
 
     private final Uri uri;
@@ -62,6 +64,7 @@ public class MediaSource implements ExtractorOutput, SampleQueue.UpstreamFormatC
     private final LoadErrorHandlingPolicy loadErrorHandlingPolicy;
     private boolean prepared;
     private final Loader loader;
+    private SampleStream[] sampleStreams = null;
 
     PositionHolder positionHolder = new PositionHolder();
     DataSpec dataSpec;
@@ -69,7 +72,7 @@ public class MediaSource implements ExtractorOutput, SampleQueue.UpstreamFormatC
     private long length = C.LENGTH_UNSET;
     private final ExtractorOutput extractorOutput = this;
     private int dataType;
-
+    private SeekMap seekMap;
 
     public MediaSource(
             Uri uri,
@@ -117,13 +120,9 @@ public class MediaSource implements ExtractorOutput, SampleQueue.UpstreamFormatC
 
     @Override
     public void seekMap(SeekMap seekMap) {
-
+        this.seekMap = seekMap != null ? seekMap : new SeekMap.Unseekable(/* durationUs */ C.TIME_UNSET);
+        handler.post(maybeFinishPrepareRunnable);
     }
-
-    public void setLoadStatus(boolean status) {
-        loadCanceled = status;
-    }
-
 
     // Media Interface implementation
     @Override
@@ -133,7 +132,17 @@ public class MediaSource implements ExtractorOutput, SampleQueue.UpstreamFormatC
 
     @Override
     public boolean continueLoading(long positionUs) {
-        return false;
+        if (loadingFinished
+                || loader.hasFatalError()
+                /*|| !prepared */) {
+            return false;
+        }
+        boolean continuedLoading = loadCondition.open();
+        if (!loader.isLoading()) {
+            startLoading();
+            continuedLoading = true;
+        }
+        return continuedLoading;
     }
 
     @Override
@@ -166,11 +175,26 @@ public class MediaSource implements ExtractorOutput, SampleQueue.UpstreamFormatC
 
     }
 
+    @Override
+    public SampleStream[] getSampleStreams() {
+        if(this.sampleStreams != null)
+            return this.sampleStreams;
+
+        PreparedState preparedState = this.preparedState;
+        TrackGroupArray tracks = preparedState.tracks;
+
+        this.sampleStreams = new SampleStream[tracks.length];
+        for(int i = 0; i < tracks.length; i++) {
+            this.sampleStreams[i] = new SampleStreamImpl(i);
+        }
+
+        return this.sampleStreams;
+    }
 
     // Loader Callbacks implementation
     @Override
     public void onLoadCompleted(ExtractingLoadable loadable, long elapsedRealtimeMs, long loadDurationMs) {     // End of the stream callback (ex. reached the end of the file)
-
+        Log.d(TAG, "onLoadCompleted");
     }
 
     @Override
@@ -188,11 +212,84 @@ public class MediaSource implements ExtractorOutput, SampleQueue.UpstreamFormatC
 
     }
 
+    // Internals
+    private TrackOutput prepareTrackOutput(TrackId id) {            // Loader Thread
+        int trackCount = sampleQueues.length;
+        for (int i = 0; i < trackCount; i++) {
+            if (id.equals(sampleQueueTrackIds[i])) {
+                return sampleQueues[i];
+            }
+        }
+        SampleQueue trackOutput = new SampleQueue(allocator);
+        trackOutput.setUpstreamFormatChangeListener(this);
+        TrackId[] sampleQueueTrackIds = Arrays.copyOf(this.sampleQueueTrackIds, trackCount + 1);
+        sampleQueueTrackIds[trackCount] = id;
+        this.sampleQueueTrackIds = Util.castNonNullTypeArray(sampleQueueTrackIds);
+        SampleQueue[] sampleQueues = Arrays.copyOf(this.sampleQueues, trackCount + 1);
+        sampleQueues[trackCount] = trackOutput;
+        this.sampleQueues = Util.castNonNullTypeArray(sampleQueues);
+        return trackOutput;
+    }
+
+    private void maybeFinishPrepare() {         // parent thread
+        SeekMap seekMap = this.seekMap;
+        if (released || prepared || !sampleQueuesBuilt) {
+            return;
+        }
+        for (SampleQueue sampleQueue : sampleQueues) {
+            if (sampleQueue.getUpstreamFormat() == null) {
+                return;
+            }
+        }
+        loadCondition.close();
+        int trackCount = sampleQueues.length;
+        TrackGroup[] trackArray = new TrackGroup[trackCount];
+        boolean[] trackIsAudioVideoFlags = new boolean[trackCount];
+        for (int i = 0; i < trackCount; i++) {
+            Format trackFormat = sampleQueues[i].getUpstreamFormat();
+            String mimeType = trackFormat.sampleMimeType;
+            boolean isAudio = MimeTypes.isAudio(mimeType);
+            boolean isAudioVideo = isAudio || MimeTypes.isVideo(mimeType);
+            trackIsAudioVideoFlags[i] = isAudioVideo;
+            trackArray[i] = new TrackGroup(trackFormat);
+        }
+        dataType =
+                length == C.LENGTH_UNSET && seekMap.getDurationUs() == C.TIME_UNSET
+                        ? C.DATA_TYPE_MEDIA_PROGRESSIVE_LIVE
+                        : C.DATA_TYPE_MEDIA;
+        preparedState =
+                new PreparedState(seekMap, new TrackGroupArray(trackArray), trackIsAudioVideoFlags);
+        prepared = true;
+        callback.onPrepared(this);
+
+    }
+
+    public void setLoadStatus(boolean status) {
+        loadCanceled = status;
+    }
+
+    private DataSpec buildDataSpec(long position) {
+        // Disable caching if the content length cannot be resolved, since this is indicative of a
+        // progressive live stream.
+        return new DataSpec(
+                uri,
+                position,
+                C.LENGTH_UNSET,
+                "",
+                DataSpec.FLAG_ALLOW_ICY_METADATA
+                        | DataSpec.FLAG_DONT_CACHE_IF_LENGTH_UNKNOWN
+                        | DataSpec.FLAG_ALLOW_CACHE_FRAGMENTATION);
+    }
+
+    @Override
+    public void onUpstreamFormatChanged(Format format) {        // called when the actual metadata (about wich tracks are available) is ready
+        handler.post(maybeFinishPrepareRunnable);
+    }
 
 
     // Loadable implementation for extracting information
 
-    final class ExtractingLoadable implements Loader.Loadable {
+    final class ExtractingLoadable implements Loader.Loadable {     // Loading Thread only
 
         private final Uri uri;
         private final StatsDataSource dataSource;
@@ -246,7 +343,7 @@ public class MediaSource implements ExtractorOutput, SampleQueue.UpstreamFormatC
                     input = new DefaultExtractorInput(extractorDataSource, position, length);
                     Extractor extractor = extractorHolder.selectExtractor(input, extractorOutput, uri);
                     while (result == Extractor.RESULT_CONTINUE && !loadCanceled) {
-                        loadCondition.block();      // wait until the render calls prepare
+                        loadCondition.block();
                         result = extractor.read(input, positionHolder);
                         if (input.getPosition() > position + continueLoadingCheckIntervalBytes) {
                             position = input.getPosition();
@@ -270,116 +367,9 @@ public class MediaSource implements ExtractorOutput, SampleQueue.UpstreamFormatC
         }
     }
 
-    // NOT Used
-    public void load() throws IOException, InterruptedException {
-        int result = Extractor.RESULT_CONTINUE;
-        while (result == Extractor.RESULT_CONTINUE && !loadCanceled) {
-            ExtractorInput input = null;
-            try {
-                long position = positionHolder.position;
-                dataSpec = buildDataSpec(position);
-                length = dataSource.open(dataSpec);
-                if (length != C.LENGTH_UNSET) {
-                    length += position;
-                }
-                Uri uri = Assertions.checkNotNull(dataSource.getUri());
-                DataSource extractorDataSource = dataSource;
-                input = new DefaultExtractorInput(extractorDataSource, position, length);
-                Extractor extractor = extractorHolder.selectExtractor(input, extractorOutput, uri);
-                /*if (pendingExtractorSeek) {
-                    extractor.seek(position, seekTimeUs);
-                    pendingExtractorSeek = false;
-                }*/
-                while (result == Extractor.RESULT_CONTINUE && !loadCanceled) {
-                    //loadCondition.block();
-                    result = extractor.read(input, positionHolder);
-                    if (input.getPosition() > position + continueLoadingCheckIntervalBytes) {
-                        position = input.getPosition();
-                        //loadCondition.close();
-                        //handler.post(onContinueLoadingRequestedRunnable);
-                    }
-                }
-            } finally {
-                if (result == Extractor.RESULT_SEEK) {
-                    result = Extractor.RESULT_CONTINUE;
-                } else if (input != null) {
-                    positionHolder.position = input.getPosition();
-                }
-                Util.closeQuietly(dataSource);
-            }
-        }
-    }
-
-
-    // Internals
-    private TrackOutput prepareTrackOutput(TrackId id) {
-        int trackCount = sampleQueues.length;
-        for (int i = 0; i < trackCount; i++) {
-            if (id.equals(sampleQueueTrackIds[i])) {
-                return sampleQueues[i];
-            }
-        }
-        SampleQueue trackOutput = new SampleQueue(allocator);
-        trackOutput.setUpstreamFormatChangeListener(this);
-        TrackId[] sampleQueueTrackIds = Arrays.copyOf(this.sampleQueueTrackIds, trackCount + 1);
-        sampleQueueTrackIds[trackCount] = id;
-        this.sampleQueueTrackIds = Util.castNonNullTypeArray(sampleQueueTrackIds);
-        SampleQueue[] sampleQueues = Arrays.copyOf(this.sampleQueues, trackCount + 1);
-        sampleQueues[trackCount] = trackOutput;
-        this.sampleQueues = Util.castNonNullTypeArray(sampleQueues);
-        return trackOutput;
-    }
-
-    private void maybeFinishPrepare() {
-        SeekMap seekMap = null;
-        for (SampleQueue sampleQueue : sampleQueues) {
-            if (sampleQueue.getUpstreamFormat() == null) {
-                return;
-            }
-        }
-        int trackCount = sampleQueues.length;
-        TrackGroup[] trackArray = new TrackGroup[trackCount];
-        boolean[] trackIsAudioVideoFlags = new boolean[trackCount];
-        for (int i = 0; i < trackCount; i++) {
-            Format trackFormat = sampleQueues[i].getUpstreamFormat();
-            String mimeType = trackFormat.sampleMimeType;
-            boolean isAudio = MimeTypes.isAudio(mimeType);
-            boolean isAudioVideo = isAudio || MimeTypes.isVideo(mimeType);
-            trackIsAudioVideoFlags[i] = isAudioVideo;
-            trackArray[i] = new TrackGroup(trackFormat);
-        }
-        dataType =
-                length == C.LENGTH_UNSET && seekMap.getDurationUs() == C.TIME_UNSET
-                        ? C.DATA_TYPE_MEDIA_PROGRESSIVE_LIVE
-                        : C.DATA_TYPE_MEDIA;
-        preparedState =
-                new PreparedState(seekMap, new TrackGroupArray(trackArray), trackIsAudioVideoFlags);
-        prepared = true;
-
-    }
-
-    private DataSpec buildDataSpec(long position) {
-        // Disable caching if the content length cannot be resolved, since this is indicative of a
-        // progressive live stream.
-        return new DataSpec(
-                uri,
-                position,
-                C.LENGTH_UNSET,
-                "",
-                DataSpec.FLAG_ALLOW_ICY_METADATA
-                        | DataSpec.FLAG_DONT_CACHE_IF_LENGTH_UNKNOWN
-                        | DataSpec.FLAG_ALLOW_CACHE_FRAGMENTATION);
-    }
-
-    @Override
-    public void onUpstreamFormatChanged(Format format) {
-        // FIXME
-    }
-
-
-
 
     // SampleStream Implementation
+
     private final class SampleStreamImpl implements SampleStream {
 
         private final int track;
@@ -439,6 +429,10 @@ public class MediaSource implements ExtractorOutput, SampleQueue.UpstreamFormatC
             sampleQueue.reset();
         }
         Assertions.checkNotNull(callback).onContinueLoadingRequested(this);*/
+    }
+
+    public PreparedState getPreparedState() {
+        return this.preparedState;
     }
 
     private boolean isReady(int track) {
@@ -524,7 +518,7 @@ public class MediaSource implements ExtractorOutput, SampleQueue.UpstreamFormatC
     }
 
     /** Stores state that is initialized when preparation completes. */
-    private static final class PreparedState {
+    public static final class PreparedState {
 
         public final SeekMap seekMap;
         public final TrackGroupArray tracks;

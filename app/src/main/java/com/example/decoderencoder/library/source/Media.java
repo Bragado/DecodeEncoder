@@ -22,7 +22,7 @@ public interface Media {
         void onPrepared(MediaSource source);
 
         /**
-         * Called by the loader to indicate that it wishes for its {@link #MediaSource.continueLoading(long)} method
+         * Called by the loader to indicate that it wishes for its {@link MediaSource#continueLoading(long)} method
          * to be called when it can continue to load data. Called on the playback thread.
          */
         void onContinueLoadingRequested(MediaSource source);
@@ -71,5 +71,13 @@ public interface Media {
      */
     void maybeThrowPrepareError() throws IOException;
 
+
+    /**
+     * Gets all the streams of a given media content
+     *
+     * <p>Should be called after receiving {@link Callback#onContinueLoadingRequested}
+     *
+     */
+     SampleStream[] getSampleStreams();
 
 }

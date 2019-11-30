@@ -76,6 +76,15 @@ public final class TrackGroup implements Parcelable {
   }
 
   /**
+   * Returns the format of the track at a given index.
+   *
+   * @return The track's format.
+   */
+  public Format[] getFormat() {
+    return formats;
+  }
+
+  /**
    * Returns the index of the track with the given format in the group. The format is located by
    * identity so, for example, {@code group.indexOf(group.getFormat(index)) == index} even if
    * multiple tracks have formats that contain the same values.

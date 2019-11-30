@@ -6,7 +6,6 @@ import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
-import com.example.decoderencoder.library.core.DecoderEncoder;
 import com.example.decoderencoder.library.support.VCodec;
 
 public class DecoderEncoderActivity extends AppCompatActivity implements SurfaceHolder.Callback {
@@ -15,7 +14,7 @@ public class DecoderEncoderActivity extends AppCompatActivity implements Surface
 
     SurfaceView surfaceView;
     SurfaceHolder surfaceHolder;
-    DecoderEncoder decoderEncoder;
+    //DecoderEncoder decoderEncoder;
     String PATH2 = "/storage/emulated/0/Download/The Simpsons Movie - Trailer.mp4";
     //String PATH2 = "http://playready.directtaps.net/smoothstreaming/SSWSS720H264/SuperSpeedway_720_1427.ismv";
     //String PATH2 = "http://playready.directtaps.net/smoothstreaming/TTLSS720VC1/To_The_Limit_720_1427.ismv";
@@ -46,7 +45,7 @@ public class DecoderEncoderActivity extends AppCompatActivity implements Surface
     public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
 
 
-        VCodec vCodecDecoder = new VCodec(holder.getSurface(), PATH2);
+       /* VCodec vCodecDecoder = new VCodec(holder.getSurface(), PATH2);
         VCodec vCodecEncoder = new VCodec("/storage/emulated/0/Download/testX.mp4");
         decoderEncoder = new DecoderEncoder(vCodecEncoder, vCodecDecoder) ;
 
@@ -61,12 +60,12 @@ public class DecoderEncoderActivity extends AppCompatActivity implements Surface
                 e.printStackTrace();
             }
 
-        }
+        }*/
     }
 
     @Override
     public void surfaceDestroyed(SurfaceHolder holder) {
-        decoderEncoder.pause();
-        decoderEncoder.release();
+        //decoderEncoder.pause();
+        //decoderEncoder.release();
     }
 }
