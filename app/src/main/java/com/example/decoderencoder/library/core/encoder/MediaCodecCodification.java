@@ -10,6 +10,8 @@ import androidx.annotation.RequiresApi;
 
 import com.example.decoderencoder.library.core.decoder.Decoder;
 import com.example.decoderencoder.library.core.decoder.Renderer;
+import com.example.decoderencoder.library.muxer.MediaMuxer;
+import com.example.decoderencoder.library.muxer.MuxerInput;
 import com.example.decoderencoder.library.util.Util;
 
 import java.nio.ByteBuffer;
@@ -24,12 +26,17 @@ public abstract class MediaCodecCodification extends BaseCodification {
     private ByteBuffer[] inputBuffers;
     private ByteBuffer[] outputBuffers;
     protected Decoder decoder;
+    MediaMuxer mediaMuxer;
+    int trackId = -1;
+
 
 
     Surface encoderSurface;
 
-    public MediaCodecCodification(Renderer renderer, Encoder encoder, MediaFormat format) {
-        super(renderer, encoder, format);
+    public MediaCodecCodification(Renderer renderer, Encoder encoder, MediaFormat format, MuxerInput muxerInput, MediaMuxer mediaMuxer) {
+        super(renderer, encoder, format, muxerInput);
+        this.mediaMuxer = mediaMuxer;
+
     }
 
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
@@ -70,14 +77,11 @@ public abstract class MediaCodecCodification extends BaseCodification {
                 if ((bufferInfo.flags & MediaCodec.BUFFER_FLAG_CODEC_CONFIG) != 0) { bufferInfo.size = 0; } // ignore data
                 outputBuffer.position(bufferInfo.offset);
                 outputBuffer.limit(bufferInfo.offset + bufferInfo.size);
-                onDataReady(outputBuffer, bufferInfo);
+                onDataReady(outputBuffer, bufferInfo, trackId);
                 encoder.releaseOutputBuffer(encoderStatus, false);
         }
 
         return true;
-    }
-
-    private void onDataReady(ByteBuffer outputBuffer, MediaCodec.BufferInfo bufferInfo) {
     }
 
     public abstract boolean feedInputBuffer();
@@ -92,7 +96,7 @@ public abstract class MediaCodecCodification extends BaseCodification {
     public void onRelease() {}
 
     public void onFormatChange(MediaFormat mediaFormat) {
-        // TODO: tell the muxer the format changed
+        trackId = mediaMuxer.addTrack(mediaFormat);
     }
 
 

@@ -14,11 +14,9 @@ public interface MuxerInput {
      * Called to write sample data to the output.
      *
      * @param outputBuffer An {@link EncoderBuffer} from the encoder to read the sample data.
-     * @param length The maximum length to read from the input.
-     * @return The number of bytes not appended.
      * @throws IOException If an error occurred reading from the input.
      * @throws InterruptedException If the thread was interrupted.
      */
-    int sampleData(EncoderBuffer outputBuffer, int length)
+    int sampleData(EncoderBuffer outputBuffer, int trackId)
             throws IOException, InterruptedException;
 }

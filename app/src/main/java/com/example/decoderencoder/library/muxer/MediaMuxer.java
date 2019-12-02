@@ -17,4 +17,6 @@ public interface MediaMuxer {
 
     public void sniff(int container);
 
+    public void writeSampleData(int trackIndex, ByteBuffer byteBuf, int offset, int size, int flags, long presentationTimeUs);
+
 }

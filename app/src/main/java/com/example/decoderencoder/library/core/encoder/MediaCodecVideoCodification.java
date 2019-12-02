@@ -9,6 +9,8 @@ import androidx.annotation.RequiresApi;
 import com.example.decoderencoder.OpenGL.InputSurface;
 import com.example.decoderencoder.library.core.decoder.MediaCodecVideoRenderer;
 import com.example.decoderencoder.library.core.decoder.Renderer;
+import com.example.decoderencoder.library.muxer.MediaMuxer;
+import com.example.decoderencoder.library.muxer.MuxerInput;
 import com.example.decoderencoder.library.source.Media;
 
 import java.io.IOException;
@@ -18,8 +20,8 @@ public class MediaCodecVideoCodification extends MediaCodecCodification {
     InputSurface inputSurface;
 
 
-    public MediaCodecVideoCodification(Renderer renderer, Encoder encoder, MediaFormat mediaFormat) {
-        super(renderer, encoder, mediaFormat);
+    public MediaCodecVideoCodification(Renderer renderer, Encoder encoder, MediaFormat mediaFormat, MediaMuxer mediaMuxer, MuxerInput muxerInput) {
+        super(renderer, encoder, mediaFormat, muxerInput, mediaMuxer);
     }
 
 
@@ -28,7 +30,7 @@ public class MediaCodecVideoCodification extends MediaCodecCodification {
         this.encoder.makeCodecReady(this.format);
         this.encoderSurface = this.encoder.createInputSurface();
 
-        if(openGLSurfaceIsNecessary()) {        // openGL adds an overload, they are necessary only when we need to change frame resolution
+        if(openGLSurfaceIsNecessary()) {        // openGL adds an overload, it is necessary only when we need to change frame resolution
             // inicialize inputSurface
             this.inputSurface = new InputSurface(this.encoderSurface);
             this.inputSurface.makeCurrent();

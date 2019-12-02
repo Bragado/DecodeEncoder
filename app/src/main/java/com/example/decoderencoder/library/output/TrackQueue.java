@@ -23,16 +23,14 @@ public class TrackQueue implements MuxerInput {
     SampleQueue.AllocationNode readAllocationNode;
     SampleQueue.AllocationNode writeAllocationNode;
     private long totalBytesWritten;
-    TrackGroup trackGroup;
 
 
-    public TrackQueue(TrackGroup trackGroup, Allocator allocator) {
+    public TrackQueue( Allocator allocator) {
         this.allocator = allocator;
         allocationLength = allocator.getIndividualAllocationLength();
         readAllocationNode = new SampleQueue.AllocationNode(0, allocator.getIndividualAllocationLength());
         writeAllocationNode = readAllocationNode;
         totalBytesWritten = 0;
-        this.trackGroup = trackGroup;
     }
 
 

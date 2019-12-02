@@ -11,7 +11,6 @@ import androidx.annotation.RequiresApi;
 import com.example.decoderencoder.library.muxer.MediaCodecMuxer;
 import com.example.decoderencoder.library.muxer.MediaMuxer;
 import com.example.decoderencoder.library.muxer.MuxerInput;
-import com.example.decoderencoder.library.muxer.SampleOutput;
 import com.example.decoderencoder.library.network.Allocator;
 import com.example.decoderencoder.library.network.DataOutput;
 import com.example.decoderencoder.library.source.Media;
@@ -38,7 +37,6 @@ public class MediaOutputImpl extends HandlerThread implements MediaOutput {
     final MediaSource.PreparedState preparedState;
 
     MuxerInput[] muxerInputBuffers;
-    SampleOutput sampleOutput;
     MediaMuxer mediaMuxer;
 
     public MediaOutputImpl(Handler transcoderHandler,
@@ -74,7 +72,7 @@ public class MediaOutputImpl extends HandlerThread implements MediaOutput {
             int noTracks = this.preparedState.tracks.length;
             this.muxerInputBuffers = new MuxerInput[this.preparedState.tracks.length];
             for(int i = 0; i < noTracks; i++) {
-                this.muxerInputBuffers[i] = new TrackQueue(this.preparedState.tracks.get(i), allocator);
+                this.muxerInputBuffers[i] = new TrackQueue(allocator);
             }
         }
         return this.muxerInputBuffers;
