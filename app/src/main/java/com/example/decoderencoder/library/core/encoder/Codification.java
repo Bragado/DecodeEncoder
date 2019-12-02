@@ -3,6 +3,7 @@ package com.example.decoderencoder.library.core.encoder;
 import com.example.decoderencoder.library.Format;
 import com.example.decoderencoder.library.core.decoder.Decoder;
 import com.example.decoderencoder.library.core.decoder.Renderer;
+import com.example.decoderencoder.library.muxer.MediaMuxer;
 import com.example.decoderencoder.library.source.SampleStream;
 import com.example.decoderencoder.library.util.C;
 
@@ -53,6 +54,9 @@ public interface Codification {
     boolean feedInputBuffer();
 
     boolean drainOutputBuffer();
+
+
+    void setMediaMuxer(MediaMuxer mediaMuxer);
 
 
 }

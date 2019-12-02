@@ -12,6 +12,7 @@ import androidx.annotation.RequiresApi;
 import com.example.decoderencoder.library.core.decoder.DefaultRenderFactory;
 import com.example.decoderencoder.library.core.decoder.Renderer;
 import com.example.decoderencoder.library.core.encoder.Codification;
+import com.example.decoderencoder.library.core.encoder.MediaCodecCodification;
 import com.example.decoderencoder.library.extractor.DefaultExtractorsFactory;
 import com.example.decoderencoder.library.muxer.MediaMuxer;
 import com.example.decoderencoder.library.network.Allocator;
@@ -237,6 +238,8 @@ public class DefaultTranscoder  extends HandlerThread implements Transcoder, Ren
         public void onContinueLoadingRequested(MediaSource source) {        // TODO
             if(transcoderRunning && allocator.getTotalBytesAllocated() < 42833536)
                 source.continueLoading(0);
+            else
+                decodeEncodeStreams.stopTranscoding();
         }
     }
 
@@ -292,23 +295,40 @@ public class DefaultTranscoder  extends HandlerThread implements Transcoder, Ren
         }
 
         public void startTranscoding() {
-            if(!isReady)
+            if (!isReady)
                 return;
-
+            boolean nothingToRead = false;
             /*  Basic Idea:
-            *   1. Drain encoder
-            *   2. Feed Decoder
-            *   3. Drain decoder
-            *   4. Feed Encoder
-            */
-            while(!canceled) {
-                for(int i = 0; i < renderers.length; i++) {
+             *   1. Drain encoder
+             *   2. Feed Decoder
+             *   3. Drain decoder
+             *   4. Feed Encoder
+             */
+            long counter = 0;
+            while (counter++ < 500) {
+                for (int i = 0; i < renderers.length; i++) {
                     codifications[i].drainOutputBuffer();
                     codifications[i].feedInputBuffer();
                     renderers[i].drainOutputBuffer();
                     renderers[i].feedInputBuffer();
+
                 }
             }
+
+            for (int i = 0; i < renderers.length; i++) {
+                renderers[i].signalEndOfStream();
+            }
+
+            while (counter++ < 530) {
+                for (int i = 0; i < renderers.length; i++) {
+                    codifications[i].drainOutputBuffer();
+                    codifications[i].feedInputBuffer();
+                    renderers[i].drainOutputBuffer();
+                    nothingToRead &= !(renderers[i].feedInputBuffer());
+                }
+            }
+            ((MediaCodecCodification)codifications[0]).androidMuxer.stop();
+
         }
 
         public void stopTranscoding() {

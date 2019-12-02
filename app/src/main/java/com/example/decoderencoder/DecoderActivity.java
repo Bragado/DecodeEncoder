@@ -139,7 +139,7 @@ public class DecoderActivity  extends AppCompatActivity implements SurfaceHolder
                 // configure() call to throw an unhelpful exception.
                 format.setInteger(MediaFormat.KEY_COLOR_FORMAT,
                         MediaCodecInfo.CodecCapabilities.COLOR_FormatSurface);
-                format.setInteger(MediaFormat.KEY_BIT_RATE, 8388608);
+                format.setInteger(MediaFormat.KEY_BIT_RATE, 5388608);
                 format.setInteger(MediaFormat.KEY_FRAME_RATE, 50);
                 format.setInteger(MediaFormat.KEY_I_FRAME_INTERVAL, 1);
 
@@ -148,8 +148,8 @@ public class DecoderActivity  extends AppCompatActivity implements SurfaceHolder
                 formatAudio.setInteger(MediaFormat.KEY_BIT_RATE, 64000);
                 formatAudio.setInteger(MediaFormat.KEY_MAX_INPUT_SIZE,655360);
 
-                TrackGroup[] trackGroups = new TrackGroup[] {tracks.get(0), tracks.get(2)};
-                MediaFormat[] mediaFormats = new MediaFormat[] {format, formatAudio};
+                TrackGroup[] trackGroups = new TrackGroup[] {tracks.get(0)/*, tracks.get(2)*/};
+                MediaFormat[] mediaFormats = new MediaFormat[] {format/*, formatAudio*/};
                 transcoder.setSelectedTracks(trackGroups, mediaFormats);
 
             }

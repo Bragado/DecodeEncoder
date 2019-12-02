@@ -7,15 +7,11 @@ import android.os.Build;
 import androidx.annotation.RequiresApi;
 
 import com.example.decoderencoder.library.core.decoder.Renderer;
+import com.example.decoderencoder.library.muxer.MuxerInput;
 
 import java.nio.ByteBuffer;
 
 public class MediaCodecAudioCodification extends MediaCodecCodification {
-
-    public MediaCodecAudioCodification(Renderer renderer, Encoder encoder, MediaFormat format) {
-        super(renderer, encoder, format);
-
-    }
 
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
     @Override
@@ -54,6 +50,11 @@ public class MediaCodecAudioCodification extends MediaCodecCodification {
         }
         renderer.getDecoder().releaseOutputBuffer(decoderIndex, false);
         return true;
+    }
+
+    public MediaCodecAudioCodification(Renderer renderer, Encoder encoder, MediaFormat format, MuxerInput muxerInput) {
+        super(renderer, encoder, format, muxerInput);
+
     }
 
     @Override

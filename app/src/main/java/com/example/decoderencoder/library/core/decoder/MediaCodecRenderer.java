@@ -195,7 +195,7 @@ public abstract class MediaCodecRenderer extends BaseRenderer {
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
     public boolean feedInputBuffer() {
         if(!initCodec()) {
-            return false;
+            return true;
         }
 
         inputIndex = decoder.dequeueInputBuffer(0);
@@ -203,7 +203,7 @@ public abstract class MediaCodecRenderer extends BaseRenderer {
 
         if(buffer.data == null) {
             Log.d(TAG, "Codec Input Buffer is null");
-            return false;
+            return true;
         }
         // For adaptive reconfiguration OMX decoders expect all reconfiguration data to be supplied
         // at the start of the buffer that also contains the first frame in the new format.

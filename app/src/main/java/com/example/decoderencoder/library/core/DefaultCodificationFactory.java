@@ -43,15 +43,15 @@ public class DefaultCodificationFactory implements CodificationFactory {
                 String mimeType = preparedState.tracks.get(i).getFormat(0).sampleMimeType;
                 if(mimeType.startsWith("video/")) {
                     encoders[i] = new DefaultEncoder();
-                    codifications[i] = new MediaCodecVideoCodification(renderers[i], encoders[i], formats[j++]);
+                    codifications[i] = new MediaCodecVideoCodification(renderers[i], encoders[i], formats[j++], null);
                 }else if(mimeType.startsWith("audio/")) {
                     encoders[i] = new DefaultEncoder();
-                    codifications[i] = new MediaCodecAudioCodification(renderers[i], encoders[i], formats[j++]);
+                    codifications[i] = new MediaCodecAudioCodification(renderers[i], encoders[i], formats[j++], null);
                 }else {     // should not be here
-                    codifications[i] = new EmptyCodification(renderers[i],  tracks.get(i).getFormat(0));
+                    codifications[i] = new EmptyCodification(renderers[i],  tracks.get(i).getFormat(0), null);
                 }
             }else {
-                codifications[i] = new EmptyCodification(renderers[i], tracks.get(i).getFormat(0));
+                codifications[i] = new EmptyCodification(renderers[i], tracks.get(i).getFormat(0), null);
             }
         }
 

@@ -8,13 +8,16 @@ import com.example.decoderencoder.library.Format;
 import com.example.decoderencoder.library.core.decoder.MediaCodecAudioRenderer;
 import com.example.decoderencoder.library.core.decoder.MediaCodecVideoRenderer;
 import com.example.decoderencoder.library.core.decoder.Renderer;
+import com.example.decoderencoder.library.muxer.MediaMuxer;
+import com.example.decoderencoder.library.muxer.MuxerInput;
 
 public class EmptyCodification extends BaseCodification {
 
+    MediaMuxer mediaMuxer;
 
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
-    public EmptyCodification(Renderer renderer, Format format) {
-        super(renderer, null, null);          // TODO: set the format
+    public EmptyCodification(Renderer renderer, Format format, MuxerInput muxerInput) {
+        super(renderer, null, null, muxerInput);          // TODO: set the format
         /* set the format */
         setFormat(format);
     }
@@ -37,6 +40,11 @@ public class EmptyCodification extends BaseCodification {
     @Override
     public boolean drainOutputBuffer() {
         return false;
+    }
+
+    @Override
+    public void setMediaMuxer(MediaMuxer mediaMuxer) {
+        this.mediaMuxer = mediaMuxer;
     }
 
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)

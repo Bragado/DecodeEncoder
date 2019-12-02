@@ -20,8 +20,8 @@ public class MediaCodecVideoCodification extends MediaCodecCodification {
     InputSurface inputSurface;
 
 
-    public MediaCodecVideoCodification(Renderer renderer, Encoder encoder, MediaFormat mediaFormat, MediaMuxer mediaMuxer, MuxerInput muxerInput) {
-        super(renderer, encoder, mediaFormat, muxerInput, mediaMuxer);
+    public MediaCodecVideoCodification(Renderer renderer, Encoder encoder, MediaFormat mediaFormat, MuxerInput muxerInput) {
+        super(renderer, encoder, mediaFormat, muxerInput);
     }
 
 
