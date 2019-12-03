@@ -9,6 +9,11 @@ android {
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+        ndk {
+            abiFilters 'x86', 'x86_64', 'armeabi-v7a', 'arm64-v8a'
+        }
+
     }
     buildTypes {
         release {
@@ -16,6 +21,19 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
+
+    sourceSets {
+        main {
+            // let gradle pack the shared library into apk
+            jniLibs.srcDirs = ['../ffmpeg-android-maker/output/lib']
+        }
+    }
+    externalNativeBuild {
+        cmake {
+            path "CMakeLists.txt"
+        }
+    }
+
     compileOptions {
         sourceCompatibility = 1.8
         targetCompatibility = 1.8

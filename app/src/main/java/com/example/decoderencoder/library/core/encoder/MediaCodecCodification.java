@@ -10,6 +10,7 @@ import androidx.annotation.RequiresApi;
 
 import com.example.decoderencoder.library.core.decoder.Decoder;
 import com.example.decoderencoder.library.core.decoder.Renderer;
+import com.example.decoderencoder.library.muxer.FFmpegMuxer;
 import com.example.decoderencoder.library.muxer.MediaMuxer;
 import com.example.decoderencoder.library.muxer.MuxerInput;
 import com.example.decoderencoder.library.util.Util;
@@ -43,6 +44,7 @@ public abstract class MediaCodecCodification extends BaseCodification {
 
         try {
             this.androidMuxer = new android.media.MediaMuxer("/storage/emulated/0/Download/test.mp4",  android.media.MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4);
+            this.mediaMuxer = new FFmpegMuxer(null);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -106,8 +108,10 @@ public abstract class MediaCodecCodification extends BaseCodification {
     public void mux(ByteBuffer  outputBuffer, MediaCodec.BufferInfo bufferInfo, int trackId) {
         if(!androidMuxerStarted) {
             androidMuxer.start();
+            mediaMuxer.start();
             androidMuxerStarted = true;
         }
+        mediaMuxer.writeSampleData(trackId, outputBuffer, bufferInfo.offset, bufferInfo.size, bufferInfo.flags, bufferInfo.presentationTimeUs);
         androidMuxer.writeSampleData(trackId, outputBuffer, bufferInfo);
     }
 
@@ -126,7 +130,7 @@ public abstract class MediaCodecCodification extends BaseCodification {
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
     public void onFormatChange(MediaFormat mediaFormat) {
         //trackId = mediaMuxer.addTrack(mediaFormat);       // FIXME
-
+        mediaMuxer.addTrack(mediaFormat);
         trackId = androidMuxer.addTrack(mediaFormat);
     }
 
