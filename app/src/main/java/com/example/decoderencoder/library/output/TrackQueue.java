@@ -16,7 +16,7 @@ import java.util.Arrays;
 /**
  * A simplified version of SampleQueue
  */
-public class TrackQueue implements MuxerInput {
+public class TrackQueue {
 
     final Allocator allocator;
     final int allocationLength;
@@ -62,19 +62,7 @@ public class TrackQueue implements MuxerInput {
     }
 
 
-    @Override
-    public int sampleData(EncoderBuffer outputBuffer, int length) throws IOException, InterruptedException {
-        int remaining_bytes = length;
 
-        while(remaining_bytes > 0) {
-            length = preAppend(length);
-            int offset = writeAllocationNode.translateOffset(totalBytesWritten);
-            outputBuffer.data.put(writeAllocationNode.allocation.data, offset, length);
-            postAppend(length);
-            remaining_bytes -= length;
-        }
-        return length;
-    }
 
     /**
      * Reads data from the front of the rolling buffer.

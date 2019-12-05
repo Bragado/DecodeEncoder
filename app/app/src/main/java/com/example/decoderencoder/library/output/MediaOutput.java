@@ -1,5 +1,7 @@
 package com.example.decoderencoder.library.output;
 
+import android.media.MediaFormat;
+
 import com.example.decoderencoder.library.muxer.MediaMuxer;
 import com.example.decoderencoder.library.muxer.MuxerInput;
 import com.example.decoderencoder.library.muxer.SampleOutput;
@@ -9,8 +11,6 @@ public interface MediaOutput {
 
     void prepare(MediaMuxer mediaMuxer);
 
-    boolean continueLoading(long positionUs);
-
     interface Callback {
 
         public void onPrepared(MediaOutput mediaOutput);
@@ -18,18 +18,11 @@ public interface MediaOutput {
         public void onContinueLoading(MediaOutput mediaOutput);
     }
 
+    MuxerInput newTrackDiscovered(MediaFormat trackFormat);
 
-    /**
-     * Gets all the streams of a given media content
-     *
-     * <p>Should be called after receiving {@link Callback#onContinueLoadingRequested}
-     *
-     */
-    MuxerInput[] getInputBuffers();
+    long getCurrentMaxPts();
 
-
-
-
+    long getCurrentMinPts();
 
 
 }

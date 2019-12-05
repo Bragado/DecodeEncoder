@@ -2,6 +2,7 @@ package com.example.decoderencoder.library.core.encoder;
 
 import android.media.MediaCodec;
 import android.media.MediaFormat;
+import android.net.Uri;
 import android.os.Build;
 import android.util.Log;
 import android.view.Surface;
@@ -44,7 +45,8 @@ public abstract class MediaCodecCodification extends BaseCodification {
 
         try {
             this.androidMuxer = new android.media.MediaMuxer("/storage/emulated/0/Download/test.mp4",  android.media.MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4);
-            this.mediaMuxer = new FFmpegMuxer(null);
+
+            this.mediaMuxer = new FFmpegMuxer(Uri.parse("/storage/emulated/0/Download/ffmpeg.ts"));
         } catch (IOException e) {
             e.printStackTrace();
         }

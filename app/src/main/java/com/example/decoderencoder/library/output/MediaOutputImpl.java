@@ -8,6 +8,7 @@ import android.os.HandlerThread;
 
 import androidx.annotation.RequiresApi;
 
+import com.example.decoderencoder.library.core.encoder.EncoderBuffer;
 import com.example.decoderencoder.library.muxer.MediaCodecMuxer;
 import com.example.decoderencoder.library.muxer.MediaMuxer;
 import com.example.decoderencoder.library.muxer.MuxerInput;
@@ -16,6 +17,9 @@ import com.example.decoderencoder.library.network.DataOutput;
 import com.example.decoderencoder.library.source.Media;
 import com.example.decoderencoder.library.source.MediaSource;
 import com.example.decoderencoder.library.util.ConditionVariable;
+
+import java.io.IOException;
+import java.util.ArrayList;
 
 
 /**
@@ -28,34 +32,31 @@ public class MediaOutputImpl extends HandlerThread implements MediaOutput {
 
     Handler mediaOutputHandler;
     Handler transcoderHandler;
-    Uri uri;
-    final Allocator allocator;
-    DataOutput dataOutput;
-    MediaFormat[] mediaFormats;
-    final MediaOutput.Callback callback;
-    final ConditionVariable loadCondition;
-    final MediaSource.PreparedState preparedState;
 
-    MuxerInput[] muxerInputBuffers;
+    final Allocator allocator;
+    final MediaOutput.Callback callback;
+
     MediaMuxer mediaMuxer;
+    ArrayList<MuxerInput> muxerInputs = new ArrayList<>();
+    ArrayList<MediaFormat> mediaFormats = new ArrayList<>();
+
+
+    long maxPTS = Long.MIN_VALUE;
+    long minPTS = Long.MAX_VALUE;
+
+    //final ConditionVariable loadCondition;
+
+
 
     public MediaOutputImpl(Handler transcoderHandler,
-                           Uri uri,
                            Allocator allocator,
-                           DataOutput dataOutput,
-                           MediaFormat[] mediaFormat,
-                           Callback callback,
-                           MediaSource.PreparedState preparedState
+                           Callback callback
     ) {
         super("MediaOutput");
-        this.uri = uri;
         this.allocator = allocator;
-        this.dataOutput = dataOutput;
-        this.mediaFormats = mediaFormat;
         this.callback = callback;
-        loadCondition = new ConditionVariable();
+        //loadCondition = new ConditionVariable();
         this.transcoderHandler = transcoderHandler;
-        this.preparedState = preparedState;
     }
 
 
@@ -65,35 +66,32 @@ public class MediaOutputImpl extends HandlerThread implements MediaOutput {
     }
 
     @Override
-    public MuxerInput[] getInputBuffers() {
-        if(this.muxerInputBuffers != null)
-            return this.muxerInputBuffers;
-        else {
-            int noTracks = this.preparedState.tracks.length;
-            this.muxerInputBuffers = new MuxerInput[this.preparedState.tracks.length];
-            for(int i = 0; i < noTracks; i++) {
-                this.muxerInputBuffers[i] = new TrackQueue(allocator);
-            }
-        }
-        return this.muxerInputBuffers;
+    public MuxerInput newTrackDiscovered(MediaFormat trackFormat) {
+        mediaFormats.add(trackFormat);
+        int trackId = mediaMuxer.addTrack(trackFormat);
+        EncoderOutput encoderOutput = new EncoderOutput(trackId);
+        muxerInputs.add(encoderOutput);
+        return encoderOutput;
+    }
+
+    @Override
+    public long getCurrentMaxPts() {
+        return maxPTS;
+    }
+
+    @Override
+    public long getCurrentMinPts() {
+        return minPTS;
     }
 
 
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
     @Override
     public void prepare(MediaMuxer mediaMuxer) {
-        loadCondition.open();
+        //loadCondition.open();
         this.mediaMuxer = mediaMuxer;/* new MediaCodecMuxer(uri.getPath(),  android.media.MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4); */
-        for(MediaFormat f : mediaFormats) {
-            mediaMuxer.addTrack(f);
-        }
     }
 
-    @Override
-    public boolean continueLoading(long positionUs) {
-        loadCondition.open();
-        return false;
-    }
 
 
     // Internals
@@ -111,6 +109,21 @@ public class MediaOutputImpl extends HandlerThread implements MediaOutput {
                 loadCondition.close();
         }*/
 
+    }
+
+
+    public class EncoderOutput implements MuxerInput {
+        int trackId;
+
+        public EncoderOutput(int trackId) {
+            this.trackId = trackId;
+        }
+
+        @Override
+        public int sampleData(EncoderBuffer outputBuffer) throws IOException, InterruptedException {
+            mediaMuxer.writeSampleData(trackId, outputBuffer.data, outputBuffer.offset, outputBuffer.size, outputBuffer.flags, outputBuffer.presentationTimeUs);
+            return 1;
+        }
     }
 
 

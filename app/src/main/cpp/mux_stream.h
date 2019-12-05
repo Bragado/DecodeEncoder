@@ -3,16 +3,33 @@
 
 #include <jni.h>
 #include <map>
-#include<string>
+#include <string>
+
+extern "C" {
+#include <libavformat/avformat.h>
+#include <libavcodec/avcodec.h>
+}
+
+typedef struct OutputStream{
+	AVStream **out_streams;
+	AVOutputFormat *of;
+	AVFormatContext *ofmt_ctx;
+	int nbstreams;
+	int allocation_size;		// FIXME : realloc
+	const char * path;
 
 
-void prepareStart(jobject instance);
+} OutputStream;
 
-void release(jobject instance);
+OutputStream * init(const char * path);
 
-void writeFrame(jint trackIndex, jobject byteBuffer, jint offset, jint size, jint flags, jlong presentationTimeUs);
+void prepareStart(OutputStream * video_st);
 
-int addTrack(std::map<std::string, std::string> mymap);
+void release(OutputStream * video_st);
+
+void writeFrame(OutputStream * video_st, jint trackIndex, jbyte* framedata, jint offset, jint size, jint flags, jlong presentationTimeUs);
+
+int addTrack(OutputStream * video_st, std::map<std::string, const char *> mymap);
 
 
-#endif ENCODERDECODER_MUX_STREAM_H
+#endif //ENCODERDECODER_MUX_STREAM_H

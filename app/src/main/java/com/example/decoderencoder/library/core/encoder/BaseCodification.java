@@ -61,13 +61,13 @@ public abstract class BaseCodification implements Codification {
 
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
     final void onDataReady(ByteBuffer outputBuffer, MediaCodec.BufferInfo bufferInfo, int trackId) {
-        try {
+       /* try {
             muxerInput.sampleData(new EncoderBuffer(outputBuffer, bufferInfo.offset, bufferInfo.size, bufferInfo.presentationTimeUs), trackId);
         } catch (IOException e) {
             e.printStackTrace();
         } catch (InterruptedException e) {
             e.printStackTrace();
-        }
+        }*/
 
     }
 

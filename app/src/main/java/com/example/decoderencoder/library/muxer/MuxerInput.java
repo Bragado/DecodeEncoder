@@ -17,6 +17,6 @@ public interface MuxerInput {
      * @throws IOException If an error occurred reading from the input.
      * @throws InterruptedException If the thread was interrupted.
      */
-    int sampleData(EncoderBuffer outputBuffer, int trackId)
+    int sampleData(EncoderBuffer outputBuffer)
             throws IOException, InterruptedException;
 }

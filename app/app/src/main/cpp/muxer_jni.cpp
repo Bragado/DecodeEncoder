@@ -9,30 +9,30 @@ using namespace std;
 
 extern "C" {
 
-JNIEXPORT void JNICALL
+JNIEXPORT jlong JNICALL
 Java_com_example_decoderencoder_library_muxer_FFmpegMuxer_nativeInit(JNIEnv * env, jobject instance, jstring outputPath) {
 	const char *nativeString = env->GetStringUTFChars(outputPath, 0);
-	init(nativeString);
+	return reinterpret_cast<jlong>(init(nativeString));
 }
 
 JNIEXPORT void JNICALL
-Java_com_example_decoderencoder_library_muxer_FFmpegMuxer_nativeStart(JNIEnv * env, jobject instance) {
-    prepareStart(instance);
+Java_com_example_decoderencoder_library_muxer_FFmpegMuxer_nativeStart(JNIEnv * env, jobject instance, jlong stream) {
+    prepareStart((OutputStream *)stream);
 }
 
 JNIEXPORT void JNICALL
-Java_com_example_decoderencoder_library_muxer_FFmpegMuxer_nativeStop(JNIEnv * env, jobject instance) {
-    release();
+Java_com_example_decoderencoder_library_muxer_FFmpegMuxer_nativeStop(JNIEnv * env, jobject instance, jlong stream) {
+    release((OutputStream *)stream);
 }
 
 JNIEXPORT void JNICALL
-Java_com_example_decoderencoder_library_muxer_FFmpegMuxer_nativeWriteSampleData(JNIEnv * env, jobject instance, jint trackIndex, jobject byteBuffer, jint offset, jint size, jint flags, jlong presentationTimeUs) {
+Java_com_example_decoderencoder_library_muxer_FFmpegMuxer_nativeWriteSampleData(JNIEnv * env, jobject instance, jlong stream, jint trackIndex, jobject byteBuffer, jint offset, jint size, jint flags, jlong presentationTimeUs) {
 	jbyte* buf_in = (jbyte*)env->GetDirectBufferAddress(byteBuffer);
-	writeFrame(trackIndex, buf_in, offset, size, flags, presentationTimeUs);
+	writeFrame((OutputStream *)stream, trackIndex, buf_in, offset, size, flags, presentationTimeUs);
 }
 
 JNIEXPORT jint JNICALL
-Java_com_example_decoderencoder_library_muxer_FFmpegMuxer_nativeAddTrack(JNIEnv * env, jobject instance, jobjectArray keys,
+Java_com_example_decoderencoder_library_muxer_FFmpegMuxer_nativeAddTrack(JNIEnv * env, jobject instance, jlong stream, jobjectArray keys,
         jobjectArray values) {
 	int index = -1;
     std::map<std::string, const char *> mymap;
@@ -48,7 +48,7 @@ Java_com_example_decoderencoder_library_muxer_FFmpegMuxer_nativeAddTrack(JNIEnv 
 
     }
 
-    index = addTrack(mymap);
+    index = addTrack((OutputStream *)stream, mymap);
     return static_cast<jint>(index);	
 }
 }
