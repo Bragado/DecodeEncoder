@@ -1,0 +1,14 @@
+prefix=/home/lrc/git/IPIP_Transcoder/ffmpeg-android-maker/build/x86
+exec_prefix=${prefix}
+libdir=/home/lrc/git/IPIP_Transcoder/ffmpeg-android-maker/build/x86/lib
+includedir=/home/lrc/git/IPIP_Transcoder/ffmpeg-android-maker/build/x86/include
+
+Name: libavutil
+Description: FFmpeg utility library
+Version: 56.31.100
+Requires: 
+Requires.private: 
+Conflicts:
+Libs: -L${libdir}  -lavutil 
+Libs.private: -pthread -lm
+Cflags: -I${includedir}

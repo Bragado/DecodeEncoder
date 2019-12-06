@@ -296,11 +296,6 @@ public class DefaultTranscoder  extends HandlerThread implements Transcoder, Ren
 
         public void startTranscoding() {
 
-            try {
-                Thread.sleep(2000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
             if (!isReady)
                 return;
             boolean nothingToRead = false;
@@ -334,7 +329,7 @@ public class DefaultTranscoder  extends HandlerThread implements Transcoder, Ren
                 }
             }
             ((MediaCodecCodification)codifications[0]).androidMuxer.stop();
-
+            ((MediaCodecCodification)codifications[0]).mediaMuxer.stop();
         }
 
         public void stopTranscoding() {

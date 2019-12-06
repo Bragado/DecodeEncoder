@@ -30,7 +30,7 @@ public abstract class MediaCodecRenderer extends BaseRenderer {
     protected Decoder decoder;
     private Format codecFormat;
     private final DecoderInputBuffer buffer;
-    private int inputIndex;
+    private int inputIndex = -1;
     private ByteBuffer outputBuffer;
     private MediaCrypto mediaCrypto;
     private ByteBuffer[] inputBuffers;
@@ -197,9 +197,10 @@ public abstract class MediaCodecRenderer extends BaseRenderer {
         if(!initCodec()) {
             return true;
         }
-
-        inputIndex = decoder.dequeueInputBuffer(0);
-        buffer.data = getInputBuffer(inputIndex);
+        //if(inputIndex < 0) {            // FIXME: is this correct?
+            inputIndex = decoder.dequeueInputBuffer(0);
+            buffer.data = getInputBuffer(inputIndex);
+        //}
 
         if(buffer.data == null) {
             Log.d(TAG, "Codec Input Buffer is null");

@@ -475,6 +475,9 @@ public final class  Loader implements LoaderErrorThrower {
           errorCount++;
           LoadErrorAction action =
               callback.onLoadError(loadable, nowMs, durationMs, currentError, errorCount);
+          if(action == null) {
+            return; // no storage permission? or input path is incorrect?
+          }
           if (action.type == ACTION_TYPE_DONT_RETRY_FATAL) {
             fatalError = currentError;
           } else if (action.type != ACTION_TYPE_DONT_RETRY) {

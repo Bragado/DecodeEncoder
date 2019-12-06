@@ -29,7 +29,7 @@ public abstract class MediaCodecCodification extends BaseCodification {
     private ByteBuffer[] inputBuffers;
     private ByteBuffer[] outputBuffers;
     protected Decoder decoder;
-    MediaMuxer mediaMuxer;
+    public MediaMuxer mediaMuxer;
     int trackId = -1;
 
     // testing only

@@ -92,7 +92,7 @@ public class MainActivity extends AppCompatActivity  {
         });
        final Intent decodeIntent = new Intent(this, DecoderActivity.class);
         Button decode = (Button) findViewById(R.id.decode_only);
-
+        startActivity(decodeIntent);
         decode.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

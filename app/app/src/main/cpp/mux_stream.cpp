@@ -31,6 +31,7 @@ OutputStream * init(const char * path) {
 		release(video_st);
 	}
 	video_st->of = video_st->ofmt_ctx->oformat;
+	video_st->ofmt_ctx->debug = 1;
 	strcpy( video_st->ofmt_ctx->filename, video_st->path );
 	return video_st;
 
@@ -39,11 +40,23 @@ OutputStream * init(const char * path) {
 void prepareStart(OutputStream * video_st) {
 	if(DEBUG)
 		LOGI("native prepareStart called");
-
+	int ret = 1;
 	// Init container
 	//av_set_parameters(video_st->ofmt_ctx, 0);
 	//avformat_write_header(video_st->ofmt_ctx, 0);
 	av_dump_format(video_st->ofmt_ctx, 0, video_st->path, 1);
+
+	if (!(video_st->of->flags & AVFMT_NOFILE)) {
+		ret = avio_open(&video_st->ofmt_ctx->pb, video_st->path , AVIO_FLAG_WRITE);
+		if (ret < 0) {
+			LOGE("Could not open output file '%s'", video_st->path);
+		}
+	}
+	ret = avformat_write_header(video_st->ofmt_ctx, NULL);
+	if (ret < 0) {
+		LOGE("Error occurred when opening output file\n");
+	}
+
 }
 
 void release(OutputStream * video_st) {
@@ -51,7 +64,12 @@ void release(OutputStream * video_st) {
 		LOGI("native release called");
 
 	//avformat_free_context(video_st->ofmt_ctx);
+	av_write_trailer(video_st->ofmt_ctx);
 
+	// close output
+	avio_closep(&video_st->ofmt_ctx->pb);
+
+	avformat_free_context(video_st->ofmt_ctx);
 	free(video_st->out_streams);
 	free(video_st);
 	video_st = 0;
@@ -60,6 +78,7 @@ void release(OutputStream * video_st) {
 void writeFrame(OutputStream * video_st, jint trackIndex, jbyte* framedata, jint offset, jint size, jint flags, jlong presentationTimeUs) {
 	if(DEBUG)
 		LOGI("native  writeFrame called");
+	int ret = -1;
 
 	AVPacket packet;
 	av_init_packet(&packet);
@@ -73,7 +92,21 @@ void writeFrame(OutputStream * video_st, jint trackIndex, jbyte* framedata, jint
 	packet.flags |= AV_PKT_FLAG_KEY;
 	LOGI("NativeWriteFrame: video_st: %p, trackIndex: %d, offset: %d, size: %d, presentationTime: %d", video_st, trackIndex, offset, size, presentationTimeUs);
 	LOGI("NativeWriteFrame: path: %s", video_st->path);
-	av_interleaved_write_frame( video_st->ofmt_ctx, &packet);
+	if(!video_st->ofmt_ctx) {
+		LOGE("context is not allocated");
+	}else {
+		LOGE("context is not the problem");
+	}
+
+	//
+	AVStream *st = video_st->ofmt_ctx->streams[packet.stream_index];
+	LOGI("stream is ok");
+	ret = av_interleaved_write_frame( video_st->ofmt_ctx, &packet);
+	if (ret < 0) {
+		LOGE("Error muxing packet\n");
+	}
+
+	av_packet_unref(&packet);	// wipe the packet
 	if(DEBUG)
 		LOGI("frame was written to output");
 }
@@ -127,7 +160,7 @@ void add_stream(OutputStream * video_st, AVStream ** stream, std::map<std::strin
 		break;
 	}
 
-	//pcc->codec_tag = atoi(format["codec_tag"]);
+	pcc->codec_tag = 0;
 	pcc->codec_type = AVMEDIA_TYPE_VIDEO;		// FIXME
 	pcc->codec_id = AV_CODEC_ID_H264; // FIXME
 	pcc->bit_rate = atoi(format["bit_rate"]);
