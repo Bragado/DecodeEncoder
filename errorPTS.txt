@@ -1,0 +1,31 @@
+Correto: 2021.823473
+Incorreto: 2021.773234 -> ptsWrapAbove 
+
+
+
+PTS    		- TimeUs	|	
+1) 2021819873 	- 20000		|
+2) 2021828873 	- 120000	|
+3) 2021825273 	- 80000		|
+4) 2021823473 	- 60000		|
+5) 2021773234 	- (-1)*498211	|
+6) 2021775753   - (-1)*470222   |
+7)
+
+
+
+tests for:	| 2021828873:	| 2021825273 	| 2021823473 	| 2021773234 	|
+closestWrapCount| 0		| 0	     	| 0 	  	| 0	     	|	
+ptsWrapBelow 	| -6568105719	| -6568105719	| -6568105719	| -6568105719	|
+ptsWrapAbove	| 2021828873	| 2021828873 	| 2021828873 	| 2021773234 	|
+pts 		| 2021828873	| 2021828873 	| 2021828873 	| 2021773234   	|
+adjusted	|		|		|		|		|
+
+
+Files: 
+- timestampAdjuster.java
+- PESREADER.java (parseHeaderExtension) 
+1. possible solution: if the offset is bigger than the pts, one should update all previous timestamps (with + (offset - newoffset)) and offset = newoffset 	      	
+
+
+

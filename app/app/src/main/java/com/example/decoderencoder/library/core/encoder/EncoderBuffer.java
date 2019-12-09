@@ -72,11 +72,12 @@ public class EncoderBuffer {
     public int flags;
 
 
-    public EncoderBuffer(ByteBuffer data, int offset, int size, long presentationTimeUs) {
+    public EncoderBuffer(ByteBuffer data, int offset, int size, int flags, long presentationTimeUs) {
         this.data = data;
         this.offset = offset;
         this.size = size;
         this.presentationTimeUs = presentationTimeUs;
+        this.flags = flags;
     }
 
 

@@ -147,7 +147,7 @@ public final class TimestampAdjuster {
         notifyAll();
       }
     }
-    return timeUs + timestampOffsetUs;
+    return timeUs /*+ timestampOffsetUs*/;    // TODO: FIXME @lrc
   }
 
   /**

@@ -7,7 +7,9 @@ import android.os.Build;
 import androidx.annotation.RequiresApi;
 
 import com.example.decoderencoder.library.core.decoder.Renderer;
+import com.example.decoderencoder.library.muxer.MediaMuxer;
 import com.example.decoderencoder.library.muxer.MuxerInput;
+import com.example.decoderencoder.library.output.MediaOutput;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -21,12 +23,13 @@ public abstract class BaseCodification implements Codification {
     Encoder encoder;
     MediaFormat format;
     MuxerInput muxerInput;
+    MediaOutput mediaOutput;
 
-    public BaseCodification(Renderer renderer, Encoder encoder, MediaFormat format, MuxerInput muxerInput) {
+    public BaseCodification(Renderer renderer, Encoder encoder, MediaFormat format, MediaOutput mediaOutput) {
         this.renderer = renderer;
         this.format = format;
         this.encoder = encoder;
-        this.muxerInput = muxerInput;
+        this.mediaOutput = mediaOutput;
     }
 
 
@@ -60,15 +63,21 @@ public abstract class BaseCodification implements Codification {
     public abstract void onRelease();
 
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
-    final void onDataReady(ByteBuffer outputBuffer, MediaCodec.BufferInfo bufferInfo, int trackId) {
-       /* try {
-            muxerInput.sampleData(new EncoderBuffer(outputBuffer, bufferInfo.offset, bufferInfo.size, bufferInfo.presentationTimeUs), trackId);
+    final void onDataReady(ByteBuffer outputBuffer, MediaCodec.BufferInfo bufferInfo) {
+        mediaOutput.maybeStartMuxer();
+        try {
+            muxerInput.sampleData(new EncoderBuffer(outputBuffer, bufferInfo.offset, bufferInfo.size, bufferInfo.flags, bufferInfo.presentationTimeUs));
         } catch (IOException e) {
             e.printStackTrace();
         } catch (InterruptedException e) {
             e.printStackTrace();
-        }*/
+        }
 
     }
+
+    public void addTrack(MediaFormat trackFormat) {
+        this.muxerInput = mediaOutput.newTrackDiscovered(trackFormat);
+    }
+
 
 }

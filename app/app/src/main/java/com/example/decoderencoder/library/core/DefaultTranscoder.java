@@ -41,7 +41,8 @@ public class DefaultTranscoder  extends HandlerThread implements Transcoder, Ren
     private Transcoder.State currentState = Transcoder.State.INICIALIZED;
     private DataSource dataSource = null;
     private MediaMuxer mediaMuxer = null;
-    private Uri uri = null;
+    private Uri inputUri = null;
+    private Uri outputUri = null;
     private Transcoder.Callback callback;
 
     /*  Shared variables */
@@ -49,6 +50,8 @@ public class DefaultTranscoder  extends HandlerThread implements Transcoder, Ren
     LoadErrorHandlingPolicy loadErrorHandlingPolicy;
     MediaSource mediaSource;
     MediaManagement mediaManagement;
+    MediaOutput mediaOutput;
+    OutputManagement outputManagement;
 
     /* DefaultTranscoder Variables */
     Handler transcoderHandler;
@@ -72,11 +75,12 @@ public class DefaultTranscoder  extends HandlerThread implements Transcoder, Ren
 
 
 
-    public DefaultTranscoder (Transcoder.Callback callback, String path) {     // Thread : UI
+    public DefaultTranscoder (Transcoder.Callback callback, String inputPath, String outputPath) {     // Thread : UI
         super("DefaultTranscoder");
         this.allocator = new DefaultAllocator(true, C.DEFAULT_BUFFER_SEGMENT_SIZE);
         this.loadErrorHandlingPolicy = new DefaultLoadErrorHandlingPolicy();
-        this.uri = Uri.parse(path);
+        this.inputUri = Uri.parse(inputPath);
+        this.outputUri = Uri.parse(outputPath);
         this.uiHandler = new Handler();
         this.callback = callback;
 
@@ -85,7 +89,7 @@ public class DefaultTranscoder  extends HandlerThread implements Transcoder, Ren
     @Override
     protected void onLooperPrepared() {  // Thread : DefaultTranscoder
         transcoderHandler = new Handler();
-        mediaSource = new MediaSource(uri, dataSource, new DefaultExtractorsFactory().createExtractors(), allocator, MediaSource.DEFAULT_LOADING_CHECK_INTERVAL_BYTES, loadErrorHandlingPolicy);
+        mediaSource = new MediaSource(inputUri, dataSource, new DefaultExtractorsFactory().createExtractors(), allocator, MediaSource.DEFAULT_LOADING_CHECK_INTERVAL_BYTES, loadErrorHandlingPolicy);
         if(prepareWhenReady) {
             onPrepare();
         }
@@ -99,11 +103,13 @@ public class DefaultTranscoder  extends HandlerThread implements Transcoder, Ren
     }
 
     @Override
-    public boolean setOutputSource(MediaMuxer mediaMuxer) {  // Thread : UI
-        this.mediaMuxer = mediaMuxer;
-        /* Create MuxerInput instances */
-
-        /* Start Muxer */
+    public boolean setOutputSource(MediaOutput mediaOutput) {  // Thread : UI
+        //this.mediaMuxer = mediaMuxer;
+        /*TODO:
+        *
+        * */
+        this.mediaOutput = mediaOutput;
+        mediaOutput.prepare(outputManagement, outputUri);
         return true;
     }
 
@@ -121,9 +127,9 @@ public class DefaultTranscoder  extends HandlerThread implements Transcoder, Ren
 
     @Override
     public boolean startTranscoder() {  // Thread : UI
-        if(!tracksSelected /*|| this.mediaMuxer == null*/)  // TODO: mediaMuxer should not be null
+        if(!tracksSelected || this.mediaOutput == null)
             return false;
-        else {      // TODO
+        else {
             transcoderHandler.post(() -> {
                 for (Codification codification : codifications) {
                     codification.start();
@@ -175,6 +181,7 @@ public class DefaultTranscoder  extends HandlerThread implements Transcoder, Ren
 
     public void onPrepare() {
         DefaultTranscoder.this.mediaManagement = new MediaManagement();
+        DefaultTranscoder.this.outputManagement = new OutputManagement();
         mediaSource.prepare(DefaultTranscoder.this.mediaManagement,0);   // Thread : DefaultTranscoder
     }
 
@@ -201,7 +208,7 @@ public class DefaultTranscoder  extends HandlerThread implements Transcoder, Ren
                 DefaultTranscoder.this.renderers = defaultRenderFactory.createRenderers(sampleStreams, preparedState);
 
                 /* Create Codifications */
-                DefaultTranscoder.this.codifications = defaultCodificationFactory.createCodification(DefaultTranscoder.this.formats, preparedState, DefaultTranscoder.this.renderers);
+                DefaultTranscoder.this.codifications = defaultCodificationFactory.createCodification(DefaultTranscoder.this.formats, preparedState, DefaultTranscoder.this.renderers, mediaOutput);
 
             }else {         // TODO: change transcoding languages onDemand
                 // 1. Evaluate which renderers will be maintained
@@ -328,8 +335,7 @@ public class DefaultTranscoder  extends HandlerThread implements Transcoder, Ren
                     nothingToRead &= !(renderers[i].feedInputBuffer());
                 }
             }
-            ((MediaCodecCodification)codifications[0]).androidMuxer.stop();
-            ((MediaCodecCodification)codifications[0]).mediaMuxer.stop();
+            mediaOutput.stopMuxer();
         }
 
         public void stopTranscoding() {

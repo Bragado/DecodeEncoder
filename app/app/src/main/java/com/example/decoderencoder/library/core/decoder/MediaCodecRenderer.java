@@ -253,7 +253,7 @@ public abstract class MediaCodecRenderer extends BaseRenderer {
                 decodeOnlyPresentationTimestamps.add(presentationTimeUs);
             }
             if(buffer.isEndOfStream()) {
-                decoder.queueInputBuffer(inputIndex, 0, 0, 0, MediaCodec.BUFFER_FLAG_END_OF_STREAM);
+                decoder.queueInputBuffer(inputIndex, 0, 0, presentationTimeUs, MediaCodec.BUFFER_FLAG_END_OF_STREAM);
                 resetInputBuffer();
             }
 

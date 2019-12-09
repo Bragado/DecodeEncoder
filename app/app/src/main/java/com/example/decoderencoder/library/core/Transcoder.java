@@ -5,6 +5,7 @@ import android.net.Uri;
 
 import com.example.decoderencoder.library.muxer.MediaMuxer;
 import com.example.decoderencoder.library.network.DataSource;
+import com.example.decoderencoder.library.output.MediaOutput;
 import com.example.decoderencoder.library.source.MediaSource;
 import com.example.decoderencoder.library.source.TrackGroup;
 import com.example.decoderencoder.library.source.TrackGroupArray;
@@ -53,11 +54,11 @@ public interface Transcoder {
     public boolean setDataSource(DataSource dataSource);
 
     /**
-     * Sets the transcoder MediaMuxer , should be called before start()
-     * @param mediaMuxer
+     * Sets the transcoder mediaOutput , should be called before start()
+     * @param mediaOutput
      * @return
      */
-    public boolean setOutputSource(MediaMuxer mediaMuxer);
+    public boolean setOutputSource(MediaOutput mediaOutput);
 
     /**
      * Tells the transcoder to prepare itself to perform all necessary operations to go to ready state
