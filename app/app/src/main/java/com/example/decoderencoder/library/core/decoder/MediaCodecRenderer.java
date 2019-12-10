@@ -197,10 +197,10 @@ public abstract class MediaCodecRenderer extends BaseRenderer {
         if(!initCodec()) {
             return true;
         }
-        //if(inputIndex < 0) {            // FIXME: is this correct?
-            inputIndex = decoder.dequeueInputBuffer(0);
+        if(inputIndex < 0) {            // FIXME: is this correct?
+            inputIndex = decoder.dequeueInputBuffer(10);
             buffer.data = getInputBuffer(inputIndex);
-        //}
+        }
 
         if(buffer.data == null) {
             Log.d(TAG, "Codec Input Buffer is null");
@@ -220,6 +220,7 @@ public abstract class MediaCodecRenderer extends BaseRenderer {
         if (this.streamIsFinal) {
             decoder.queueInputBuffer(inputIndex, 0, 0, 0, MediaCodec.BUFFER_FLAG_END_OF_STREAM);
             resetInputBuffer();
+            inputIndex = -1;
             return false;
         }
 
@@ -237,6 +238,7 @@ public abstract class MediaCodecRenderer extends BaseRenderer {
             // associated with the first format.
             buffer.clear();
             codecFormat = formatHolder.format;
+            inputIndex = -1;
             return true;
         }
 
@@ -253,7 +255,7 @@ public abstract class MediaCodecRenderer extends BaseRenderer {
                 decodeOnlyPresentationTimestamps.add(presentationTimeUs);
             }
             if(buffer.isEndOfStream()) {
-                decoder.queueInputBuffer(inputIndex, 0, 0, 0, MediaCodec.BUFFER_FLAG_END_OF_STREAM);
+                decoder.queueInputBuffer(inputIndex, 0, 0, presentationTimeUs, MediaCodec.BUFFER_FLAG_END_OF_STREAM);
                 resetInputBuffer();
             }
 
@@ -269,6 +271,7 @@ public abstract class MediaCodecRenderer extends BaseRenderer {
         } catch (MediaCodec.CryptoException e) {
             throw e;
         }
+        inputIndex = -1;
         return true;
     }
 

@@ -7,6 +7,7 @@ import android.os.Build;
 import androidx.annotation.RequiresApi;
 
 import com.example.decoderencoder.library.source.SampleStream;
+import com.example.decoderencoder.library.util.TimestampAdjuster;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -63,6 +64,9 @@ public class MediaCodecMuxer implements MediaMuxer {
         bf.flags = flags;
         bf.offset = offset;
         bf.presentationTimeUs = presentationTimeUs;
+        if(bf.presentationTimeUs < 0) {
+            return;
+        }
         bf.size = size;
         muxer.writeSampleData(trackIndex, byteBuf, bf);
     }
