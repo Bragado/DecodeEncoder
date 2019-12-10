@@ -1,0 +1,14 @@
+prefix=/home/luis/git/DecodeEncoder/ffmpeg/build/x86_64
+exec_prefix=${prefix}
+libdir=/home/luis/git/DecodeEncoder/ffmpeg/build/x86_64/lib
+includedir=/home/luis/git/DecodeEncoder/ffmpeg/build/x86_64/include
+
+Name: libavutil
+Description: FFmpeg utility library
+Version: 56.31.100
+Requires: 
+Requires.private: 
+Conflicts:
+Libs: -L${libdir}  -lavutil 
+Libs.private: -pthread -lm
+Cflags: -I${includedir}
