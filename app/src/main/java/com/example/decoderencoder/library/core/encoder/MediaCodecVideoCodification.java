@@ -15,6 +15,7 @@ import com.example.decoderencoder.library.output.MediaOutput;
 import com.example.decoderencoder.library.source.Media;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
 
 public class MediaCodecVideoCodification extends MediaCodecCodification {
 
@@ -52,9 +53,31 @@ public class MediaCodecVideoCodification extends MediaCodecCodification {
         return !(decoderFormat.getInteger(MediaFormat.KEY_WIDTH) == this.format.getInteger(MediaFormat.KEY_WIDTH) &&  decoderFormat.getInteger(MediaFormat.KEY_HEIGHT) == this.format.getInteger(MediaFormat.KEY_HEIGHT));
     }
 
+    /**
+     * Before each keyframe we must write the codec extra data (this hack took me a while to figure out)
+     * @param encoderBuffer contains the extra data for the muxer, built in {@link #onCodecConfigAvailable}
+     */
     @Override
     public void onKeyFrameReady(EncoderBuffer encoderBuffer) {
         super.onDataReady(encoderBuffer);
+    }
+
+
+    /**
+     * Collects the extra data for the codec, i.e. PPS and SPS
+     * @param outputBuffer  encoder output buffer with pps and sps starting with (0x00000001)
+     * @param bufferInfo describes the output buffer (size, offset, etc)
+     */
+    @Override
+    protected void onCodecConfigAvailable(ByteBuffer outputBuffer, MediaCodec.BufferInfo bufferInfo) {
+        ByteBuffer videoSPSandPPS;
+        videoSPSandPPS = ByteBuffer.allocateDirect(bufferInfo.size);
+        byte[] videoConfig = new byte[bufferInfo.size];
+        outputBuffer.get(videoConfig, 0, bufferInfo.size);
+        outputBuffer.position(bufferInfo.offset);
+        outputBuffer.limit(bufferInfo.offset + bufferInfo.size);
+        videoSPSandPPS.put(videoConfig, 0, bufferInfo.size);
+        super.extraData = new EncoderBuffer(videoSPSandPPS, bufferInfo.offset, bufferInfo.size, bufferInfo.flags, bufferInfo.presentationTimeUs);
     }
 
 

@@ -15,7 +15,7 @@ typedef struct OutputStream{
 	AVOutputFormat *of;
 	AVFormatContext *ofmt_ctx;
 
-	AVCodec ** avcodecs;
+	AVCodecContext ** avcodecs;
 	AVRational *streamSourceTimeBase;
 
 	int nbstreams;

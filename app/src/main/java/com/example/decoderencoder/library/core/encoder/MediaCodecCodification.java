@@ -30,7 +30,7 @@ public abstract class MediaCodecCodification extends BaseCodification {
     private ByteBuffer[] inputBuffers;
     private ByteBuffer[] outputBuffers;
     protected Decoder decoder;
-    EncoderBuffer extraData = null;
+    protected EncoderBuffer extraData = null;
 
 
 
@@ -82,18 +82,8 @@ public abstract class MediaCodecCodification extends BaseCodification {
                 }
 
                 if ((bufferInfo.flags & MediaCodec.BUFFER_FLAG_CODEC_CONFIG) != 0) {
-                                      // if video:
-
-                    ByteBuffer videoSPSandPPS;
-                    videoSPSandPPS = ByteBuffer.allocateDirect(bufferInfo.size);
-                    byte[] videoConfig = new byte[bufferInfo.size];
-                    outputBuffer.get(videoConfig, 0, bufferInfo.size);
-                    outputBuffer.position(bufferInfo.offset);
-                    outputBuffer.limit(bufferInfo.offset + bufferInfo.size);
-                    //outputBuffer.put(videoConfig, 0, bufferInfo.size);
-                    videoSPSandPPS.put(videoConfig, 0, bufferInfo.size);
-                    //onDataReady(outputBuffer, bufferInfo);
-                    extraData = new EncoderBuffer(videoSPSandPPS, bufferInfo.offset, bufferInfo.size, bufferInfo.flags, bufferInfo.presentationTimeUs);
+                                      // if video:      h264 / h265 requires sps and pps values, those values can be obtained here
+                    onCodecConfigAvailable(outputBuffer, bufferInfo);
                     encoder.releaseOutputBuffer(encoderStatus, false);
                     return true;
                 }
@@ -110,6 +100,8 @@ public abstract class MediaCodecCodification extends BaseCodification {
 
         return true;
     }
+
+
 
     protected void mayUpdateOutputBuffer() {
         if (Util.SDK_INT <= 21) {
@@ -159,7 +151,11 @@ public abstract class MediaCodecCodification extends BaseCodification {
 
 
     protected void onKeyFrameReady(EncoderBuffer extraData) {
+        // no-op, only necessary for video muxers
+    }
 
+    protected void onCodecConfigAvailable(ByteBuffer outputBuffer, MediaCodec.BufferInfo bufferInfo) {
+        // no-op, only necessary for video muxers
     }
 
 }

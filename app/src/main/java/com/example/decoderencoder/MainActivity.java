@@ -78,7 +78,7 @@ public class MainActivity extends AppCompatActivity  {
                         name = "encoder : " + codecInfo.getName();
                     }else
                         name = "decoder : "  + codecInfo.getName();
-
+                    Log.d(TAG, "codec: " + name);
                     codecs.add(name);
                 }
 

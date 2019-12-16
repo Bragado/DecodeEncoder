@@ -34,7 +34,7 @@ OutputStream * init(const char * path) {
 	video_st->nbstreams = 0;
 	video_st->out_streams = (AVStream**)malloc(DEFAULT_NO_STREAMS*sizeof(AVStream*));
 	video_st->path = path;
-	video_st->avcodecs = (AVCodec**)malloc(DEFAULT_NO_STREAMS*sizeof(AVCodec*));
+	video_st->avcodecs = (AVCodecContext**)malloc(DEFAULT_NO_STREAMS*sizeof(AVCodec*));
 	videoSourceTimeBase = (AVRational*)av_malloc(sizeof(AVRational));
 	videoSourceTimeBase->num = 1;
 	videoSourceTimeBase->den = 1000000;
@@ -84,6 +84,10 @@ void release(OutputStream * video_st) {
 
 	// close output
 	avio_closep(&video_st->ofmt_ctx->pb);
+    for(int i = 0; i < video_st->nbstreams; i++) {
+        avcodec_close(video_st->avcodecs[i]);
+    }
+
 
 	avformat_free_context(video_st->ofmt_ctx);
 	free(video_st->out_streams);
@@ -130,19 +134,23 @@ int addTrack(OutputStream * video_st, std::map<std::string, const char *>& forma
 		LOGE("FFmpeg muxer was not initialized when trying to add a track");
 	}
 	int streamType = atoi(format["streamType"]);
+	int streamIndex = -1;
 	switch(streamType){
 	case 0:		// video
-		return addVideoStream(video_st, format);
-
+        streamIndex = addVideoStream(video_st, format);
+        break;
 	case 1:		// audio
-		return addAudioStream(video_st, format);
-
+        streamIndex = addAudioStream(video_st, format);
+        break;
 	case 2:		// subtitle
-		return addSubtitleStream(video_st, format);
-
+        streamIndex = addSubtitleStream(video_st, format);
+        break;
 	default:
-		return  addUnknownStream(video_st, format);
+        streamIndex = addUnknownStream(video_st, format);
+	    break;
 	}
+	video_st->nbstreams += 1;
+    return streamIndex;
 }
 
 int addVideoStream(OutputStream * video_st, std::map<std::string, const char *>& format) {
@@ -150,7 +158,7 @@ int addVideoStream(OutputStream * video_st, std::map<std::string, const char *>&
 	AVCodecContext *c;
 	AVStream *st;
 	AVCodec *codec;
-	int streamIndex;
+	int streamIndex = -1;
 
 	int bitrate = atoi(format["bit_rate"]);
 	int width = atoi(format["width"]);
@@ -168,11 +176,11 @@ int addVideoStream(OutputStream * video_st, std::map<std::string, const char *>&
 	if (!st) {
 		LOGE("add_video_stream could not alloc stream");
 	}
-	streamIndex = st->index;
+	streamIndex = st->index;   // ok
 	LOGI("addVideoStream at index %d", streamIndex);
 //	c = st->codec;
 
-	avcodec_get_context_defaults3(c, codec);
+	avcodec_get_context_defaults3(c, codec);        // this is a problem, is c being initialized?
 
 	c->codec_id = AV_CODEC_ID_H264;
 
@@ -183,6 +191,7 @@ int addVideoStream(OutputStream * video_st, std::map<std::string, const char *>&
 	c->time_base.num = 1;
 
 	c->pix_fmt = AV_PIX_FMT_YUV420P;
+    video_st->avcodecs[streamIndex] =  c;
 	/*if (dest->oformat->flags & AVFMT_GLOBALHEADER)
 			c->flags |= CODEC_FLAG_GLOBAL_HEADER;*/
 
@@ -194,7 +203,7 @@ int addAudioStream(OutputStream * video_st, std::map<std::string, const char *>&
 	AVCodecContext *c;
 	AVStream *st;
 	AVCodec *codec;
-	int audioStreamIndex;
+	int audioStreamIndex = -1;
 
 	/* find the audio encoder */
 	AVCodecID codecId = getCodecByID(atoi(format["codecID"]));
@@ -218,7 +227,7 @@ int addAudioStream(OutputStream * video_st, std::map<std::string, const char *>&
 	c->sample_rate = atoi(format["sampleRate"]);
 	c->channels    = atoi(format["channels"]);
 	LOGI("addAudioStream sample_rate %d index %d", c->sample_rate, st->index);
-
+    video_st->avcodecs[audioStreamIndex] =  c;
 	/*if (formatContext->oformat->flags & AVFMT_GLOBALHEADER)
 			codecContext->flags |= CODEC_FLAG_GLOBAL_HEADER;*/
 
@@ -226,21 +235,16 @@ int addAudioStream(OutputStream * video_st, std::map<std::string, const char *>&
 }
 
 int addSubtitleStream(OutputStream * video_st, const std::map<std::string, const char *>& format) {
-	int streamIndex;
+	int streamIndex = -1;
 
 	return streamIndex;
 }
 
 int addUnknownStream(OutputStream * video_st, const std::map<std::string, const char *>& format) {
-	int streamIndex;
+	int streamIndex = -1;
 
 	return streamIndex;
 }
-
-
-
-
-
 
 
 
