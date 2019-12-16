@@ -15,6 +15,8 @@ import com.example.decoderencoder.library.extractor.ExtractorOutput;
 import com.example.decoderencoder.library.extractor.PositionHolder;
 import com.example.decoderencoder.library.extractor.SeekMap;
 import com.example.decoderencoder.library.extractor.TrackOutput;
+import com.example.decoderencoder.library.extractor.ts.ElementaryStreamReader;
+import com.example.decoderencoder.library.extractor.ts.SeiReader;
 import com.example.decoderencoder.library.metadata.Metadata;
 import com.example.decoderencoder.library.metadata.icy.IcyHeaders;
 import com.example.decoderencoder.library.network.Allocator;
@@ -53,6 +55,7 @@ public class MediaSource implements ExtractorOutput, SampleQueue.UpstreamFormatC
 
     private TrackId[] sampleQueueTrackIds;
     private SampleQueue[] sampleQueues;
+    private Object[] readers;
     private boolean sampleQueuesBuilt;
     private boolean loadingFinished;
     private boolean notifyDiscontinuity;
@@ -73,6 +76,7 @@ public class MediaSource implements ExtractorOutput, SampleQueue.UpstreamFormatC
     private final ExtractorOutput extractorOutput = this;
     private int dataType;
     private SeekMap seekMap;
+
 
     public MediaSource(
             Uri uri,
@@ -98,6 +102,7 @@ public class MediaSource implements ExtractorOutput, SampleQueue.UpstreamFormatC
         handler = new Handler();
         sampleQueueTrackIds = new TrackId[0];
         sampleQueues = new SampleQueue[0];
+        this.readers = new Object[0];
         pendingResetPositionUs = C.TIME_UNSET;
         loader = new Loader("Loader:MediaSource");
         this.loadErrorHandlingPolicy = loadErrorHandlingPolicy;
@@ -108,8 +113,8 @@ public class MediaSource implements ExtractorOutput, SampleQueue.UpstreamFormatC
 
     // ExtractorOutput Interface Implementation
     @Override
-    public TrackOutput track(int id, int type) {
-        return prepareTrackOutput(new TrackId(id, /* isIcyTrack= */ false));
+    public TrackOutput track(Object reader, int id, int type) {
+        return prepareTrackOutput(new TrackId(id, /* isIcyTrack= */ false), reader);
     }
 
     @Override
@@ -156,14 +161,14 @@ public class MediaSource implements ExtractorOutput, SampleQueue.UpstreamFormatC
         ExtractingLoadable loadable =
                 new ExtractingLoadable(
                         uri, dataSource, extractorHolder, /* extractorOutput= */ this, loadCondition);
-        if (prepared) {
+        /*if (prepared) {
             SeekMap seekMap = preparedState.seekMap;
             Assertions.checkState(isPendingReset());
 
             loadable.setLoadPosition(
                     seekMap.getSeekPoints(pendingResetPositionUs).first.position, pendingResetPositionUs);
             pendingResetPositionUs = C.TIME_UNSET;
-        }
+        }*/
         long elapsedRealtimeMs =
                 loader.startLoading(
                         loadable, this, loadErrorHandlingPolicy.getMinimumLoadableRetryCount(dataType));
@@ -191,6 +196,27 @@ public class MediaSource implements ExtractorOutput, SampleQueue.UpstreamFormatC
         return this.sampleStreams;
     }
 
+    @Override
+    public void discardTracks(boolean discard, int[] tracksID) {
+        int k = 0;
+        for(int i = 0; i < sampleQueues.length; i++) {
+            if(tracksID.length > k) {
+                if(tracksID[k] == sampleQueueTrackIds[i].id) {
+                    if(readers[i] != null) {
+                        if(readers[i] instanceof ElementaryStreamReader) {
+                            ((ElementaryStreamReader)readers[i]).discardStream(discard);
+                        }else if(readers[i] instanceof SeiReader) {
+                            ((SeiReader)readers[i]).discardStream(discard);
+                        }
+                    }else {
+                        Log.e(TAG, "This stream with ID " + tracksID[i] + " will not be discarded because you must implemented it yet. Follow the previous examples");
+                    }
+                    k++;
+                }
+            }
+        }
+    }
+
     // Loader Callbacks implementation
     @Override
     public void onLoadCompleted(ExtractingLoadable loadable, long elapsedRealtimeMs, long loadDurationMs) {     // End of the stream callback (ex. reached the end of the file)
@@ -213,7 +239,7 @@ public class MediaSource implements ExtractorOutput, SampleQueue.UpstreamFormatC
     }
 
     // Internals
-    private TrackOutput prepareTrackOutput(TrackId id) {            // Loader Thread
+    private TrackOutput prepareTrackOutput(TrackId id, Object reader) {            // Loader Thread
         int trackCount = sampleQueues.length;
         for (int i = 0; i < trackCount; i++) {
             if (id.equals(sampleQueueTrackIds[i])) {
@@ -225,9 +251,14 @@ public class MediaSource implements ExtractorOutput, SampleQueue.UpstreamFormatC
         TrackId[] sampleQueueTrackIds = Arrays.copyOf(this.sampleQueueTrackIds, trackCount + 1);
         sampleQueueTrackIds[trackCount] = id;
         this.sampleQueueTrackIds = Util.castNonNullTypeArray(sampleQueueTrackIds);
+
+        Object[] readers = Arrays.copyOf(this.readers, trackCount + 1);
+        readers[trackCount] = reader;
+        this.readers = readers;
         SampleQueue[] sampleQueues = Arrays.copyOf(this.sampleQueues, trackCount + 1);
         sampleQueues[trackCount] = trackOutput;
         this.sampleQueues = Util.castNonNullTypeArray(sampleQueues);
+
         return trackOutput;
     }
 
@@ -291,7 +322,6 @@ public class MediaSource implements ExtractorOutput, SampleQueue.UpstreamFormatC
 
     final class ExtractingLoadable implements Loader.Loadable {     // Loading Thread only
 
-        private final Uri uri;
         private final StatsDataSource dataSource;
         private final ExtractorHolder extractorHolder;
         private final ExtractorOutput extractorOutput;
@@ -311,7 +341,7 @@ public class MediaSource implements ExtractorOutput, SampleQueue.UpstreamFormatC
                 ExtractorHolder extractorHolder,
                 ExtractorOutput extractorOutput,
                 ConditionVariable loadCondition) {
-            this.uri = uri;
+
             this.dataSource = new StatsDataSource(dataSource);
             this.extractorHolder = extractorHolder;
             this.extractorOutput = extractorOutput;
@@ -520,10 +550,16 @@ public class MediaSource implements ExtractorOutput, SampleQueue.UpstreamFormatC
     /** Stores state that is initialized when preparation completes. */
     public static final class PreparedState {
 
+        public enum TRACKSTATE {
+            SELECTED,
+            PASSTROUGH,
+            DISCARD
+        }
+
         public final SeekMap seekMap;
         public final TrackGroupArray tracks;
         public final boolean[] trackIsAudioVideoFlags;
-        public final boolean[] trackEnabledStates;
+        public final TRACKSTATE[] trackEnabledStates;
         public final boolean[] trackNotifiedDownstreamFormats;
 
         public PreparedState(
@@ -531,7 +567,7 @@ public class MediaSource implements ExtractorOutput, SampleQueue.UpstreamFormatC
             this.seekMap = seekMap;
             this.tracks = tracks;
             this.trackIsAudioVideoFlags = trackIsAudioVideoFlags;
-            this.trackEnabledStates = new boolean[tracks.length];
+            this.trackEnabledStates = new TRACKSTATE[tracks.length];
             this.trackNotifiedDownstreamFormats = new boolean[tracks.length];
         }
     }

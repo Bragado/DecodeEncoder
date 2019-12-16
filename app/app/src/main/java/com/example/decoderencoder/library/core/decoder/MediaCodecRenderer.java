@@ -200,6 +200,7 @@ public abstract class MediaCodecRenderer extends BaseRenderer {
         if(inputIndex < 0) {            // FIXME: is this correct?
             inputIndex = decoder.dequeueInputBuffer(10);
             buffer.data = getInputBuffer(inputIndex);
+            buffer.clear();
         }
 
         if(buffer.data == null) {
@@ -215,17 +216,18 @@ public abstract class MediaCodecRenderer extends BaseRenderer {
                 buffer.data.put(data);
             }
         }
-        buffer.clear();
+
 
         if (this.streamIsFinal) {
             decoder.queueInputBuffer(inputIndex, 0, 0, 0, MediaCodec.BUFFER_FLAG_END_OF_STREAM);
             resetInputBuffer();
-            inputIndex = -1;
             return false;
         }
 
         int result = readSource(formatHolder, buffer, false);
-
+        if(buffer.getFlag(C.BUFFER_FLAG_DECODE_ONLY) ) {
+            return true;
+        }
 
         if (result == C.RESULT_NOTHING_READ) {
             Log.d(TAG, "RESULT_NOTHING_READ");
@@ -238,7 +240,6 @@ public abstract class MediaCodecRenderer extends BaseRenderer {
             // associated with the first format.
             buffer.clear();
             codecFormat = formatHolder.format;
-            inputIndex = -1;
             return true;
         }
 
@@ -271,7 +272,7 @@ public abstract class MediaCodecRenderer extends BaseRenderer {
         } catch (MediaCodec.CryptoException e) {
             throw e;
         }
-        inputIndex = -1;
+        resetInputBuffer();
         return true;
     }
 

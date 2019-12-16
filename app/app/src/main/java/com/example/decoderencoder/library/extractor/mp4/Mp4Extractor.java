@@ -416,7 +416,7 @@ public final class Mp4Extractor implements Extractor, SeekMap {
           track.durationUs != C.TIME_UNSET ? track.durationUs : trackSampleTable.durationUs;
       durationUs = Math.max(durationUs, trackDurationUs);
       Mp4Track mp4Track = new Mp4Track(track, trackSampleTable,
-          extractorOutput.track(i, track.type));
+          extractorOutput.track(null, i, track.type));
 
       // Each sample has up to three bytes of overhead for the start code that replaces its length.
       // Allow ten source samples per output sample, like the platform extractor.

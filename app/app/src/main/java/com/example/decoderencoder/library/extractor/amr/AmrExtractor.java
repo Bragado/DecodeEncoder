@@ -166,7 +166,7 @@ public final class AmrExtractor implements Extractor {
   @Override
   public void init(ExtractorOutput extractorOutput) {
     this.extractorOutput = extractorOutput;
-    trackOutput = extractorOutput.track(/* id= */ 0, C.TRACK_TYPE_AUDIO);
+    trackOutput = extractorOutput.track(null, /* id= */ 0, C.TRACK_TYPE_AUDIO);
     extractorOutput.endTracks();
   }
 

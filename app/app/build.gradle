@@ -10,9 +10,10 @@ android {
         versionName "1.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
-       /* ndk {
+        ndk {
             abiFilters 'x86', 'x86_64', 'armeabi-v7a', 'arm64-v8a'
-        }*/
+            ldLibs "log"
+        }
 
     }
     buildTypes {
@@ -23,18 +24,18 @@ android {
 
     }
 
-    /*sourceSets {
+    sourceSets {
         main {
             // let gradle pack the shared library into apk
             jniLibs.srcDirs = ['../ffmpeg-android-maker/output/lib']
         }
     }
- /*   externalNativeBuild {
+    externalNativeBuild {
         cmake {
             path "CMakeLists.txt"
         }
     }
-*/
+
     compileOptions {
         sourceCompatibility = 1.8
         targetCompatibility = 1.8

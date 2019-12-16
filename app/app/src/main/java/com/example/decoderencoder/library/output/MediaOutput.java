@@ -27,6 +27,8 @@ public interface MediaOutput {
 
     MuxerInput newTrackDiscovered(MediaFormat trackFormat);
 
+    void setNumOfStreams(int streams);
+
     long getCurrentMaxPts();
 
     long getCurrentMinPts();

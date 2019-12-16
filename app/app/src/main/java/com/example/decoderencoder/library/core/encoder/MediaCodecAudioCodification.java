@@ -14,6 +14,8 @@ import java.nio.ByteBuffer;
 
 public class MediaCodecAudioCodification extends MediaCodecCodification {
 
+    int index = -1;
+    ByteBuffer encoderInputBuffer;
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
     public MediaCodecAudioCodification(Renderer renderer, Encoder encoder, MediaFormat format, MediaOutput mediaOutput) {
         super(renderer, encoder, format, mediaOutput);
@@ -31,16 +33,17 @@ public class MediaCodecAudioCodification extends MediaCodecCodification {
         if(decoder == null) {                   // TODO: ensure decoder is initialized and get this out of here
             decoder = renderer.getDecoder();
         }
+        if(index < 0) {
+            index = this.encoder.dequeueInputBuffer(0);
+            encoderInputBuffer = getInputBuffer(index);
+        }
 
+        if(encoderInputBuffer == null)
+            return true;
         int decoderIndex = renderer.poolBufferIndex();
         if(decoderIndex < 0)
             return true;
         MediaCodec.BufferInfo decoderBufferInfo = renderer.pollBufferInfo();
-
-        int index = this.encoder.dequeueInputBuffer(0);
-        ByteBuffer encoderInputBuffer = getInputBuffer(index);
-        if(encoderInputBuffer == null)
-            return true;
 
         int size = decoderBufferInfo.size;
         int encodeSize = encoderInputBuffer.capacity();
@@ -59,6 +62,7 @@ public class MediaCodecAudioCodification extends MediaCodecCodification {
                     size,
                     presentationTime,
                     decoderBufferInfo.flags);
+            index = -1;
         }
         renderer.getDecoder().releaseOutputBuffer(decoderIndex, false);
         return true;

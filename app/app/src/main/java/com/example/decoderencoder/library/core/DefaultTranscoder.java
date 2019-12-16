@@ -29,6 +29,8 @@ import com.example.decoderencoder.library.source.TrackGroupArray;
 import com.example.decoderencoder.library.util.C;
 import com.example.decoderencoder.library.util.Log;
 
+import java.util.Arrays;
+
 /**
  * This class is responsible to create and manage all
  */
@@ -131,11 +133,15 @@ public class DefaultTranscoder  extends HandlerThread implements Transcoder, Ren
             return false;
         else {
             transcoderHandler.post(() -> {
+                int i = 0;
                 for (Codification codification : codifications) {
-                    codification.start();
+                    i++;
+                    if(codification != null)
+                        codification.start();
                 }
                 for (Renderer renderer : renderers) {
-                    renderer.start();
+                    if(renderer != null)
+                        renderer.start();
                 }
                 reallyStartTranscoding();
             });
@@ -145,21 +151,28 @@ public class DefaultTranscoder  extends HandlerThread implements Transcoder, Ren
 
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
     @Override
-    public boolean setSelectedTracks(TrackGroup[] selectedTracks, MediaFormat[] formats) {  // Thread : UI
+    public boolean setSelectedTracks(TrackGroup[] selectedTracks, TrackGroup[] discardedTracks, MediaFormat[] formats) {  // Thread : UI
         if(this.preparedState == null)
             return false;
         TrackGroupArray available_tracks = this.preparedState.tracks;
+        int[] tracksToDiscard = new int[0];     // tracks to be discarded
         this.formats = formats;
         int j = 0;
+        int k = 0;
         for(int i = 0; i < available_tracks.length; i++) {
-            if(selectedTracks.length > j && selectedTracks[j].getFormat(0).id.equals(available_tracks.get(i).getFormat(0).id)) {
-                this.preparedState.trackEnabledStates[i] = true;
+            if(selectedTracks.length > j && selectedTracks[j].getFormat(0).id.equals(available_tracks.get(i).getFormat(0).id)) {    // which tracks are going to be transcoded
+                this.preparedState.trackEnabledStates[i] = MediaSource.PreparedState.TRACKSTATE.SELECTED;
                 j++;
-            }else {
-                this.preparedState.trackEnabledStates[i] = false;
+            }else if(discardedTracks.length > k && discardedTracks[k].getFormat(0).id.equals(available_tracks.get(i).getFormat(0).id)) {    // which tracks are going to be discarded
+                this.preparedState.trackEnabledStates[i] = MediaSource.PreparedState.TRACKSTATE.DISCARD;
+                tracksToDiscard = Arrays.copyOf(tracksToDiscard, tracksToDiscard.length + 1);
+                tracksToDiscard[tracksToDiscard.length-1] = Integer.parseInt(available_tracks.get(i).getFormat(0).id.split("/")[1]);
+                k++;
+            }else {         // which tracks are going to be passthrough
+                this.preparedState.trackEnabledStates[i] = MediaSource.PreparedState.TRACKSTATE.PASSTROUGH;
             }
         }
-        onSelectedTracks();
+        onSelectedTracks(tracksToDiscard);
         return true;
     }
 
@@ -196,19 +209,25 @@ public class DefaultTranscoder  extends HandlerThread implements Transcoder, Ren
      * Inicialize the renderers and the encoders
      */
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
-    public void onSelectedTracks() {        // Thread : UI
+    public void onSelectedTracks(int[] tracksToDiscard) {        // Thread : UI
         tracksSelected = true;
         transcoderHandler.post(() -> {
             if(renderers == null) {
-                /* 1. Create Codification */
+                /* 0. Discard tracks */
+                mediaSource.discardTracks(true, tracksToDiscard);
+
+                /* 1. Create Factories */
                 DefaultTranscoder.this.defaultCodificationFactory = new DefaultCodificationFactory();
                 DefaultTranscoder.this.defaultRenderFactory = new DefaultRenderFactory(DefaultTranscoder.this);
 
-                /* Create Renderers */
+                /*2. Create Renderers */
                 DefaultTranscoder.this.renderers = defaultRenderFactory.createRenderers(sampleStreams, preparedState);
 
                 /* Create Codifications */
                 DefaultTranscoder.this.codifications = defaultCodificationFactory.createCodification(DefaultTranscoder.this.formats, preparedState, DefaultTranscoder.this.renderers, mediaOutput);
+
+                 /* Tell the mediaOutput how many streams there is*/
+                 mediaOutput.setNumOfStreams(this.preparedState.tracks.length - tracksToDiscard.length);
 
             }else {         // TODO: change transcoding languages onDemand
                 // 1. Evaluate which renderers will be maintained

@@ -1,5 +1,7 @@
 package com.example.decoderencoder.library.core.encoder;
 
+import android.media.MediaCodec;
+import android.media.MediaFormat;
 import android.os.Build;
 
 import androidx.annotation.RequiresApi;
@@ -10,22 +12,23 @@ import com.example.decoderencoder.library.core.decoder.MediaCodecVideoRenderer;
 import com.example.decoderencoder.library.core.decoder.Renderer;
 import com.example.decoderencoder.library.muxer.MediaMuxer;
 import com.example.decoderencoder.library.muxer.MuxerInput;
+import com.example.decoderencoder.library.output.DefaultMediaOutput;
 import com.example.decoderencoder.library.output.MediaOutput;
+
+import java.nio.ByteBuffer;
 
 public class EmptyCodification extends BaseCodification {
 
-    MediaMuxer mediaMuxer;
+    boolean format_registered = false;
 
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
-    public EmptyCodification(Renderer renderer, Format format, MediaOutput mediaOutput) {
+    public EmptyCodification(Renderer renderer, MediaOutput mediaOutput) {
         super(renderer, null, null, mediaOutput);          // TODO: set the format
-        /* set the format */
-        setFormat(format);
     }
 
     @Override
     public void onRelease() {
-
+        format_registered = false;
     }
 
     @Override
@@ -33,31 +36,28 @@ public class EmptyCodification extends BaseCodification {
 
     }
 
-    @Override
-    public boolean feedInputBuffer() {
-        return false;
-    }
-
-    @Override
-    public boolean drainOutputBuffer() {
-        return false;
-    }
-
 
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
-    private void setFormat(Format format) {
-        String mimeType = format.sampleMimeType;
-        if(mimeType.startsWith("video/")) {
-            this.format = MediaCodecVideoRenderer.getMediaFormat(format, format.sampleMimeType, false);
-        }else if(mimeType.startsWith("audio/")) {
-            this.format = MediaCodecAudioRenderer.getMediaFormat(format, format.sampleMimeType);
-        }else if(mimeType.startsWith("application/cea")) {
-
-        }else if(mimeType.startsWith("application/dvbsubs")) {
-
-        }else {
-
+    @Override
+    public boolean drainOutputBuffer() {
+        if(!format_registered) {
+            // let's add the stream
+            MediaFormat mediaFormat = renderer.getFormat();
+            if(mediaFormat != null) {
+                addTrack(mediaFormat);
+                format_registered = true;
+            }else {
+                return true;
+            }
         }
+        ByteBuffer data = renderer.pollFrameData();
+        MediaCodec.BufferInfo bf = renderer.pollBufferInfo();
+        if(data == null || bf == null)
+            return false;
+        onDataReady(data, bf);
+        return true;
+
     }
+
 
 }

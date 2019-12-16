@@ -81,7 +81,7 @@ public interface Transcoder {
      * @param formats the desired output format,  format[i] refers to track selectedTracks.get(i)
      * @return false if it's not possible to select a track (the transcoder does not yet have information about the available tracks), true otherwise
      */
-    public boolean setSelectedTracks(TrackGroup[] selectedTracks, MediaFormat[] formats);
+    public boolean setSelectedTracks(TrackGroup[] selectedTracks,TrackGroup[] discardedTracks, MediaFormat[] formats);
 
 
     /**

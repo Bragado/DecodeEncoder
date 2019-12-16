@@ -52,12 +52,5 @@ public class MediaCodecVideoCodification extends MediaCodecCodification {
         return !(decoderFormat.getInteger(MediaFormat.KEY_WIDTH) == this.format.getInteger(MediaFormat.KEY_WIDTH) &&  decoderFormat.getInteger(MediaFormat.KEY_HEIGHT) == this.format.getInteger(MediaFormat.KEY_HEIGHT));
     }
 
-    /**
-     * no-op
-     * @return
-     */
-    @Override
-    public boolean feedInputBuffer() {
-        return true;
-    }
+
 }

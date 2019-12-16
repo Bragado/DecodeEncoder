@@ -49,6 +49,6 @@ Java_com_example_decoderencoder_library_muxer_FFmpegMuxer_nativeAddTrack(JNIEnv 
     }
 
     index = addTrack((OutputStream *)stream, mymap);
-    return static_cast<jint>(index);	
+    return reinterpret_cast<jint>(index);
 }
 }

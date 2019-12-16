@@ -61,6 +61,7 @@ public final class LatmReader implements ElementaryStreamReader {
   private int sampleSize;
   private int secondHeaderByte;
   private long timeUs;
+  private boolean keepTrack = true;
 
   // Container data.
   private boolean streamMuxRead;
@@ -72,6 +73,7 @@ public final class LatmReader implements ElementaryStreamReader {
   private int sampleRateHz;
   private long sampleDurationUs;
   private int channelCount;
+
 
   /**
    * @param language Track language.
@@ -91,7 +93,7 @@ public final class LatmReader implements ElementaryStreamReader {
   @Override
   public void createTracks(ExtractorOutput extractorOutput, TrackIdGenerator idGenerator) {
     idGenerator.generateNewId();
-    output = extractorOutput.track(idGenerator.getTrackId(), C.TRACK_TYPE_AUDIO);
+    output = extractorOutput.track(this, idGenerator.getTrackId(), C.TRACK_TYPE_AUDIO);
     formatId = idGenerator.getFormatId();
   }
 
@@ -146,6 +148,16 @@ public final class LatmReader implements ElementaryStreamReader {
   @Override
   public void packetFinished() {
     // Do nothing.
+  }
+
+  @Override
+  public void discardStream(boolean discard) {
+    this.keepTrack = !discard;
+  }
+
+  @Override
+  public boolean keepsTrack() {
+    return this.keepTrack;
   }
 
   /**

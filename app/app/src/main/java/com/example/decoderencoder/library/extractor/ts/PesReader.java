@@ -79,6 +79,9 @@ public final class PesReader implements TsPayloadReader {
 
   @Override
   public final void consume(ParsableByteArray data, @Flags int flags) throws ParserException {
+    if(!reader.keepsTrack()) {    // stream will be discarded
+      return;
+    }
     if ((flags & FLAG_PAYLOAD_UNIT_START_INDICATOR) != 0) {
       switch (state) {
         case STATE_FINDING_HEADER:

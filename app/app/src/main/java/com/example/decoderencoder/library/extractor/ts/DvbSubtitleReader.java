@@ -41,6 +41,7 @@ public final class DvbSubtitleReader implements ElementaryStreamReader {
   private int bytesToCheck;
   private int sampleBytesWritten;
   private long sampleTimeUs;
+  private boolean keepTrack = true;
 
   /**
    * @param subtitleInfos Information about the DVB subtitles associated to the stream.
@@ -60,7 +61,7 @@ public final class DvbSubtitleReader implements ElementaryStreamReader {
     for (int i = 0; i < outputs.length; i++) {
       DvbSubtitleInfo subtitleInfo = subtitleInfos.get(i);
       idGenerator.generateNewId();
-      TrackOutput output = extractorOutput.track(idGenerator.getTrackId(), C.TRACK_TYPE_TEXT);
+      TrackOutput output = extractorOutput.track(this, idGenerator.getTrackId(), C.TRACK_TYPE_TEXT);
       output.format(
           Format.createImageSampleFormat(
               idGenerator.getFormatId(),
@@ -94,6 +95,16 @@ public final class DvbSubtitleReader implements ElementaryStreamReader {
       }
       writingSample = false;
     }
+  }
+
+  @Override
+  public void discardStream(boolean discard) {
+    this.keepTrack = !discard;
+  }
+
+  @Override
+  public boolean keepsTrack() {
+    return this.keepTrack;
   }
 
   @Override

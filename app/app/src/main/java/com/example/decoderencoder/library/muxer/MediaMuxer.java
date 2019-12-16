@@ -3,6 +3,8 @@ package com.example.decoderencoder.library.muxer;
 import android.media.MediaCodec;
 import android.media.MediaFormat;
 
+import com.example.decoderencoder.library.core.encoder.EncoderBuffer;
+
 import java.nio.ByteBuffer;
 
 public interface MediaMuxer {
@@ -46,6 +48,6 @@ public interface MediaMuxer {
      * @param flags     mediacodec flags
      * @param presentationTimeUs pts
      */
-    public void writeSampleData(int trackIndex, ByteBuffer byteBuf, int offset, int size, int flags, long presentationTimeUs);
+    public void writeSampleData(int trackIndex, EncoderBuffer outputBuffer);
 
 }

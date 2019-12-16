@@ -10,6 +10,8 @@ import com.example.decoderencoder.library.Format;
 import com.example.decoderencoder.library.source.SampleStream;
 import com.example.decoderencoder.library.util.C;
 
+import java.nio.ByteBuffer;
+
 public interface Renderer {
 
 
@@ -156,5 +158,7 @@ public interface Renderer {
      */
     MediaFormat getFormat();
 
+
+    ByteBuffer pollFrameData();
 
 }

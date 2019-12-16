@@ -15,6 +15,8 @@
  */
 package com.example.decoderencoder.library.extractor;
 
+import com.example.decoderencoder.library.extractor.ts.ElementaryStreamReader;
+
 /**
  * Receives stream level data extracted by an {@link Extractor}.
  */
@@ -30,11 +32,11 @@ public interface ExtractorOutput {
    *     {@code TRACK_TYPE_*} constants.
    * @return The {@link TrackOutput} for the given track identifier.
    */
-  TrackOutput track(int id, int type);
+  TrackOutput track(Object reader, int id, int type);
 
   /**
    * Called when all tracks have been identified, meaning no new {@code trackId} values will be
-   * passed to {@link #track(int, int)}.
+   * passed to {@link #track(Object, int, int)}.
    */
   void endTracks();
 

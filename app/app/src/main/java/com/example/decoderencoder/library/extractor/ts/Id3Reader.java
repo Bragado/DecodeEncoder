@@ -46,6 +46,7 @@ public final class Id3Reader implements ElementaryStreamReader {
   private long sampleTimeUs;
   private int sampleSize;
   private int sampleBytesRead;
+  private boolean keepTrack = true;
 
   public Id3Reader() {
     id3Header = new ParsableByteArray(ID3_HEADER_SIZE);
@@ -59,7 +60,7 @@ public final class Id3Reader implements ElementaryStreamReader {
   @Override
   public void createTracks(ExtractorOutput extractorOutput, TrackIdGenerator idGenerator) {
     idGenerator.generateNewId();
-    output = extractorOutput.track(idGenerator.getTrackId(), C.TRACK_TYPE_METADATA);
+    output = extractorOutput.track(this, idGenerator.getTrackId(), C.TRACK_TYPE_METADATA);
     output.format(Format.createSampleFormat(idGenerator.getFormatId(), MimeTypes.APPLICATION_ID3,
         null, Format.NO_VALUE, null));
   }
@@ -112,6 +113,16 @@ public final class Id3Reader implements ElementaryStreamReader {
     }
     output.sampleMetadata(sampleTimeUs, C.BUFFER_FLAG_KEY_FRAME, sampleSize, 0, null);
     writingSample = false;
+  }
+
+  @Override
+  public void discardStream(boolean discard) {
+    this.keepTrack = !discard;
+  }
+
+  @Override
+  public boolean keepsTrack() {
+    return this.keepTrack;
   }
 
 }

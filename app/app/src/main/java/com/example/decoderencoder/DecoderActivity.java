@@ -149,9 +149,10 @@ public class DecoderActivity  extends AppCompatActivity implements SurfaceHolder
                 formatAudio.setInteger(MediaFormat.KEY_BIT_RATE, 64000);
                 formatAudio.setInteger(MediaFormat.KEY_MAX_INPUT_SIZE,655360);
 
-                TrackGroup[] trackGroups = new TrackGroup[] {tracks.get(0)/*, tracks.get(4)*/};
-                MediaFormat[] mediaFormats = new MediaFormat[] {format/*, formatAudio*/};
-                transcoder.setSelectedTracks(trackGroups, mediaFormats);
+                TrackGroup[] trackGroups = new TrackGroup[] {tracks.get(0)};
+                TrackGroup[] discardTracks = new TrackGroup[] {tracks.get(1),  tracks.get(2), tracks.get(3), tracks.get(4), tracks.get(5)};
+                MediaFormat[] mediaFormats = new MediaFormat[] {format , formatAudio };
+                transcoder.setSelectedTracks(trackGroups, discardTracks,  mediaFormats);
 
             }
 
@@ -168,7 +169,7 @@ public class DecoderActivity  extends AppCompatActivity implements SurfaceHolder
 
         MediaOutput mediaOutput = new DefaultMediaOutput(allocator);
 
-        DefaultTranscoder df = new DefaultTranscoder(callback, PATH, "/storage/emulated/0/Download/transkika.mp4");
+        DefaultTranscoder df = new DefaultTranscoder(callback, PATH, "/storage/emulated/0/Download/kikats.ts");
         df.start();
         df.setDataSource(dataSource);
         df.setOutputSource(mediaOutput);

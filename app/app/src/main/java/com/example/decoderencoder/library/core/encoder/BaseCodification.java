@@ -79,5 +79,10 @@ public abstract class BaseCodification implements Codification {
         this.muxerInput = mediaOutput.newTrackDiscovered(trackFormat);
     }
 
+    @Override
+    public boolean feedInputBuffer() {
+        return false;
+    }
+
 
 }

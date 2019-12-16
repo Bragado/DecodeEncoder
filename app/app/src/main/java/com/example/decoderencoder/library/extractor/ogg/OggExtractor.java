@@ -77,7 +77,7 @@ public class OggExtractor implements Extractor {
       input.resetPeekPosition();
     }
     if (!streamReaderInitialized) {
-      TrackOutput trackOutput = output.track(0, C.TRACK_TYPE_AUDIO);
+      TrackOutput trackOutput = output.track(null, 0, C.TRACK_TYPE_AUDIO);
       output.endTracks();
       streamReader.init(output, trackOutput);
       streamReaderInitialized = true;

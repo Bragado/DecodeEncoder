@@ -94,6 +94,7 @@ public final class AdtsReader implements ElementaryStreamReader {
 
   private TrackOutput currentOutput;
   private long currentSampleDuration;
+  private boolean keepTrack = true;
 
   /**
    * @param exposeId3 True if the reader should expose ID3 information.
@@ -131,10 +132,10 @@ public final class AdtsReader implements ElementaryStreamReader {
   public void createTracks(ExtractorOutput extractorOutput, TrackIdGenerator idGenerator) {
     idGenerator.generateNewId();
     formatId = idGenerator.getFormatId();
-    output = extractorOutput.track(idGenerator.getTrackId(), C.TRACK_TYPE_AUDIO);
+    output = extractorOutput.track(this, idGenerator.getTrackId(), C.TRACK_TYPE_AUDIO);
     if (exposeId3) {
       idGenerator.generateNewId();
-      id3Output = extractorOutput.track(idGenerator.getTrackId(), C.TRACK_TYPE_METADATA);
+      id3Output = extractorOutput.track(this, idGenerator.getTrackId(), C.TRACK_TYPE_METADATA);
       id3Output.format(Format.createSampleFormat(idGenerator.getFormatId(),
           MimeTypes.APPLICATION_ID3, null, Format.NO_VALUE, null));
     } else {
@@ -180,6 +181,16 @@ public final class AdtsReader implements ElementaryStreamReader {
   @Override
   public void packetFinished() {
     // Do nothing.
+  }
+
+  @Override
+  public void discardStream(boolean discard) {
+    this.keepTrack = !discard;
+  }
+
+  @Override
+  public boolean keepsTrack() {
+    return this.keepTrack;
   }
 
   /**

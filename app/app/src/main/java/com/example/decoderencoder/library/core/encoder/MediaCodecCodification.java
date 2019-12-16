@@ -87,21 +87,6 @@ public abstract class MediaCodecCodification extends BaseCodification {
         return true;
     }
 
-
- /*   @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
-    public void mux(ByteBuffer  outputBuffer, MediaCodec.BufferInfo bufferInfo, int trackId) {
-        if(!androidMuxerStarted) {
-            androidMuxer.start();
-            mediaMuxer.start();
-            androidMuxerStarted = true;
-        }
-        mediaMuxer.writeSampleData(trackId, outputBuffer, bufferInfo.offset, bufferInfo.size, bufferInfo.flags, bufferInfo.presentationTimeUs);
-        androidMuxer.writeSampleData(trackId, outputBuffer, bufferInfo);
-    }*/
-
-
-    public abstract boolean feedInputBuffer();
-
     protected void mayUpdateOutputBuffer() {
         if (Util.SDK_INT <= 21) {
             this.outputBuffers = encoder.getOutputBuffers();

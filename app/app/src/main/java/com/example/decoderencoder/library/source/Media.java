@@ -80,4 +80,11 @@ public interface Media {
      */
      SampleStream[] getSampleStreams();
 
+    /**
+     * Tells the extractor to discard the tracks
+     * @param discard if true discards the tracks in tracks otherwise starts loading the tracks
+     * @param tracksID tracks to be discarded or to be recovered
+     */
+     void discardTracks(boolean discard, int[] tracksID);
+
 }

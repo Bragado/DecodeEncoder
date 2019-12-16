@@ -68,6 +68,7 @@ public final class H265Reader implements ElementaryStreamReader {
 
   // Scratch variables to avoid allocations.
   private final ParsableByteArray seiWrapper;
+  private boolean keepTrack = true;
 
   /**
    * @param seiReader An SEI reader for consuming closed caption channels.
@@ -99,7 +100,7 @@ public final class H265Reader implements ElementaryStreamReader {
   public void createTracks(ExtractorOutput extractorOutput, TrackIdGenerator idGenerator) {
     idGenerator.generateNewId();
     formatId = idGenerator.getFormatId();
-    output = extractorOutput.track(idGenerator.getTrackId(), C.TRACK_TYPE_VIDEO);
+    output = extractorOutput.track(this, idGenerator.getTrackId(), C.TRACK_TYPE_VIDEO);
     sampleReader = new SampleReader(output);
     seiReader.createTracks(extractorOutput, idGenerator);
   }
@@ -159,6 +160,16 @@ public final class H265Reader implements ElementaryStreamReader {
   @Override
   public void packetFinished() {
     // Do nothing.
+  }
+
+  @Override
+  public void discardStream(boolean discard) {
+    this.keepTrack = !discard;
+  }
+
+  @Override
+  public boolean keepsTrack() {
+    return this.keepTrack;
   }
 
   private void startNalUnit(long position, int offset, int nalUnitType, long pesTimeUs) {

@@ -60,4 +60,14 @@ public interface ElementaryStreamReader {
    */
   void packetFinished();
 
+  /**
+   * Discards the stream, tells the reader there's no necessity to read this stream because it will be discarded
+   */
+  void discardStream(boolean discard);
+
+  /**
+   * Asks if the reader will consumes the streams
+   * @return true if the stream is to be consume, false if it's to be discarded
+   */
+  boolean keepsTrack();
 }

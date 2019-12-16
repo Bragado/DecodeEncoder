@@ -158,7 +158,7 @@ public final class Mp3Extractor implements Extractor {
   @Override
   public void init(ExtractorOutput output) {
     extractorOutput = output;
-    trackOutput = extractorOutput.track(0, C.TRACK_TYPE_AUDIO);
+    trackOutput = extractorOutput.track(null, 0, C.TRACK_TYPE_AUDIO);
     extractorOutput.endTracks();
   }
 
