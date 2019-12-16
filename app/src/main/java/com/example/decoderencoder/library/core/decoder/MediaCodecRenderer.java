@@ -30,7 +30,7 @@ public abstract class MediaCodecRenderer extends BaseRenderer {
     protected Decoder decoder;
     private Format codecFormat;
     private final DecoderInputBuffer buffer;
-    private int inputIndex;
+    private int inputIndex = -1;
     private ByteBuffer outputBuffer;
     private MediaCrypto mediaCrypto;
     private ByteBuffer[] inputBuffers;
@@ -197,9 +197,11 @@ public abstract class MediaCodecRenderer extends BaseRenderer {
         if(!initCodec()) {
             return true;
         }
-
-        inputIndex = decoder.dequeueInputBuffer(0);
-        buffer.data = getInputBuffer(inputIndex);
+        if(inputIndex < 0) {            // FIXME: is this correct?
+            inputIndex = decoder.dequeueInputBuffer(10);
+            buffer.data = getInputBuffer(inputIndex);
+            buffer.clear();
+        }
 
         if(buffer.data == null) {
             Log.d(TAG, "Codec Input Buffer is null");
@@ -214,7 +216,7 @@ public abstract class MediaCodecRenderer extends BaseRenderer {
                 buffer.data.put(data);
             }
         }
-        buffer.clear();
+
 
         if (this.streamIsFinal) {
             decoder.queueInputBuffer(inputIndex, 0, 0, 0, MediaCodec.BUFFER_FLAG_END_OF_STREAM);
@@ -223,7 +225,9 @@ public abstract class MediaCodecRenderer extends BaseRenderer {
         }
 
         int result = readSource(formatHolder, buffer, false);
-
+        if(buffer.getFlag(C.BUFFER_FLAG_DECODE_ONLY) ) {
+            return true;
+        }
 
         if (result == C.RESULT_NOTHING_READ) {
             Log.d(TAG, "RESULT_NOTHING_READ");
@@ -252,7 +256,7 @@ public abstract class MediaCodecRenderer extends BaseRenderer {
                 decodeOnlyPresentationTimestamps.add(presentationTimeUs);
             }
             if(buffer.isEndOfStream()) {
-                decoder.queueInputBuffer(inputIndex, 0, 0, 0, MediaCodec.BUFFER_FLAG_END_OF_STREAM);
+                decoder.queueInputBuffer(inputIndex, 0, 0, presentationTimeUs, MediaCodec.BUFFER_FLAG_END_OF_STREAM);
                 resetInputBuffer();
             }
 
@@ -268,6 +272,7 @@ public abstract class MediaCodecRenderer extends BaseRenderer {
         } catch (MediaCodec.CryptoException e) {
             throw e;
         }
+        resetInputBuffer();
         return true;
     }
 

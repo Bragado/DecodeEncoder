@@ -31,6 +31,8 @@ import com.example.decoderencoder.library.network.DefaultDataSourceFactory;
 import com.example.decoderencoder.library.network.DefaultLoadErrorHandlingPolicy;
 import com.example.decoderencoder.library.network.LoadErrorHandlingPolicy;
 import com.example.decoderencoder.library.network.Loader;
+import com.example.decoderencoder.library.output.DefaultMediaOutput;
+import com.example.decoderencoder.library.output.MediaOutput;
 import com.example.decoderencoder.library.source.Media;
 import com.example.decoderencoder.library.source.MediaSource;
 import com.example.decoderencoder.library.source.SampleStream;
@@ -41,8 +43,7 @@ import com.example.decoderencoder.library.util.Stats;
 
 import java.io.IOException;
 
-public class DecoderActivity  extends AppCompatActivity implements SurfaceHolder.Callback, Loader.Callback<DecoderActivity.DecodeLoadable>,
-        Loader.ReleaseCallback {
+public class DecoderActivity  extends AppCompatActivity implements SurfaceHolder.Callback {
 
     public final String TAG = "DECODER ACTIVITY";
 
@@ -148,9 +149,10 @@ public class DecoderActivity  extends AppCompatActivity implements SurfaceHolder
                 formatAudio.setInteger(MediaFormat.KEY_BIT_RATE, 64000);
                 formatAudio.setInteger(MediaFormat.KEY_MAX_INPUT_SIZE,655360);
 
-                TrackGroup[] trackGroups = new TrackGroup[] {tracks.get(0)/*, tracks.get(2)*/};
-                MediaFormat[] mediaFormats = new MediaFormat[] {format/*, formatAudio*/};
-                transcoder.setSelectedTracks(trackGroups, mediaFormats);
+                TrackGroup[] trackGroups = new TrackGroup[] {tracks.get(0)};
+                TrackGroup[] discardTracks = new TrackGroup[] {tracks.get(1),  tracks.get(2), tracks.get(3), tracks.get(4), tracks.get(5)};
+                MediaFormat[] mediaFormats = new MediaFormat[] {format , formatAudio };
+                transcoder.setSelectedTracks(trackGroups, discardTracks,  mediaFormats);
 
             }
 
@@ -165,9 +167,12 @@ public class DecoderActivity  extends AppCompatActivity implements SurfaceHolder
             }
         };
 
-        DefaultTranscoder df = new DefaultTranscoder(callback, PATH);
+        MediaOutput mediaOutput = new DefaultMediaOutput(allocator);
+
+        DefaultTranscoder df = new DefaultTranscoder(callback, PATH, "/storage/emulated/0/Download/kikats.ts");
         df.start();
         df.setDataSource(dataSource);
+        df.setOutputSource(mediaOutput);
         df.prepare();
 
         surfaceView = (SurfaceView) findViewById(R.id.decoderSurfaceView);
@@ -207,53 +212,6 @@ public class DecoderActivity  extends AppCompatActivity implements SurfaceHolder
     }
 
 
-    @Override
-    public void onLoaderReleased() {
 
-    }
-
-
-    @Override
-    public void onLoadCompleted(DecodeLoadable loadable, long elapsedRealtimeMs, long loadDurationMs) {
-
-    }
-
-    @Override
-    public void onLoadCanceled(DecodeLoadable loadable, long elapsedRealtimeMs, long loadDurationMs, boolean released) {
-
-    }
-
-    @Override
-    public Loader.LoadErrorAction onLoadError(DecodeLoadable loadable, long elapsedRealtimeMs, long loadDurationMs, IOException error, int errorCount) {
-        return null;
-    }
-
-    final class DecodeLoadable implements Loader.Loadable {
-
-        Renderer renderer;
-        Decoder decoder;
-        TrackGroup trackGroup;
-        SampleStream sampleStream;
-
-        @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
-        public DecodeLoadable(Surface surface, TrackGroup trackGroup, SampleStream sampleStream) {
-            //decoder = new DefaultDecoder(trackGroup, surface);
-            //renderer = new MediaCodecVideoRenderer(C.TRACK_TYPE_VIDEO, decoder);
-            this.trackGroup = trackGroup;
-            this.sampleStream = sampleStream;
-
-        }
-
-        @Override
-        public void cancelLoad() {
-
-        }
-
-        @Override
-        public void load() throws IOException, InterruptedException {
-            renderer.enable(trackGroup.getFormat(), sampleStream, 0,0);
-            renderer.start();
-        }
-    }
 
 }

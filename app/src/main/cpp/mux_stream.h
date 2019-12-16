@@ -14,6 +14,10 @@ typedef struct OutputStream{
 	AVStream **out_streams;
 	AVOutputFormat *of;
 	AVFormatContext *ofmt_ctx;
+
+	AVCodec ** avcodecs;
+	AVRational *streamSourceTimeBase;
+
 	int nbstreams;
 	int allocation_size;		// FIXME : realloc
 	const char * path;
@@ -29,7 +33,7 @@ void release(OutputStream * video_st);
 
 void writeFrame(OutputStream * video_st, jint trackIndex, jbyte* framedata, jint offset, jint size, jint flags, jlong presentationTimeUs);
 
-int addTrack(OutputStream * video_st, std::map<std::string, const char *> mymap);
+int addTrack(OutputStream * video_st, std::map<std::string, const char *> & mymap);
 
 
 #endif //ENCODERDECODER_MUX_STREAM_H

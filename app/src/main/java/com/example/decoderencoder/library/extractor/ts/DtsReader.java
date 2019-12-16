@@ -53,6 +53,7 @@ public final class DtsReader implements ElementaryStreamReader {
 
   // Used when reading the samples.
   private long timeUs;
+  private boolean keepTrack = true;
 
   /**
    * Constructs a new reader for DTS elementary streams.
@@ -76,7 +77,7 @@ public final class DtsReader implements ElementaryStreamReader {
   public void createTracks(ExtractorOutput extractorOutput, TrackIdGenerator idGenerator) {
     idGenerator.generateNewId();
     formatId = idGenerator.getFormatId();
-    output = extractorOutput.track(idGenerator.getTrackId(), C.TRACK_TYPE_AUDIO);
+    output = extractorOutput.track(this, idGenerator.getTrackId(), C.TRACK_TYPE_AUDIO);
   }
 
   @Override
@@ -120,6 +121,16 @@ public final class DtsReader implements ElementaryStreamReader {
   @Override
   public void packetFinished() {
     // Do nothing.
+  }
+
+  @Override
+  public void discardStream(boolean discard) {
+    this.keepTrack = !discard;
+  }
+
+  @Override
+  public boolean keepsTrack() {
+    return this.keepTrack;
   }
 
   /**

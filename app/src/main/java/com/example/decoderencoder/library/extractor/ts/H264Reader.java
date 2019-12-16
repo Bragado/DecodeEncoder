@@ -56,6 +56,7 @@ public final class H264Reader implements ElementaryStreamReader {
   private String formatId;
   private TrackOutput output;
   private SampleReader sampleReader;
+  private boolean keepTrack = true;
 
   // State that should not be reset on seek.
   private boolean hasOutputFormat;
@@ -68,6 +69,7 @@ public final class H264Reader implements ElementaryStreamReader {
 
   // Scratch variables to avoid allocations.
   private final ParsableByteArray seiWrapper;
+
 
   /**
    * @param seiReader An SEI reader for consuming closed caption channels.
@@ -102,7 +104,7 @@ public final class H264Reader implements ElementaryStreamReader {
   public void createTracks(ExtractorOutput extractorOutput, TrackIdGenerator idGenerator) {
     idGenerator.generateNewId();
     formatId = idGenerator.getFormatId();
-    output = extractorOutput.track(idGenerator.getTrackId(), C.TRACK_TYPE_VIDEO);
+    output = extractorOutput.track(this, idGenerator.getTrackId(), C.TRACK_TYPE_VIDEO);
     sampleReader = new SampleReader(output, allowNonIdrKeyframes, detectAccessUnits);
     seiReader.createTracks(extractorOutput, idGenerator);
   }
@@ -159,6 +161,16 @@ public final class H264Reader implements ElementaryStreamReader {
   @Override
   public void packetFinished() {
     // Do nothing.
+  }
+
+  @Override
+  public void discardStream(boolean discard) {
+    this.keepTrack = !discard;
+  }
+
+  @Override
+  public boolean keepsTrack() {
+    return this.keepTrack;
   }
 
   private void startNalUnit(long position, int nalUnitType, long pesTimeUs) {

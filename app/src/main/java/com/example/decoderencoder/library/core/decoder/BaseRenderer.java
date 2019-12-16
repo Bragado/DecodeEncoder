@@ -5,6 +5,8 @@ import com.example.decoderencoder.library.FormatHolder;
 import com.example.decoderencoder.library.source.SampleStream;
 import com.example.decoderencoder.library.util.C;
 
+import java.nio.ByteBuffer;
+
 public abstract class BaseRenderer implements Renderer {
 
     private final int trackType;
@@ -80,6 +82,8 @@ public abstract class BaseRenderer implements Renderer {
         this.streamIsFinal = true;
     }
 
+    @Override
+    public ByteBuffer pollFrameData() { return null; }
 
     // Methods to be overridden by subclasses.
 

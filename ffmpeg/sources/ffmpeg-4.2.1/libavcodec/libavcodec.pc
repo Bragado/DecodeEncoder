@@ -1,7 +1,14 @@
+<<<<<<< HEAD
 prefix=/home/lrc/git/IPIP_Transcoder/ffmpeg-android-maker/build/x86_64
 exec_prefix=${prefix}
 libdir=/home/lrc/git/IPIP_Transcoder/ffmpeg-android-maker/build/x86_64/lib
 includedir=/home/lrc/git/IPIP_Transcoder/ffmpeg-android-maker/build/x86_64/include
+=======
+prefix=/home/luis/git/DecodeEncoder/ffmpeg/build/x86_64
+exec_prefix=${prefix}
+libdir=/home/luis/git/DecodeEncoder/ffmpeg/build/x86_64/lib
+includedir=/home/luis/git/DecodeEncoder/ffmpeg/build/x86_64/include
+>>>>>>> 2b47fee5e208bedb29cc56a2f173aa1aea23a672
 
 Name: libavcodec
 Description: FFmpeg codec library

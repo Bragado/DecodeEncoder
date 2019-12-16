@@ -69,6 +69,7 @@ public final class H262Reader implements ElementaryStreamReader {
   private long sampleTimeUs;
   private boolean sampleIsKeyframe;
   private boolean sampleHasPicture;
+  private boolean keepTrack = true;
 
   public H262Reader() {
     this(null);
@@ -102,7 +103,7 @@ public final class H262Reader implements ElementaryStreamReader {
   public void createTracks(ExtractorOutput extractorOutput, TrackIdGenerator idGenerator) {
     idGenerator.generateNewId();
     formatId = idGenerator.getFormatId();
-    output = extractorOutput.track(idGenerator.getTrackId(), C.TRACK_TYPE_VIDEO);
+    output = extractorOutput.track(this, idGenerator.getTrackId(), C.TRACK_TYPE_VIDEO);
     if (userDataReader != null) {
       userDataReader.createTracks(extractorOutput, idGenerator);
     }
@@ -206,6 +207,16 @@ public final class H262Reader implements ElementaryStreamReader {
   @Override
   public void packetFinished() {
     // Do nothing.
+  }
+
+  @Override
+  public void discardStream(boolean discard) {
+    this.keepTrack = !discard;
+  }
+
+  @Override
+  public boolean keepsTrack() {
+    return this.keepTrack;
   }
 
   /**

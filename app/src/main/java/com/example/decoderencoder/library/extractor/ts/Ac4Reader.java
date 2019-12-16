@@ -35,6 +35,8 @@ import java.lang.annotation.RetentionPolicy;
 /** Parses a continuous AC-4 byte stream and extracts individual samples. */
 public final class Ac4Reader implements ElementaryStreamReader {
 
+
+
   @Documented
   @Retention(RetentionPolicy.SOURCE)
   @IntDef({STATE_FINDING_SYNC, STATE_READING_HEADER, STATE_READING_SAMPLE})
@@ -65,7 +67,7 @@ public final class Ac4Reader implements ElementaryStreamReader {
 
   // Used when reading the samples.
   private long timeUs;
-
+  private boolean keepTrack = true;
   /** Constructs a new reader for AC-4 elementary streams. */
   public Ac4Reader() {
     this(null);
@@ -98,7 +100,7 @@ public final class Ac4Reader implements ElementaryStreamReader {
   public void createTracks(ExtractorOutput extractorOutput, TrackIdGenerator generator) {
     generator.generateNewId();
     trackFormatId = generator.getFormatId();
-    output = extractorOutput.track(generator.getTrackId(), C.TRACK_TYPE_AUDIO);
+    output = extractorOutput.track(this, generator.getTrackId(), C.TRACK_TYPE_AUDIO);
   }
 
   @Override
@@ -145,6 +147,16 @@ public final class Ac4Reader implements ElementaryStreamReader {
   @Override
   public void packetFinished() {
     // Do nothing.
+  }
+
+  @Override
+  public void discardStream(boolean discard) {
+    this.keepTrack = !discard;
+  }
+
+  @Override
+  public boolean keepsTrack() {
+    return this.keepTrack;
   }
 
   /**

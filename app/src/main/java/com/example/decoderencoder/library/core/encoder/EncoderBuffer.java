@@ -1,8 +1,11 @@
 package com.example.decoderencoder.library.core.encoder;
 
-import java.nio.ByteBuffer;
+import android.support.annotation.NonNull;
 
-public class EncoderBuffer {
+import java.nio.ByteBuffer;
+import java.util.Comparator;
+
+public class EncoderBuffer implements Comparable {
 
     /**
      * This indicates that the (encoded) buffer marked as such contains
@@ -72,12 +75,20 @@ public class EncoderBuffer {
     public int flags;
 
 
-    public EncoderBuffer(ByteBuffer data, int offset, int size, long presentationTimeUs) {
+    public EncoderBuffer(ByteBuffer data, int offset, int size, int flags, long presentationTimeUs) {
         this.data = data;
         this.offset = offset;
         this.size = size;
         this.presentationTimeUs = presentationTimeUs;
+        this.flags = flags;
     }
 
-
+    @Override
+    public int compareTo(@NonNull Object o) {
+        if(this.presentationTimeUs < ((EncoderBuffer)o).presentationTimeUs)
+            return -1;
+        else if(this.presentationTimeUs > ((EncoderBuffer)o).presentationTimeUs)
+            return 1;
+        return 0;
+    }
 }

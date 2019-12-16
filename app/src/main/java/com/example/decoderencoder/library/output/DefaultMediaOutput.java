@@ -9,6 +9,7 @@ import android.os.HandlerThread;
 import androidx.annotation.RequiresApi;
 
 import com.example.decoderencoder.library.core.encoder.EncoderBuffer;
+import com.example.decoderencoder.library.muxer.FFmpegMuxer;
 import com.example.decoderencoder.library.muxer.MediaCodecMuxer;
 import com.example.decoderencoder.library.muxer.MediaMuxer;
 import com.example.decoderencoder.library.muxer.MuxerInput;
@@ -17,9 +18,11 @@ import com.example.decoderencoder.library.network.DataOutput;
 import com.example.decoderencoder.library.source.Media;
 import com.example.decoderencoder.library.source.MediaSource;
 import com.example.decoderencoder.library.util.ConditionVariable;
+import com.example.decoderencoder.library.util.Log;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.LinkedList;
 
 
 /**
@@ -30,6 +33,7 @@ import java.util.ArrayList;
  */
 public class DefaultMediaOutput extends HandlerThread implements MediaOutput {
 
+    private static final String TAG = "DEFAULTMEDIAOUTPUT";
     Handler mediaOutputHandler;
     Handler transcoderHandler;
 
@@ -45,7 +49,8 @@ public class DefaultMediaOutput extends HandlerThread implements MediaOutput {
     long minPTS = Long.MAX_VALUE;
 
     boolean muxerStarted = false;
-
+    int numOfMuxingStreams = -1;     // FIXME
+    int currentNumOfStreams = 0;
     //final ConditionVariable loadCondition;
 
 
@@ -72,7 +77,13 @@ public class DefaultMediaOutput extends HandlerThread implements MediaOutput {
         int trackId = mediaMuxer.addTrack(trackFormat);
         EncoderOutput encoderOutput = new EncoderOutput(trackId);
         muxerInputs.add(encoderOutput);
+        currentNumOfStreams++;
         return encoderOutput;
+    }
+
+    @Override
+    public void setNumOfStreams(int streams) {
+        numOfMuxingStreams = streams;
     }
 
     @Override
@@ -97,12 +108,17 @@ public class DefaultMediaOutput extends HandlerThread implements MediaOutput {
          * mediamuxer factory
          * based on the uri, check which muxer can handle it
          */
-        this.mediaMuxer = new MediaCodecMuxer(uri.getPath(),  android.media.MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4);
+        //this.mediaMuxer = new MediaCodecMuxer(uri.getPath(),  android.media.MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4);
+        this.mediaMuxer = new FFmpegMuxer(uri);
     }
 
     @Override
     public void maybeStartMuxer() {
-        if(!muxerStarted) {
+        if(numOfMuxingStreams < 0) {
+            Log.d(TAG, "Cannot start muxing because the number of streams was not defined");
+        }
+
+        if(!muxerStarted && numOfMuxingStreams == currentNumOfStreams) {
             this.mediaMuxer.start();
             muxerStarted = true;
         }
@@ -142,6 +158,12 @@ public class DefaultMediaOutput extends HandlerThread implements MediaOutput {
 
     public class EncoderOutput implements MuxerInput {
         int trackId;
+        long smallestTimeStamp;
+        long biggestTimeStamp;
+        int trackType = 0;
+
+        LinkedList<EncoderBuffer> pendingEncoderOutputBuffers = new LinkedList<EncoderBuffer>();
+
 
         public EncoderOutput(int trackId) {
             this.trackId = trackId;
@@ -149,7 +171,17 @@ public class DefaultMediaOutput extends HandlerThread implements MediaOutput {
 
         @Override
         public int sampleData(EncoderBuffer outputBuffer) throws IOException, InterruptedException {
-            mediaMuxer.writeSampleData(trackId, outputBuffer.data, outputBuffer.offset, outputBuffer.size, outputBuffer.flags, outputBuffer.presentationTimeUs);
+
+            if(numOfMuxingStreams > currentNumOfStreams) {
+                pendingEncoderOutputBuffers.add(outputBuffer);
+            }else {
+                while(pendingEncoderOutputBuffers.size() > 0) {                 // TODO
+                    EncoderBuffer bf = pendingEncoderOutputBuffers.poll();
+                    mediaMuxer.writeSampleData(trackId, outputBuffer);
+                }
+                mediaMuxer.writeSampleData(trackId, outputBuffer);
+            }
+
             return 1;
         }
     }

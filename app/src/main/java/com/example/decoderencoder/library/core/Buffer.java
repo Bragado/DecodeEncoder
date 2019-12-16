@@ -88,8 +88,13 @@ public abstract class Buffer {
    * @param flag The flag to check.
    * @return Whether the flag is set.
    */
-  protected final boolean getFlag(@C.BufferFlags int flag) {
+  public final boolean getFlag(@C.BufferFlags int flag) {
     return (flags & flag) == flag;
   }
+
+  public final int getFlag()  {
+    return flags;
+  }
+
 
 }

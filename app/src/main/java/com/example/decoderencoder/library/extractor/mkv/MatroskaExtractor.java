@@ -2016,7 +2016,7 @@ public class MatroskaExtractor implements Extractor {
         throw new ParserException("Unexpected MIME type.");
       }
 
-      this.output = output.track(number, type);
+      this.output = output.track(null, number, type);
       this.output.format(format);
     }
 

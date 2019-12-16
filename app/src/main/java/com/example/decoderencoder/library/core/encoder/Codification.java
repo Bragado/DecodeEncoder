@@ -56,7 +56,5 @@ public interface Codification {
     boolean drainOutputBuffer();
 
 
-    void setMediaMuxer(MediaMuxer mediaMuxer);
-
 
 }

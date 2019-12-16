@@ -14,6 +14,7 @@ import com.example.decoderencoder.library.core.decoder.Renderer;
 import com.example.decoderencoder.library.muxer.FFmpegMuxer;
 import com.example.decoderencoder.library.muxer.MediaMuxer;
 import com.example.decoderencoder.library.muxer.MuxerInput;
+import com.example.decoderencoder.library.output.MediaOutput;
 import com.example.decoderencoder.library.util.Util;
 
 import java.io.IOException;
@@ -29,34 +30,17 @@ public abstract class MediaCodecCodification extends BaseCodification {
     private ByteBuffer[] inputBuffers;
     private ByteBuffer[] outputBuffers;
     protected Decoder decoder;
-    MediaMuxer mediaMuxer;
-    int trackId = -1;
+    EncoderBuffer extraData = null;
 
-    // testing only
-    public android.media.MediaMuxer androidMuxer;
-    boolean androidMuxerStarted = false;
+
 
     Surface encoderSurface;
 
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
-    public MediaCodecCodification(Renderer renderer, Encoder encoder, MediaFormat format, MuxerInput muxerInput) {
-        super(renderer, encoder, format, muxerInput);
-
-
-        try {
-            this.androidMuxer = new android.media.MediaMuxer("/storage/emulated/0/Download/test.mp4",  android.media.MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4);
-
-            this.mediaMuxer = new FFmpegMuxer(Uri.parse("/storage/emulated/0/Download/ffmpeg.ts"));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
+    public MediaCodecCodification(Renderer renderer, Encoder encoder, MediaFormat format, MediaOutput mediaOutput) {
+        super(renderer, encoder, format, mediaOutput);
     }
 
-    @Override
-    public void setMediaMuxer(MediaMuxer mediaMuxer) {
-        this.mediaMuxer = mediaMuxer;
-    }
 
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
     @Override
@@ -83,6 +67,9 @@ public abstract class MediaCodecCodification extends BaseCodification {
                 break;
             case MediaCodec.INFO_OUTPUT_FORMAT_CHANGED:
                 MediaFormat newFormat = this.encoder.getOutputFormat();
+
+
+
                 onFormatChange(newFormat);
                 break;
             default:
@@ -94,31 +81,35 @@ public abstract class MediaCodecCodification extends BaseCodification {
                     Log.e(TAG, "Encoded data is null, something went wrong");
                 }
 
-                if ((bufferInfo.flags & MediaCodec.BUFFER_FLAG_CODEC_CONFIG) != 0) { bufferInfo.size = 0; } // ignore data
+                if ((bufferInfo.flags & MediaCodec.BUFFER_FLAG_CODEC_CONFIG) != 0) {
+                                      // if video:
+
+                    ByteBuffer videoSPSandPPS;
+                    videoSPSandPPS = ByteBuffer.allocateDirect(bufferInfo.size);
+                    byte[] videoConfig = new byte[bufferInfo.size];
+                    outputBuffer.get(videoConfig, 0, bufferInfo.size);
+                    outputBuffer.position(bufferInfo.offset);
+                    outputBuffer.limit(bufferInfo.offset + bufferInfo.size);
+                    //outputBuffer.put(videoConfig, 0, bufferInfo.size);
+                    videoSPSandPPS.put(videoConfig, 0, bufferInfo.size);
+                    //onDataReady(outputBuffer, bufferInfo);
+                    extraData = new EncoderBuffer(videoSPSandPPS, bufferInfo.offset, bufferInfo.size, bufferInfo.flags, bufferInfo.presentationTimeUs);
+                    encoder.releaseOutputBuffer(encoderStatus, false);
+                    return true;
+                }
+                if((bufferInfo.flags & MediaCodec.BUFFER_FLAG_SYNC_FRAME) != 0) {
+                    onKeyFrameReady(extraData);
+                }
+
+
                 outputBuffer.position(bufferInfo.offset);
                 outputBuffer.limit(bufferInfo.offset + bufferInfo.size);
-                //onDataReady(outputBuffer, bufferInfo, trackId);           FIXME
-                mux(outputBuffer, bufferInfo, trackId);
+                onDataReady(outputBuffer, bufferInfo);
                 encoder.releaseOutputBuffer(encoderStatus, false);
         }
 
         return true;
     }
-
-
-    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
-    public void mux(ByteBuffer  outputBuffer, MediaCodec.BufferInfo bufferInfo, int trackId) {
-        if(!androidMuxerStarted) {
-            androidMuxer.start();
-            mediaMuxer.start();
-            androidMuxerStarted = true;
-        }
-        mediaMuxer.writeSampleData(trackId, outputBuffer, bufferInfo.offset, bufferInfo.size, bufferInfo.flags, bufferInfo.presentationTimeUs);
-        androidMuxer.writeSampleData(trackId, outputBuffer, bufferInfo);
-    }
-
-
-    public abstract boolean feedInputBuffer();
 
     protected void mayUpdateOutputBuffer() {
         if (Util.SDK_INT <= 21) {
@@ -131,12 +122,8 @@ public abstract class MediaCodecCodification extends BaseCodification {
 
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
     public void onFormatChange(MediaFormat mediaFormat) {
-        //trackId = mediaMuxer.addTrack(mediaFormat);       // FIXME
-        mediaMuxer.addTrack(mediaFormat);
-        trackId = androidMuxer.addTrack(mediaFormat);
+        super.addTrack(mediaFormat);
     }
-
-
 
     protected ByteBuffer getInputBuffer(int inputIndex) {
         if(inputIndex < 0)
@@ -170,5 +157,9 @@ public abstract class MediaCodecCodification extends BaseCodification {
 
     protected abstract void init();
 
+
+    protected void onKeyFrameReady(EncoderBuffer extraData) {
+
+    }
 
 }

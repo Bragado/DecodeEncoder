@@ -29,10 +29,11 @@ import java.util.List;
 /**
  * Consumes SEI buffers, outputting contained CEA-608 messages to a {@link TrackOutput}.
  */
-/* package */ final class SeiReader {
+/* package */ public final class SeiReader {
 
   private final List<Format> closedCaptionFormats;
   private final TrackOutput[] outputs;
+  private boolean keepTrack = true;
 
   /**
    * @param closedCaptionFormats A list of formats for the closed caption channels to expose.
@@ -45,7 +46,7 @@ import java.util.List;
   public void createTracks(ExtractorOutput extractorOutput, TrackIdGenerator idGenerator) {
     for (int i = 0; i < outputs.length; i++) {
       idGenerator.generateNewId();
-      TrackOutput output = extractorOutput.track(idGenerator.getTrackId(), C.TRACK_TYPE_TEXT);
+      TrackOutput output = extractorOutput.track(this, idGenerator.getTrackId(), C.TRACK_TYPE_TEXT);
       Format channelFormat = closedCaptionFormats.get(i);
       String channelMimeType = channelFormat.sampleMimeType;
       if(!(MimeTypes.APPLICATION_CEA608.equals(channelMimeType) || MimeTypes.APPLICATION_CEA708.equals(channelMimeType))) {
@@ -70,7 +71,11 @@ import java.util.List;
   }
 
   public void consume(long pesTimeUs, ParsableByteArray seiBuffer) {
+    if(keepTrack)
     CeaUtil.consume(pesTimeUs, seiBuffer, outputs);
   }
 
+  public void discardStream(boolean discard) {
+    this.keepTrack = discard;
+  }
 }

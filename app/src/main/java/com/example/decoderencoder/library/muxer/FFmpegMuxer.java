@@ -11,6 +11,8 @@ import java.util.Map;
 import androidx.annotation.Keep;
 import androidx.annotation.RequiresApi;
 
+import com.example.decoderencoder.library.core.encoder.EncoderBuffer;
+
 public class FFmpegMuxer implements MediaMuxer {
 
     Uri uri;
@@ -42,7 +44,6 @@ public class FFmpegMuxer implements MediaMuxer {
             keys[0] = "streamType";
             values[0] = "0";
             keys[1] = "bit_rate";
-            keys[1] = "bit_rate";
             values[1] = newFormat.getInteger(MediaFormat.KEY_BIT_RATE) + "";
             keys[2] = "width";
             values[2] = newFormat.getInteger(MediaFormat.KEY_WIDTH) + "";
@@ -52,6 +53,8 @@ public class FFmpegMuxer implements MediaMuxer {
             values[4] = 50/* newFormat.getInteger(MediaFormat.KEY_FRAME_RATE) */ + ""; // FIXME
             keys[5] = "mimeType";
             values[5] = newFormat.getString(MediaFormat.KEY_MIME);
+
+
         }else if(newFormat.getString(MediaFormat.KEY_MIME).startsWith("audio/")) {
             keys[0] = "streamType";
             values[0] = "1";
@@ -87,9 +90,9 @@ public class FFmpegMuxer implements MediaMuxer {
 
 
     @Override
-    public void writeSampleData(int trackIndex, ByteBuffer byteBuf, int offset, int size, int flags, long presentationTimeUs) {
-        if(size > 0)
-        nativeWriteSampleData(nativePointer, trackIndex, byteBuf, offset, size, flags, presentationTimeUs);
+    public void writeSampleData(int trackIndex, EncoderBuffer bf) {
+        if(bf.size > 0)
+        nativeWriteSampleData(nativePointer, trackIndex, bf.data, bf.offset, bf.size, bf.flags, bf.presentationTimeUs);
     }
 
     private native long nativeInit(String path);

@@ -43,7 +43,7 @@ import java.util.List;
       ExtractorOutput extractorOutput, TsPayloadReader.TrackIdGenerator idGenerator) {
     for (int i = 0; i < outputs.length; i++) {
       idGenerator.generateNewId();
-      TrackOutput output = extractorOutput.track(idGenerator.getTrackId(), C.TRACK_TYPE_TEXT);
+      TrackOutput output = extractorOutput.track(null, idGenerator.getTrackId(), C.TRACK_TYPE_TEXT);
       Format channelFormat = closedCaptionFormats.get(i);
       String channelMimeType = channelFormat.sampleMimeType;
       Assertions.checkArgument(

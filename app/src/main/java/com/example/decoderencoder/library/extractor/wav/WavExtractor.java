@@ -54,7 +54,7 @@ public final class WavExtractor implements Extractor {
   @Override
   public void init(ExtractorOutput output) {
     extractorOutput = output;
-    trackOutput = output.track(0, C.TRACK_TYPE_AUDIO);
+    trackOutput = output.track(null, 0, C.TRACK_TYPE_AUDIO);
     wavHeader = null;
     output.endTracks();
   }

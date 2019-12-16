@@ -6,15 +6,26 @@ import android.os.Build;
 
 import androidx.annotation.RequiresApi;
 
+import com.example.decoderencoder.library.core.encoder.EncoderBuffer;
 import com.example.decoderencoder.library.source.SampleStream;
+import com.example.decoderencoder.library.util.Log;
+import com.example.decoderencoder.library.util.TimestampAdjuster;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.PriorityQueue;
 
 public class MediaCodecMuxer implements MediaMuxer {
 
+    private static final String TAG = "MediaCodecMuxer";
+    private final int MAX_BUFFERING = 50;
+
     android.media.MediaMuxer muxer;
     boolean started = false;
+    long last_pts[] = new long[0];
+
 
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
     public MediaCodecMuxer(String path, int container) {
@@ -34,6 +45,8 @@ public class MediaCodecMuxer implements MediaMuxer {
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
     @Override
     public int addTrack(MediaFormat newFormat) {
+        last_pts = Arrays.copyOf(last_pts, last_pts.length + 1);
+        last_pts[last_pts.length - 1] = 0;
         return muxer.addTrack(newFormat);
     }
 
@@ -58,13 +71,23 @@ public class MediaCodecMuxer implements MediaMuxer {
 
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
     @Override
-    public void writeSampleData(int trackIndex, ByteBuffer byteBuf, int offset, int size, int flags,  long presentationTimeUs) {
+    public void writeSampleData(int trackIndex, EncoderBuffer encoderBuffer) {
+
+        long presentationTimeUs = encoderBuffer.presentationTimeUs;
+        if(presentationTimeUs < 0) {
+            return;
+        }
+        if(presentationTimeUs < last_pts[trackIndex]) {
+            Log.d(TAG, "Packet drop due to bad pts : [last_pts, current_pts] = " +  "["+ last_pts + ","+ presentationTimeUs +"]");
+            return;
+        }
+        last_pts[trackIndex] = encoderBuffer.presentationTimeUs;
         MediaCodec.BufferInfo bf = new MediaCodec.BufferInfo();
-        bf.flags = flags;
-        bf.offset = offset;
-        bf.presentationTimeUs = presentationTimeUs;
-        bf.size = size;
-        muxer.writeSampleData(trackIndex, byteBuf, bf);
+        bf.flags = encoderBuffer.flags;
+        bf.offset = encoderBuffer.offset;
+        bf.presentationTimeUs = encoderBuffer.presentationTimeUs;
+        bf.size = encoderBuffer.size;
+        muxer.writeSampleData(trackIndex, encoderBuffer.data, bf);
     }
 
 }

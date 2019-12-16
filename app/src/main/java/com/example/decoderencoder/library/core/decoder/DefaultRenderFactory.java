@@ -12,6 +12,8 @@ import com.example.decoderencoder.library.source.SampleStream;
 import com.example.decoderencoder.library.util.C;
 import com.example.decoderencoder.library.util.Log;
 
+import java.util.Arrays;
+
 public class DefaultRenderFactory implements RenderersFactory, Renderer.Callback {
 
     public static final String TAG = "RENDERERFACTORY";
@@ -32,23 +34,39 @@ public class DefaultRenderFactory implements RenderersFactory, Renderer.Callback
 
         Log.d(TAG, "createRenderers");
         Renderer[] renderers = new Renderer[sampleStreams.length];
+
         String mimeType;
         decoders = new Decoder[sampleStreams.length];
 
+        int numOfRenderers = 0;
         for(int i = 0; i < preparedState.tracks.length; i++) {
             mimeType = preparedState.tracks.get(i).getFormat(0).sampleMimeType;
-            if(mimeType.startsWith("video/") && preparedState.trackEnabledStates[i]) {
-                decoders[i] = new DefaultDecoder(preparedState.tracks.get(i));
-                renderers[i] = new MediaCodecVideoRenderer(this, C.TRACK_TYPE_VIDEO, decoders[i]);
-                renderers[i].enable(preparedState.tracks.get(i).getFormat(), sampleStreams[i], 0,0);
-            }else if(mimeType.startsWith("audio/") && preparedState.trackEnabledStates[i]) {
-                decoders[i] = new DefaultDecoder(preparedState.tracks.get(i));
-                renderers[i] = new MediaCodecAudioRenderer(C.TRACK_TYPE_AUDIO, decoders[i]);
-                renderers[i].enable(preparedState.tracks.get(i).getFormat(), sampleStreams[i], 0,0);
+            if(preparedState.trackEnabledStates[i] == MediaSource.PreparedState.TRACKSTATE.SELECTED) {
+
+                if(mimeType.startsWith("video/")) {
+                    decoders[i] = new DefaultDecoder(preparedState.tracks.get(i));
+                    renderers[numOfRenderers] = new MediaCodecVideoRenderer(this, C.TRACK_TYPE_VIDEO, decoders[i]);
+                    renderers[numOfRenderers].enable(preparedState.tracks.get(i).getFormat(), sampleStreams[i], 0,0);
+                }else if(mimeType.startsWith("audio/")) {
+                    decoders[i] = new DefaultDecoder(preparedState.tracks.get(i));
+                    renderers[numOfRenderers] = new MediaCodecAudioRenderer(C.TRACK_TYPE_AUDIO, decoders[i]);
+                    renderers[numOfRenderers].enable(preparedState.tracks.get(i).getFormat(), sampleStreams[i], 0,0);
+                }else {     // passthrough, only audio and video are supported
+                    renderers[numOfRenderers] = new EmptyRenderer(C.TRACK_TYPE_UNKNOWN);       // FIXME: Renderer output
+                    renderers[numOfRenderers].enable(preparedState.tracks.get(i).getFormat(), sampleStreams[i], 0,0);
+                }
+                numOfRenderers++;
+            }else if(preparedState.trackEnabledStates[i] == MediaSource.PreparedState.TRACKSTATE.PASSTROUGH ) {
+                renderers[numOfRenderers] = new EmptyRenderer(C.TRACK_TYPE_UNKNOWN);       // FIXME: Renderer output
+                renderers[numOfRenderers].enable(preparedState.tracks.get(i).getFormat(), sampleStreams[i], 0,0);
+                numOfRenderers++;
             }else {
-                renderers[i] = new EmptyRenderer(C.TRACK_TYPE_UNKNOWN, null);       // FIXME: Renderer output
+                // discard, do nothing
             }
         }
+        // realloc renderers
+        renderers = Arrays.copyOf(renderers, numOfRenderers);
+
         return renderers;
     }
 

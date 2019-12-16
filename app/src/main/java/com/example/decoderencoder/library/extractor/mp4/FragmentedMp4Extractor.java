@@ -285,7 +285,7 @@ public class FragmentedMp4Extractor implements Extractor {
   public void init(ExtractorOutput output) {
     extractorOutput = output;
     if (sideloadedTrack != null) {
-      TrackBundle bundle = new TrackBundle(output.track(0, sideloadedTrack.type));
+      TrackBundle bundle = new TrackBundle(output.track(null, 0, sideloadedTrack.type));
       bundle.init(sideloadedTrack, new DefaultSampleValues(0, 0, 0, 0));
       trackBundles.put(0, bundle);
       maybeInitExtraTracks();
@@ -517,7 +517,7 @@ public class FragmentedMp4Extractor implements Extractor {
       // We need to create the track bundles.
       for (int i = 0; i < trackCount; i++) {
         Track track = tracks.valueAt(i);
-        TrackBundle trackBundle = new TrackBundle(extractorOutput.track(i, track.type));
+        TrackBundle trackBundle = new TrackBundle(extractorOutput.track(null,i, track.type));
         trackBundle.init(track, getDefaultSampleValues(defaultSampleValuesArray, track.id));
         trackBundles.put(track.id, trackBundle);
         durationUs = Math.max(durationUs, track.durationUs);
@@ -580,7 +580,7 @@ public class FragmentedMp4Extractor implements Extractor {
       }
       if ((flags & FLAG_ENABLE_EMSG_TRACK) != 0) {
         emsgTrackOutputs[emsgTrackOutputCount++] =
-            extractorOutput.track(trackBundles.size(), C.TRACK_TYPE_METADATA);
+            extractorOutput.track(null,trackBundles.size(), C.TRACK_TYPE_METADATA);
       }
       emsgTrackOutputs = Arrays.copyOf(emsgTrackOutputs, emsgTrackOutputCount);
 
@@ -591,7 +591,7 @@ public class FragmentedMp4Extractor implements Extractor {
     if (cea608TrackOutputs == null) {
       cea608TrackOutputs = new TrackOutput[closedCaptionFormats.size()];
       for (int i = 0; i < cea608TrackOutputs.length; i++) {
-        TrackOutput output = extractorOutput.track(trackBundles.size() + 1 + i, C.TRACK_TYPE_TEXT);
+        TrackOutput output = extractorOutput.track(null,trackBundles.size() + 1 + i, C.TRACK_TYPE_TEXT);
         output.format(closedCaptionFormats.get(i));
         cea608TrackOutputs[i] = output;
       }

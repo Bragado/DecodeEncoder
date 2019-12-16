@@ -54,6 +54,7 @@ public final class MpegAudioReader implements ElementaryStreamReader {
 
   // The timestamp to attach to the next sample in the current packet.
   private long timeUs;
+  private boolean keepTrack = true;
 
   public MpegAudioReader() {
     this(null);
@@ -79,7 +80,7 @@ public final class MpegAudioReader implements ElementaryStreamReader {
   public void createTracks(ExtractorOutput extractorOutput, TrackIdGenerator idGenerator) {
     idGenerator.generateNewId();
     formatId = idGenerator.getFormatId();
-    output = extractorOutput.track(idGenerator.getTrackId(), C.TRACK_TYPE_AUDIO);
+    output = extractorOutput.track(this, idGenerator.getTrackId(), C.TRACK_TYPE_AUDIO);
   }
 
   @Override
@@ -109,6 +110,16 @@ public final class MpegAudioReader implements ElementaryStreamReader {
   @Override
   public void packetFinished() {
     // Do nothing.
+  }
+
+  @Override
+  public void discardStream(boolean discard) {
+    this.keepTrack = !discard;
+  }
+
+  @Override
+  public boolean keepsTrack() {
+    return this.keepTrack;
   }
 
   /**
