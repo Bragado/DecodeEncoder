@@ -39,7 +39,7 @@ public class DefaultDecoder implements Decoder {
         Format f = trackGroup.getFormat(0);
         try {
             decoder = MediaCodec.createDecoderByType(mediaFormat.getString(MediaFormat.KEY_MIME));
-        } catch (IOException e) {       // TODO: paśsthrough or ffmeg decoder
+        } catch (IOException e) {       // TODO: passthrough or ffmeg decoder
             e.printStackTrace();
             return false;
         }

@@ -42,6 +42,7 @@ import com.example.decoderencoder.library.util.C;
 import com.example.decoderencoder.library.util.Stats;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
 
 public class DecoderActivity  extends AppCompatActivity implements SurfaceHolder.Callback {
 
@@ -145,13 +146,24 @@ public class DecoderActivity  extends AppCompatActivity implements SurfaceHolder
                 format.setInteger(MediaFormat.KEY_I_FRAME_INTERVAL, 1);
 
 
-                MediaFormat formatAudio = MediaFormat.createAudioFormat("audio/mp4a-latm", 44100, 2);
+                MediaFormat formatAudio = MediaFormat.createAudioFormat("audio/mp4a-latm", 44100, 2);   // AAC Low Overhead Audio Transport Multiplex
+                formatAudio.setInteger(MediaFormat.KEY_AAC_PROFILE, MediaCodecInfo.CodecProfileLevel.AACObjectLC);
                 formatAudio.setInteger(MediaFormat.KEY_BIT_RATE, 64000);
                 formatAudio.setInteger(MediaFormat.KEY_MAX_INPUT_SIZE,655360);
+                /*byte[] data = new byte[]{0x12, 0x12};
+                ByteBuffer csd_0 = ByteBuffer.wrap(data);
+                formatAudio.setByteBuffer("csd-0", csd_0);*/
 
-                TrackGroup[] trackGroups = new TrackGroup[] {tracks.get(0)};
-                TrackGroup[] discardTracks = new TrackGroup[] {tracks.get(1),  tracks.get(2), tracks.get(3), tracks.get(4), tracks.get(5)};
-                MediaFormat[] mediaFormats = new MediaFormat[] {format , formatAudio };
+                ByteBuffer csd = ByteBuffer.allocate(2);
+                csd.put(0, (byte) (2 << 3 | 4 >> 1));
+                csd.put(1, (byte)((4 & 0x01) << 7 | 2 << 3));
+                formatAudio.setByteBuffer("csd-0", csd);
+
+
+
+                TrackGroup[] trackGroups = new TrackGroup[] { tracks.get(2)};
+                TrackGroup[] discardTracks = new TrackGroup[] {tracks.get(0),tracks.get(1),  tracks.get(3), tracks.get(4), tracks.get(5)};
+                MediaFormat[] mediaFormats = new MediaFormat[] {/*format ,*/ formatAudio };
                 transcoder.setSelectedTracks(trackGroups, discardTracks,  mediaFormats);
 
             }

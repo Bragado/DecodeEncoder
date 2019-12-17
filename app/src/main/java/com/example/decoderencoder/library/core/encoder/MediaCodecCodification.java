@@ -90,17 +90,20 @@ public abstract class MediaCodecCodification extends BaseCodification {
                 if((bufferInfo.flags & MediaCodec.BUFFER_FLAG_SYNC_FRAME) != 0) {
                     onKeyFrameReady(extraData);
                 }
-
-
                 outputBuffer.position(bufferInfo.offset);
                 outputBuffer.limit(bufferInfo.offset + bufferInfo.size);
-                onDataReady(outputBuffer, bufferInfo);
+
+                ByteBuffer frameData = maybeProccessOutputData(outputBuffer, bufferInfo);
+                onDataReady(frameData, bufferInfo);
                 encoder.releaseOutputBuffer(encoderStatus, false);
         }
 
         return true;
     }
 
+    protected ByteBuffer maybeProccessOutputData(ByteBuffer outputBuffer, MediaCodec.BufferInfo bufferInfo) {
+        return outputBuffer;
+    }
 
 
     protected void mayUpdateOutputBuffer() {

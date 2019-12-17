@@ -12,6 +12,7 @@ import androidx.annotation.Keep;
 import androidx.annotation.RequiresApi;
 
 import com.example.decoderencoder.library.core.encoder.EncoderBuffer;
+import com.example.decoderencoder.library.source.Media;
 
 public class FFmpegMuxer implements MediaMuxer {
 
@@ -39,9 +40,11 @@ public class FFmpegMuxer implements MediaMuxer {
         String[] values = null;
 
         if(newFormat.getString(MediaFormat.KEY_MIME).startsWith("video/")) {
-            keys = new String[6];
-            values = new String[6];
-            keys[0] = "streamType";
+            keys = new String[7];
+            values = new String[7];
+            keys[6] = "streamType";
+            values[6] = "0";
+            keys[0] = "codecID";
             values[0] = "0";
             keys[1] = "bit_rate";
             values[1] = newFormat.getInteger(MediaFormat.KEY_BIT_RATE) + "";
@@ -50,19 +53,33 @@ public class FFmpegMuxer implements MediaMuxer {
             keys[3] = "height";
             values[3] = newFormat.getInteger(MediaFormat.KEY_HEIGHT) + "";
             keys[4] = "fps";
-            values[4] = 50/* newFormat.getInteger(MediaFormat.KEY_FRAME_RATE) */ + ""; // FIXME
+            values[4] =  newFormat.getInteger(MediaFormat.KEY_FRAME_RATE) + ""; // FIXME: sometimes this is null, what to do in those cases ?? passthrough the configuration??
             keys[5] = "mimeType";
             values[5] = newFormat.getString(MediaFormat.KEY_MIME);
 
-
         }else if(newFormat.getString(MediaFormat.KEY_MIME).startsWith("audio/")) {
-            keys[0] = "streamType";
+            keys = new String[5];
+            values = new String[5];
+            keys[3] = "streamType";
+            values[3] = "1";
+            keys[0] = "codecID";
             values[0] = "1";
-
+            keys[1] = "sampleRate";
+            values[1] = newFormat.getInteger(MediaFormat.KEY_SAMPLE_RATE) + "";
+            keys[2] = "channels";
+            values[2] = newFormat.getInteger(MediaFormat.KEY_CHANNEL_COUNT) + "";
+            keys[4] = "bitrate";
+            values[4] = newFormat.getInteger(MediaFormat.KEY_BIT_RATE) + "";
         }else if(newFormat.getString(MediaFormat.KEY_MIME).startsWith("text/")) {
-            keys[0] = "streamType";
+            keys = new String[3];
+            values = new String[3];
+            keys[2] = "streamType";
+            values[2] = "2";
+            keys[0] = "codecID";
             values[0] = "2";
-        }else {
+            keys[1] = "language";
+            values[1] = newFormat.getString(MediaFormat.KEY_LANGUAGE);
+        }else {     // what to do ??
             keys[0] = "streamType";
             values[0] = "-1";
         }

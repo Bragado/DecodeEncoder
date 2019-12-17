@@ -18,6 +18,9 @@ int addSubtitleStream(OutputStream * video_st, const std::map<std::string, const
 int addUnknownStream(OutputStream * video_st, const std::map<std::string, const char *>& format);
 AVCodecID getCodecByID(int ID);
 AVRational *videoSourceTimeBase;
+AVRational * audioTime;
+int64_t lastpts = -1;
+
 
 /* TODO: erase the next 2 functions */
 static void *thread_func(void*);
@@ -68,10 +71,13 @@ void prepareStart(OutputStream * video_st) {
 			LOGE("Could not open output file '%s'", video_st->path);
 		}
 	}
-	ret = avformat_write_header(video_st->ofmt_ctx, NULL);
+
+    AVDictionary *options = NULL;
+	ret = avformat_write_header(video_st->ofmt_ctx, &options);
 	if (ret < 0) {
 		LOGE("Error occurred when opening output file\n");
 	}
+    av_dict_free(&options);
 
 }
 
@@ -113,11 +119,7 @@ void writeFrame(OutputStream * video_st, jint trackIndex, jbyte* framedata, jint
 	LOGI("NativeWriteFrame: video_st: %p, trackIndex: %d, offset: %d, size: %d, presentationTime: %ld", video_st, trackIndex, offset, size, presentationTimeUs);
 	LOGI("NativeWriteFrame: path: %s", video_st->path);
 	packet.pts = av_rescale_q(packet.pts, *videoSourceTimeBase, (video_st->ofmt_ctx->streams[packet.stream_index]->time_base));
-	if(!video_st->ofmt_ctx) {
-		LOGE("context is not allocated");
-	}else {
-		LOGE("context is not the problem");
-	}
+
 	ret = av_interleaved_write_frame( video_st->ofmt_ctx, &packet);
 	if (ret < 0) {
 		LOGE("Error muxing packet\n");
@@ -179,7 +181,7 @@ int addVideoStream(OutputStream * video_st, std::map<std::string, const char *>&
 	streamIndex = st->index;   // ok
 	LOGI("addVideoStream at index %d", streamIndex);
 //	c = st->codec;
-
+    c = avcodec_alloc_context3(codec);
 	avcodec_get_context_defaults3(c, codec);        // this is a problem, is c being initialized?
 
 	c->codec_id = AV_CODEC_ID_H264;
@@ -203,6 +205,11 @@ int addAudioStream(OutputStream * video_st, std::map<std::string, const char *>&
 	AVCodecContext *c;
 	AVStream *st;
 	AVCodec *codec;
+	AVCodecParameters * avCodecParameters;
+    audioTime = (AVRational*)av_malloc(sizeof(AVRational));
+    audioTime->num = 1;
+    audioTime->den =  atoi(format["sampleRate"]);
+
 	int audioStreamIndex = -1;
 
 	/* find the audio encoder */
@@ -216,20 +223,29 @@ int addAudioStream(OutputStream * video_st, std::map<std::string, const char *>&
 		LOGE("add_audio_stream could not alloc stream");
 	}
 	audioStreamIndex = st->index;
-//	c = st->codec;
+    avCodecParameters = st->codecpar;
+    avCodecParameters->codec_id = codecId;
+    avCodecParameters->sample_rate =  atoi(format["sampleRate"]);
+    avCodecParameters->channels = atoi(format["channels"]);;
+    avCodecParameters->bit_rate = atoi(format["bitrate"]);
+
+
+    st->time_base = *audioTime;
+    c = st->codec;
+    //c = avcodec_alloc_context3(codec);
 	avcodec_get_context_defaults3(c, codec);
 
 	c->strict_std_compliance = FF_COMPLIANCE_UNOFFICIAL;
 	c->sample_fmt  = AV_SAMPLE_FMT_S16;
 	c->time_base.den = atoi(format["sampleRate"]);
 	c->time_base.num = 1;
-
+    c->bit_rate = atoi(format["bitrate"]);
 	c->sample_rate = atoi(format["sampleRate"]);
 	c->channels    = atoi(format["channels"]);
 	LOGI("addAudioStream sample_rate %d index %d", c->sample_rate, st->index);
     video_st->avcodecs[audioStreamIndex] =  c;
-	/*if (formatContext->oformat->flags & AVFMT_GLOBALHEADER)
-			codecContext->flags |= CODEC_FLAG_GLOBAL_HEADER;*/
+    if (formatContext->oformat->flags & AVFMT_GLOBALHEADER)
+        c->flags |= AV_CODEC_FLAG_GLOBAL_HEADER;
 
 	return audioStreamIndex;
 }
