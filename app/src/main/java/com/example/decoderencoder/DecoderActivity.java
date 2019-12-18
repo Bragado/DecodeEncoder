@@ -61,7 +61,7 @@ public class DecoderActivity  extends AppCompatActivity implements SurfaceHolder
     SurfaceView surfaceView;
     SurfaceHolder surfaceHolder;
     Renderer renderer;
-    String PATH = "/storage/emulated/0/Download/kika.ts";
+    String PATH = "/storage/emulated/0/Download/tfx.ts";
     Surface surface;
 
 
@@ -135,13 +135,13 @@ public class DecoderActivity  extends AppCompatActivity implements SurfaceHolder
 
                 /* TODO: the user should be the one selecting this: */
                 // VideoFormat:
-                MediaFormat format = MediaFormat.createVideoFormat("video/avc", 1280, 720);
+                MediaFormat format = MediaFormat.createVideoFormat("video/avc", 720, 576);
 
                 // Set some properties.  Failing to specify some of these can cause the MediaCodec
                 // configure() call to throw an unhelpful exception.
                 format.setInteger(MediaFormat.KEY_COLOR_FORMAT,
                         MediaCodecInfo.CodecCapabilities.COLOR_FormatSurface);
-                format.setInteger(MediaFormat.KEY_BIT_RATE, 5388608);
+                format.setInteger(MediaFormat.KEY_BIT_RATE, 2388608);
                 format.setInteger(MediaFormat.KEY_FRAME_RATE, 50);
                 format.setInteger(MediaFormat.KEY_I_FRAME_INTERVAL, 1);
 
