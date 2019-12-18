@@ -93,6 +93,8 @@ public class MediaCodecAudioRenderer extends MediaCodecRenderer {
         mediaFormat.setInteger(MediaFormat.KEY_CHANNEL_COUNT, format.channelCount);
         mediaFormat.setInteger(MediaFormat.KEY_SAMPLE_RATE, format.sampleRate);
         MediaFormatUtil.setCsdBuffers(mediaFormat, format.initializationData);
+        MediaFormatUtil.maybeSetInteger(
+                mediaFormat, MediaFormat.KEY_MAX_INPUT_SIZE, 20000);        // FIXME - This problem was seen in the amlogic s905x
         // Set codec max values.
         // Set codec configuration values.
         if (Util.SDK_INT >= 23) {

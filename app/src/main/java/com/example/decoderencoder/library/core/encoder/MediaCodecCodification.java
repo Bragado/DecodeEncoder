@@ -67,9 +67,6 @@ public abstract class MediaCodecCodification extends BaseCodification {
                 break;
             case MediaCodec.INFO_OUTPUT_FORMAT_CHANGED:
                 MediaFormat newFormat = this.encoder.getOutputFormat();
-
-
-
                 onFormatChange(newFormat);
                 break;
             default:
@@ -95,6 +92,7 @@ public abstract class MediaCodecCodification extends BaseCodification {
 
                 ByteBuffer frameData = maybeProccessOutputData(outputBuffer, bufferInfo);
                 onDataReady(frameData, bufferInfo);
+                Log.i(TAG, "Encoder presentation time: " + bufferInfo.presentationTimeUs);
                 encoder.releaseOutputBuffer(encoderStatus, false);
         }
 

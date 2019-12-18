@@ -331,7 +331,7 @@ public class DefaultTranscoder  extends HandlerThread implements Transcoder, Ren
              *   4. Feed Encoder
              */
             long counter = 0;
-            while (counter++ < 1000) {
+            while (counter++ < 15000) {
                 for (int i = 0; i < renderers.length; i++) {
                     codifications[i].drainOutputBuffer();
                     codifications[i].feedInputBuffer();
@@ -347,7 +347,7 @@ public class DefaultTranscoder  extends HandlerThread implements Transcoder, Ren
                 renderers[i].signalEndOfStream();
             }
 
-            while (counter++ < 1030) {
+            while (counter++ < 15030) {
                 for (int i = 0; i < renderers.length; i++) {
                     codifications[i].drainOutputBuffer();
                     codifications[i].feedInputBuffer();

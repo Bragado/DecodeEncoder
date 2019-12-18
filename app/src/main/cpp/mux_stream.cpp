@@ -19,7 +19,6 @@ int addUnknownStream(OutputStream * video_st, const std::map<std::string, const 
 AVCodecID getCodecByID(int ID);
 AVRational *videoSourceTimeBase;
 AVRational * audioTime;
-int64_t lastpts = -1;
 
 
 /* TODO: erase the next 2 functions */
@@ -71,13 +70,10 @@ void prepareStart(OutputStream * video_st) {
 			LOGE("Could not open output file '%s'", video_st->path);
 		}
 	}
-
-    AVDictionary *options = NULL;
-	ret = avformat_write_header(video_st->ofmt_ctx, &options);
+	ret = avformat_write_header(video_st->ofmt_ctx, NULL);
 	if (ret < 0) {
 		LOGE("Error occurred when opening output file\n");
 	}
-    av_dict_free(&options);
 
 }
 

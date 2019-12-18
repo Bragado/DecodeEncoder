@@ -40,7 +40,7 @@ public abstract class MediaCodecRenderer extends BaseRenderer {
     private final ArrayList<Long> decodeOnlyPresentationTimestamps;
     private long largestQueuedPresentationTimeUs;
     private boolean reconfigurationStateWritePending = false;
-
+    long lastpts = -1;
 
     /* Audio Renderers */
     LinkedList<Integer> pendingDecoderOutputBufferIndices;
