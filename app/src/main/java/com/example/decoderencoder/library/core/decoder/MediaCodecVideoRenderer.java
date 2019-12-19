@@ -54,8 +54,9 @@ public class MediaCodecVideoRenderer extends MediaCodecRenderer {
             outputSurface.drawImage();
             inputSurface.setPresentationTime(info.presentationTimeUs*1000);
             inputSurface.swapBuffers();
-            inputSurface.release();
+
         }
+
     }
 
 

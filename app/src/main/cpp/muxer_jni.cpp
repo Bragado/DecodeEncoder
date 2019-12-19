@@ -10,9 +10,10 @@ using namespace std;
 extern "C" {
 
 JNIEXPORT jlong JNICALL
-Java_com_example_decoderencoder_library_muxer_FFmpegMuxer_nativeInit(JNIEnv * env, jobject instance, jstring outputPath) {
+Java_com_example_decoderencoder_library_muxer_FFmpegMuxer_nativeInit(JNIEnv * env, jobject instance, jstring outputPath, jstring container) {
 	const char *nativeString = env->GetStringUTFChars(outputPath, 0);
-	return reinterpret_cast<jlong>(init(nativeString));
+	const char *nativeString2 = env->GetStringUTFChars(container, 0);
+	return reinterpret_cast<jlong>(init(nativeString, nativeString2));
 }
 
 JNIEXPORT void JNICALL

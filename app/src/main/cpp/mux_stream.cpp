@@ -19,13 +19,14 @@ int addUnknownStream(OutputStream * video_st, const std::map<std::string, const 
 AVCodecID getCodecByID(int ID);
 AVRational *videoSourceTimeBase;
 AVRational * audioTime;
+int64_t pts = 0;
 
 
 /* TODO: erase the next 2 functions */
 static void *thread_func(void*);
 int start_logger(const char *app_name);
 
-OutputStream * init(const char * path) {
+OutputStream * init(const char * url, const char * container) {
 
 	avformat_network_init();
 //	avcodec_register_all();
@@ -35,7 +36,7 @@ OutputStream * init(const char * path) {
 	video_st->allocation_size = DEFAULT_NO_STREAMS;
 	video_st->nbstreams = 0;
 	video_st->out_streams = (AVStream**)malloc(DEFAULT_NO_STREAMS*sizeof(AVStream*));
-	video_st->path = path;
+	video_st->path = url;
 	video_st->avcodecs = (AVCodecContext**)malloc(DEFAULT_NO_STREAMS*sizeof(AVCodec*));
 	videoSourceTimeBase = (AVRational*)av_malloc(sizeof(AVRational));
 	videoSourceTimeBase->num = 1;
@@ -44,7 +45,7 @@ OutputStream * init(const char * path) {
 
 	start_logger("FFMPEG-IMP");
 	// Create container
-	avformat_alloc_output_context2(&video_st->ofmt_ctx, NULL, NULL, path);
+	avformat_alloc_output_context2(&video_st->ofmt_ctx, NULL, container, url);
 	if(!video_st->ofmt_ctx) {
 		LOGE("Could not create output context. Releasing all allocated resources\n");
 		release(video_st);
@@ -109,14 +110,14 @@ void writeFrame(OutputStream * video_st, jint trackIndex, jbyte* framedata, jint
 	packet.stream_index = (int)trackIndex;
 	packet.data = (uint8_t*)framedata + offset;	// check this out
 	packet.size = (int)size;
-	packet.pts = (int64_t)presentationTimeUs/**9000/1000000*/;		// 90 khz
+	packet.pts = (int64_t)presentationTimeUs;		// 90 khz
 	packet.dts = AV_NOPTS_VALUE;		// FIXME: not correct
 	packet.flags |= AV_PKT_FLAG_KEY;
-	LOGI("NativeWriteFrame: video_st: %p, trackIndex: %d, offset: %d, size: %d, presentationTime: %ld", video_st, trackIndex, offset, size, presentationTimeUs);
+	LOGI("NativeWriteFrame: video_st: %p, trackIndex: %d, offset: %d, size: %d, presentationTime: %ld", video_st, trackIndex, offset, size, (int64_t)presentationTimeUs);
 	LOGI("NativeWriteFrame: path: %s", video_st->path);
 	packet.pts = av_rescale_q(packet.pts, *videoSourceTimeBase, (video_st->ofmt_ctx->streams[packet.stream_index]->time_base));
 
-	ret = av_interleaved_write_frame( video_st->ofmt_ctx, &packet);
+   	ret = av_interleaved_write_frame( video_st->ofmt_ctx, &packet);
 	if (ret < 0) {
 		LOGE("Error muxing packet\n");
 	}

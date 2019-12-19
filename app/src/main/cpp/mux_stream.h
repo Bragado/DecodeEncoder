@@ -25,7 +25,7 @@ typedef struct OutputStream{
 
 } OutputStream;
 
-OutputStream * init(const char * path);
+OutputStream * init(const char * url, const char * container);
 
 void prepareStart(OutputStream * video_st);
 

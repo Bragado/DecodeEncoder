@@ -109,6 +109,11 @@ public class DefaultMediaOutput extends HandlerThread implements MediaOutput {
          * based on the uri, check which muxer can handle it
          */
         //this.mediaMuxer = new MediaCodecMuxer(uri.getPath(),  android.media.MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4);
+        //this.mediaMuxer = new FFmpegMuxer(uri);
+    }
+
+    @Override
+    public void prepare(Callback callback, String uri) {
         this.mediaMuxer = new FFmpegMuxer(uri);
     }
 

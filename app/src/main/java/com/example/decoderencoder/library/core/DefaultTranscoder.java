@@ -44,7 +44,7 @@ public class DefaultTranscoder  extends HandlerThread implements Transcoder, Ren
     private DataSource dataSource = null;
     private MediaMuxer mediaMuxer = null;
     private Uri inputUri = null;
-    private Uri outputUri = null;
+    private String outputUri = null;
     private Transcoder.Callback callback;
 
     /*  Shared variables */
@@ -82,7 +82,7 @@ public class DefaultTranscoder  extends HandlerThread implements Transcoder, Ren
         this.allocator = new DefaultAllocator(true, C.DEFAULT_BUFFER_SEGMENT_SIZE);
         this.loadErrorHandlingPolicy = new DefaultLoadErrorHandlingPolicy();
         this.inputUri = Uri.parse(inputPath);
-        this.outputUri = Uri.parse(outputPath);
+        this.outputUri = outputPath;
         this.uiHandler = new Handler();
         this.callback = callback;
 
@@ -133,16 +133,7 @@ public class DefaultTranscoder  extends HandlerThread implements Transcoder, Ren
             return false;
         else {
             transcoderHandler.post(() -> {
-                int i = 0;
-                for (Codification codification : codifications) {
-                    i++;
-                    if(codification != null)
-                        codification.start();
-                }
-                for (Renderer renderer : renderers) {
-                    if(renderer != null)
-                        renderer.start();
-                }
+
                 reallyStartTranscoding();
             });
             return true;
@@ -185,6 +176,17 @@ public class DefaultTranscoder  extends HandlerThread implements Transcoder, Ren
     @Override
     public void getStats() {    // Thread : UI
 
+    }
+
+    public void initCodecs() {
+        for (Codification codification : codifications) {
+            if(codification != null)
+                codification.start();
+        }
+        for (Renderer renderer : renderers) {
+            if(renderer != null)
+                renderer.start();
+        }
     }
 
     // Internals
@@ -306,6 +308,7 @@ public class DefaultTranscoder  extends HandlerThread implements Transcoder, Ren
         protected void onLooperPrepared() {
             thisHandler = new Handler();
             isReady = true;
+            initCodecs();
             startTranscoding();
         }
 

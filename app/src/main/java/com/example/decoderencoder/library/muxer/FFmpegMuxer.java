@@ -21,9 +21,9 @@ public class FFmpegMuxer implements MediaMuxer {
     @Keep
     private Long nativePointer = new Long(0);
 
-    public FFmpegMuxer(Uri output) {
-        this.uri = output;
-        this.nativePointer = nativeInit(uri.getPath());
+    public FFmpegMuxer(String output) {
+        /*this.uri = output;*/
+        this.nativePointer = nativeInit(output, "mpegts");
     }
 
     @Override
@@ -53,7 +53,7 @@ public class FFmpegMuxer implements MediaMuxer {
             keys[3] = "height";
             values[3] = newFormat.getInteger(MediaFormat.KEY_HEIGHT) + "";
             keys[4] = "fps";
-            values[4] =  newFormat.getInteger(MediaFormat.KEY_FRAME_RATE) + ""; // FIXME: sometimes this is null, what to do in those cases ?? passthrough the configuration??
+            values[4] = /* newFormat.getInteger(MediaFormat.KEY_FRAME_RATE)*/50 + ""; // FIXME: sometimes this is null, what to do in those cases ?? passthrough the configuration??
             keys[5] = "mimeType";
             values[5] = newFormat.getString(MediaFormat.KEY_MIME);
 
@@ -83,9 +83,6 @@ public class FFmpegMuxer implements MediaMuxer {
             keys[0] = "streamType";
             values[0] = "-1";
         }
-
-
-
         return nativeAddTrack(nativePointer, keys, values);
     }
 
@@ -112,7 +109,7 @@ public class FFmpegMuxer implements MediaMuxer {
         nativeWriteSampleData(nativePointer, trackIndex, bf.data, bf.offset, bf.size, bf.flags, bf.presentationTimeUs);
     }
 
-    private native long nativeInit(String path);
+    private native long nativeInit(String path, String container);
 
     private native int nativeAddTrack(long nativePointer, String[] keys, String[] values);
 

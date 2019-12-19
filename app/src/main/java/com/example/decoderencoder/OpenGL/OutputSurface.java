@@ -24,8 +24,13 @@ import javax.microedition.khronos.egl.EGLSurface;
 
 import android.graphics.SurfaceTexture;
 import android.opengl.EGL14;
+import android.os.Build;
+import android.os.Handler;
+import android.os.HandlerThread;
 import android.util.Log;
 import android.view.Surface;
+
+import androidx.annotation.RequiresApi;
 
 /**
  * Holds state associated with a Surface used for MediaCodec decoder output.
@@ -49,11 +54,14 @@ public class OutputSurface implements SurfaceTexture.OnFrameAvailableListener {
     private Object mFrameSyncObject = new Object(); // guards mFrameAvailable
     private boolean mFrameAvailable;
     private TextureRenderer mTextureRender;
+    private HandlerThread mHandlerThread;
+    private Handler mHandler;
 
     /**
      * Creates an OutputSurface backed by a pbuffer with the specifed dimensions. The new EGL context and surface will be made current. Creates a Surface that can be passed to MediaCodec.configure().
      */
-    public OutputSurface( int width, int height ) {
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+    public OutputSurface(int width, int height ) {
         if ( width <= 0 || height <= 0 ) {
             throw new IllegalArgumentException();
         }
@@ -65,6 +73,7 @@ public class OutputSurface implements SurfaceTexture.OnFrameAvailableListener {
     /**
      * Creates an OutputSurface using the current EGL context. Creates a Surface that can be passed to MediaCodec.configure().
      */
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     public OutputSurface() {
         setup();
     }
@@ -72,9 +81,15 @@ public class OutputSurface implements SurfaceTexture.OnFrameAvailableListener {
     /**
      * Creates instances of TextureRender and SurfaceTexture, and a Surface associated with the SurfaceTexture.
      */
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     private void setup() {
         mTextureRender = new TextureRenderer();
         mTextureRender.surfaceCreated();
+
+        mHandlerThread = new HandlerThread("callback-thread");
+        mHandlerThread.start();
+        mHandler = new Handler(mHandlerThread.getLooper());
+
         // Even if we don't access the SurfaceTexture after the constructor returns, we
         // still need to keep a reference to it. The Surface doesn't retain a reference
         // at the Java level, so if we don't either then the object can get GCed, which
@@ -93,7 +108,11 @@ public class OutputSurface implements SurfaceTexture.OnFrameAvailableListener {
         //
         // Java language note: passing "this" out of a constructor is generally unwise,
         // but we should be able to get away with it here.
-        mSurfaceTexture.setOnFrameAvailableListener( this );
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            mSurfaceTexture.setOnFrameAvailableListener(this, mHandler);
+        } else {
+            mSurfaceTexture.setOnFrameAvailableListener(this);
+        }
         mSurface = new Surface( mSurfaceTexture );
     }
 
@@ -189,7 +208,7 @@ public class OutputSurface implements SurfaceTexture.OnFrameAvailableListener {
      * Latches the next buffer into the texture. Must be called from the thread that created the OutputSurface object, after the onFrameAvailable callback has signaled that new data is available.
      */
     public void awaitNewImage() {
-        final int TIMEOUT_MS = 500;
+        final int TIMEOUT_MS = 5000;
         synchronized ( mFrameSyncObject ) {
             while ( !mFrameAvailable ) {
                 try {

@@ -61,7 +61,7 @@ public class DecoderActivity  extends AppCompatActivity implements SurfaceHolder
     SurfaceView surfaceView;
     SurfaceHolder surfaceHolder;
     Renderer renderer;
-    String PATH = "/storage/emulated/0/Download/tfx.ts";
+    String PATH = "/storage/emulated/0/Download/kika.ts";
     Surface surface;
 
 
@@ -135,13 +135,13 @@ public class DecoderActivity  extends AppCompatActivity implements SurfaceHolder
 
                 /* TODO: the user should be the one selecting this: */
                 // VideoFormat:
-                MediaFormat format = MediaFormat.createVideoFormat("video/avc", 720, 576);
+                MediaFormat format = MediaFormat.createVideoFormat("video/avc", 1280, 720);
 
                 // Set some properties.  Failing to specify some of these can cause the MediaCodec
                 // configure() call to throw an unhelpful exception.
                 format.setInteger(MediaFormat.KEY_COLOR_FORMAT,
                         MediaCodecInfo.CodecCapabilities.COLOR_FormatSurface);
-                format.setInteger(MediaFormat.KEY_BIT_RATE, 2388608);
+                format.setInteger(MediaFormat.KEY_BIT_RATE, 4388608);
                 format.setInteger(MediaFormat.KEY_FRAME_RATE, 50);
                 format.setInteger(MediaFormat.KEY_I_FRAME_INTERVAL, 1);
 
@@ -159,8 +159,8 @@ public class DecoderActivity  extends AppCompatActivity implements SurfaceHolder
 
 
 
-                TrackGroup[] trackGroups = new TrackGroup[] { tracks.get(0), tracks.get(2)};
-                TrackGroup[] discardTracks = new TrackGroup[] {tracks.get(1),  tracks.get(3), tracks.get(4), tracks.get(5)};
+                TrackGroup[] trackGroups = new TrackGroup[] { tracks.get(0)};
+                TrackGroup[] discardTracks = new TrackGroup[] {/*tracks.get(0),*/ tracks.get(1), tracks.get(2),  tracks.get(3), tracks.get(4), tracks.get(5)};
                 MediaFormat[] mediaFormats = new MediaFormat[] {format , formatAudio };
                 transcoder.setSelectedTracks(trackGroups, discardTracks,  mediaFormats);
 
@@ -179,7 +179,7 @@ public class DecoderActivity  extends AppCompatActivity implements SurfaceHolder
 
         MediaOutput mediaOutput = new DefaultMediaOutput(allocator);
 
-        DefaultTranscoder df = new DefaultTranscoder(callback, PATH, "/storage/emulated/0/Download/kikats.ts");
+        DefaultTranscoder df = new DefaultTranscoder(callback, PATH, "udp://239.239.239.239:1234?pkt_size=1316"); //"udp://239.239.239.239:1234?pkt_size=1316"
         df.start();
         df.setDataSource(dataSource);
         df.setOutputSource(mediaOutput);

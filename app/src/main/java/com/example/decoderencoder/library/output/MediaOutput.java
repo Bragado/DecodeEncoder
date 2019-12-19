@@ -12,6 +12,8 @@ public interface MediaOutput {
 
     void prepare(Callback callback, Uri uri);
 
+    void prepare(Callback callback, String uri);
+
     void maybeStartMuxer();
 
     void stopMuxer();
