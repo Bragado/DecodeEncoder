@@ -31,10 +31,9 @@ import java.util.LinkedList;
  * to save
  *
  */
-public class DefaultMediaOutput extends HandlerThread implements MediaOutput {
+public class DefaultMediaOutput implements MediaOutput {
 
     private static final String TAG = "DEFAULTMEDIAOUTPUT";
-    Handler mediaOutputHandler;
     Handler transcoderHandler;
 
     final Allocator allocator;
@@ -59,17 +58,12 @@ public class DefaultMediaOutput extends HandlerThread implements MediaOutput {
                               Allocator allocator
 
     ) {
-        super("MediaOutput");
         this.allocator = allocator;
+        this.transcoderHandler = transcoderHandler;
         //loadCondition = new ConditionVariable();
         //this.transcoderHandler = transcoderHandler;
     }
 
-
-    @Override
-    protected void onLooperPrepared() {
-        mediaOutputHandler = new Handler();
-    }
 
     @Override
     public MuxerInput newTrackDiscovered(MediaFormat trackFormat) {
@@ -99,10 +93,11 @@ public class DefaultMediaOutput extends HandlerThread implements MediaOutput {
 
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
     @Override
-    public void prepare(Callback callback, Uri uri) {
+    public void prepare(Callback callback, Uri uri, Handler transcoderHandler) {
         //loadCondition.open();
         //this.mediaMuxer = mediaMuxer;/* new MediaCodecMuxer(uri.getPath(),  android.media.MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4); */
         this.callback = callback;
+        this.transcoderHandler = transcoderHandler;
         /**
          * TODO:
          * mediamuxer factory
@@ -113,7 +108,9 @@ public class DefaultMediaOutput extends HandlerThread implements MediaOutput {
     }
 
     @Override
-    public void prepare(Callback callback, String uri) {
+    public void prepare(Callback callback, String uri, Handler transcoderHandler) {
+        this.transcoderHandler = transcoderHandler;
+        this.callback = callback;
         this.mediaMuxer = new FFmpegMuxer(uri);
     }
 
@@ -144,22 +141,6 @@ public class DefaultMediaOutput extends HandlerThread implements MediaOutput {
 
 
     // Internals
-    public void load() {
-       /* loadCondition.block();
-        while(!loadCancelead) {
-            boolean info_available = false;
-            for(int i = 0; i < muxerInputBuffers.length; i++) {
-                if(muxerInputBuffers[i].isDataAvailable() > 0) {
-                    this.sampleOutput.writeData();
-                    info_available = true;
-                }
-            }
-            if(!info_available)
-                loadCondition.close();
-        }*/
-
-    }
-
 
     public class EncoderOutput implements MuxerInput {
         int trackId;
@@ -176,17 +157,17 @@ public class DefaultMediaOutput extends HandlerThread implements MediaOutput {
 
         @Override
         public int sampleData(EncoderBuffer outputBuffer) throws IOException, InterruptedException {
-
-            if(numOfMuxingStreams > currentNumOfStreams) {
-                pendingEncoderOutputBuffers.add(outputBuffer);
-            }else {
-                while(pendingEncoderOutputBuffers.size() > 0) {                 // TODO
-                    EncoderBuffer bf = pendingEncoderOutputBuffers.poll();
+            transcoderHandler.post(() -> {
+                if(numOfMuxingStreams > currentNumOfStreams) {
+                    pendingEncoderOutputBuffers.add(outputBuffer);
+                }else {
+                    while(pendingEncoderOutputBuffers.size() > 0) {                 // TODO
+                        EncoderBuffer bf = pendingEncoderOutputBuffers.poll();
+                        mediaMuxer.writeSampleData(trackId, outputBuffer);
+                    }
                     mediaMuxer.writeSampleData(trackId, outputBuffer);
                 }
-                mediaMuxer.writeSampleData(trackId, outputBuffer);
-            }
-
+            });
             return 1;
         }
     }

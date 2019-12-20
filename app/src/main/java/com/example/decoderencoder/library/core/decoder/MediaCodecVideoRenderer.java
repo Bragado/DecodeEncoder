@@ -49,11 +49,15 @@ public class MediaCodecVideoRenderer extends MediaCodecRenderer {
         decoder.releaseOutputBuffer(outputBufferIndex, true);
         if(inputSurface != null && outputSurface != null) {
             /* If we are using OpenGL surfaces, there's some extra work */
-            inputSurface.makeCurrent();
-            outputSurface.awaitNewImage();
-            outputSurface.drawImage();
-            inputSurface.setPresentationTime(info.presentationTimeUs*1000);
-            inputSurface.swapBuffers();
+            try {
+                inputSurface.makeCurrent();
+                outputSurface.awaitNewImage();
+                outputSurface.drawImage();
+                inputSurface.setPresentationTime(info.presentationTimeUs*1000);
+                inputSurface.swapBuffers();
+            }catch (Exception e) {
+                e.printStackTrace();
+            }
 
         }
 

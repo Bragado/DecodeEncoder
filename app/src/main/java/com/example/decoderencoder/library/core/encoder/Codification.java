@@ -53,7 +53,7 @@ public interface Codification {
 
     boolean feedInputBuffer();
 
-    boolean drainOutputBuffer();
+    int drainOutputBuffer();
 
 
 

@@ -40,7 +40,8 @@ public abstract class MediaCodecRenderer extends BaseRenderer {
     private final ArrayList<Long> decodeOnlyPresentationTimestamps;
     private long largestQueuedPresentationTimeUs;
     private boolean reconfigurationStateWritePending = false;
-    long lastpts = -1;
+    private boolean endOfStreamSignaled = false;
+
 
     /* Audio Renderers */
     LinkedList<Integer> pendingDecoderOutputBufferIndices;
@@ -50,6 +51,7 @@ public abstract class MediaCodecRenderer extends BaseRenderer {
     InputSurface inputSurface = null;
     OutputSurface outputSurface = null;
     Surface surface = null;
+
 
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
     public MediaCodecRenderer(int trackType) {
@@ -132,6 +134,7 @@ public abstract class MediaCodecRenderer extends BaseRenderer {
         return pendingDecoderOutputBufferIndices.poll();
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     public void SurfaceCreated(InputSurface inputSurface) {
         this.inputSurface = inputSurface;
@@ -140,6 +143,18 @@ public abstract class MediaCodecRenderer extends BaseRenderer {
 
     public void SurfaceCreated(Surface surface) {
         this.surface = surface;
+    }
+
+    protected void onStopped()  {
+        decoder.stop();
+        decoder.release();
+        pendingDecoderOutputBufferIndices = null;
+        pendingDecoderOutputBufferInfos = null;
+        inputBuffers = null;
+        outputBuffers = null;
+        inputSurface = null;
+        outputSurface = null;
+        surface = null;
     }
 
 
@@ -194,10 +209,14 @@ public abstract class MediaCodecRenderer extends BaseRenderer {
      */
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
     public boolean feedInputBuffer() {
+        if(this.endOfStreamSignaled) {
+            return false;
+        }
+
         if(!initCodec()) {
             return true;
         }
-        if(inputIndex < 0) {            // FIXME: is this correct?
+        if(inputIndex < 0) {
             inputIndex = decoder.dequeueInputBuffer(10);
             buffer.data = getInputBuffer(inputIndex);
             buffer.clear();
@@ -217,10 +236,12 @@ public abstract class MediaCodecRenderer extends BaseRenderer {
             }
         }
 
-
-        if (this.streamIsFinal) {
-            decoder.queueInputBuffer(inputIndex, 0, 0, 0, MediaCodec.BUFFER_FLAG_END_OF_STREAM);
-            resetInputBuffer();
+        if (this.streamIsFinal) {           // Default transcoder asked to stop this stream
+            if(!this.endOfStreamSignaled) {
+                decoder.queueInputBuffer(inputIndex, 0, 0, 0, MediaCodec.BUFFER_FLAG_END_OF_STREAM);
+                resetInputBuffer();
+                this.endOfStreamSignaled = true;
+            }
             return false;
         }
 
@@ -252,9 +273,9 @@ public abstract class MediaCodecRenderer extends BaseRenderer {
 
         try {
             long presentationTimeUs = buffer.timeUs;
-            if (buffer.isDecodeOnly()) {
+            /*if (buffer.isDecodeOnly()) {      // FIXME : this is used to regiter negative pts, check if we need this
                 decodeOnlyPresentationTimestamps.add(presentationTimeUs);
-            }
+            }*/
             if(buffer.isEndOfStream()) {
                 decoder.queueInputBuffer(inputIndex, 0, 0, presentationTimeUs, MediaCodec.BUFFER_FLAG_END_OF_STREAM);
                 resetInputBuffer();

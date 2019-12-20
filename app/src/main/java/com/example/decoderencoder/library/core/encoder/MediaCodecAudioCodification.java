@@ -35,6 +35,9 @@ public class MediaCodecAudioCodification extends MediaCodecCodification {
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
     @Override
     public boolean feedInputBuffer() {          // only for audio, for video streams we use encoders' surface to feed it data
+        if(super.endOfCodification)
+            return false;
+
         if(decoder == null) {                   // TODO: ensure decoder is initialized and get this out of here
             decoder = renderer.getDecoder();
         }
@@ -51,7 +54,6 @@ public class MediaCodecAudioCodification extends MediaCodecCodification {
         MediaCodec.BufferInfo decoderBufferInfo = renderer.pollBufferInfo();
 
         int size = decoderBufferInfo.size;
-        int encodeSize = encoderInputBuffer.capacity();
         long presentationTime = decoderBufferInfo.presentationTimeUs;
 
         if(size >= 0) {
@@ -59,7 +61,7 @@ public class MediaCodecAudioCodification extends MediaCodecCodification {
             decoderOutputBuffer.position(decoderBufferInfo.offset);
             decoderOutputBuffer.limit(decoderBufferInfo.offset + size);
             encoderInputBuffer.position(0);
-            encoderInputBuffer.put(decoderOutputBuffer); // BufferOverflowException
+            encoderInputBuffer.put(decoderOutputBuffer); // FIXME: BufferOverflowException if we do not set max buffer size in MediaFormat
 
             this.encoder.queueInputBuffer(
                     index,

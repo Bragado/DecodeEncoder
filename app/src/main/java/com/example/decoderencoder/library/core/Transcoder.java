@@ -97,6 +97,9 @@ public interface Transcoder {
 
 
 
+    public void release();
+
+
 
 
 

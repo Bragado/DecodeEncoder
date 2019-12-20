@@ -42,6 +42,8 @@ public abstract class BaseCodification implements Codification {
     @Override
     public void stop() {
         encoder.stop();
+        encoder.release();
+        onStop();
     }
 
     @Override
@@ -87,5 +89,6 @@ public abstract class BaseCodification implements Codification {
         return false;
     }
 
+    public abstract void onStop();
 
 }

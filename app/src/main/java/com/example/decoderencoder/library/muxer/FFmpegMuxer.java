@@ -17,6 +17,7 @@ import com.example.decoderencoder.library.source.Media;
 public class FFmpegMuxer implements MediaMuxer {
 
     Uri uri;
+    boolean started = false;        // TODO: create a proper "state machine"
 
     @Keep
     private Long nativePointer = new Long(0);
@@ -28,7 +29,9 @@ public class FFmpegMuxer implements MediaMuxer {
 
     @Override
     public void stop() {
-        nativeStop(nativePointer);
+        if(started)
+            nativeStop(nativePointer);
+        started = false;
     }
 
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
@@ -89,11 +92,14 @@ public class FFmpegMuxer implements MediaMuxer {
     @Override
     public void start() {
         nativeStart(nativePointer);
+        started = true;
     }
 
     @Override
     public void release() {
-        nativeStop(nativePointer);
+        if(started)
+            nativeStop(nativePointer);
+        started = false;
     }
 
     @Override

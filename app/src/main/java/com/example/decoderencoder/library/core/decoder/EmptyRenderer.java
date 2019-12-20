@@ -59,6 +59,8 @@ public class EmptyRenderer extends BaseRenderer {
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
     public boolean feedInputBuffer() {
+        if(this.streamIsFinal)
+            return false;
 
         inputBuffer = new DecoderInputBuffer(DecoderInputBuffer.BUFFER_REPLACEMENT_MODE_DIRECT);
         int result = readSource(formatHolder, inputBuffer, false);

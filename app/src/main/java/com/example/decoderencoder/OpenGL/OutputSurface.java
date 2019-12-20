@@ -113,6 +113,7 @@ public class OutputSurface implements SurfaceTexture.OnFrameAvailableListener {
         } else {
             mSurfaceTexture.setOnFrameAvailableListener(this);
         }
+        mSurfaceTexture.setOnFrameAvailableListener(this);
         mSurface = new Surface( mSurfaceTexture );
     }
 
@@ -208,7 +209,7 @@ public class OutputSurface implements SurfaceTexture.OnFrameAvailableListener {
      * Latches the next buffer into the texture. Must be called from the thread that created the OutputSurface object, after the onFrameAvailable callback has signaled that new data is available.
      */
     public void awaitNewImage() {
-        final int TIMEOUT_MS = 5000;
+        final int TIMEOUT_MS = 50;
         synchronized ( mFrameSyncObject ) {
             while ( !mFrameAvailable ) {
                 try {

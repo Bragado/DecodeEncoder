@@ -32,6 +32,11 @@ public class EmptyCodification extends BaseCodification {
     }
 
     @Override
+    public void onStop() {
+
+    }
+
+    @Override
     public void start() {
 
     }
@@ -39,7 +44,7 @@ public class EmptyCodification extends BaseCodification {
 
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
     @Override
-    public boolean drainOutputBuffer() {
+    public int drainOutputBuffer() {
         if(!format_registered) {
             // let's add the stream
             MediaFormat mediaFormat = renderer.getFormat();
@@ -47,15 +52,15 @@ public class EmptyCodification extends BaseCodification {
                 addTrack(mediaFormat);
                 format_registered = true;
             }else {
-                return true;
+                return 2;
             }
         }
         ByteBuffer data = renderer.pollFrameData();
         MediaCodec.BufferInfo bf = renderer.pollBufferInfo();
         if(data == null || bf == null)
-            return false;
+            return 0;
         onDataReady(data, bf);
-        return true;
+        return 1;
 
     }
 

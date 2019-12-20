@@ -61,7 +61,8 @@ public class DecoderActivity  extends AppCompatActivity implements SurfaceHolder
     SurfaceView surfaceView;
     SurfaceHolder surfaceHolder;
     Renderer renderer;
-    String PATH = "/storage/emulated/0/Download/kika.ts";
+    //String PATH = "/storage/emulated/0/Download/3sat.ts";
+    String PATH = "udp://239.192.2.61:1234";
     Surface surface;
 
 
@@ -77,46 +78,6 @@ public class DecoderActivity  extends AppCompatActivity implements SurfaceHolder
         this.allocator = new DefaultAllocator(true, C.DEFAULT_BUFFER_SEGMENT_SIZE);
         this.loadErrorHandlingPolicy = new DefaultLoadErrorHandlingPolicy();
 
-    /*    Media.Callback callback = new Media.Callback() {
-            @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
-            @Override
-            public void onPrepared(MediaSource source) {
-               Log.e(TAG, "onPrepared");
-                SampleStream[] samples = source.getSampleStreams();
-                TrackGroupArray tracks =  source.getTrackGroups();
-                com.example.decoderencoder.library.util.Log.d(TAG, "number of samples: " + samples.length);
-                source.continueLoading(0);
-                MediaSource.PreparedState preparedState = source.getPreparedState();
-                //DefaultRenderFactory defaultRenderFactory = new DefaultRenderFactory();
-                //defaultRenderFactory.createRenderers(samples, source.getPreparedState());
-                String tracksNames[] = new String[tracks.length];
-                for(int i = 0; i < tracks.length; i++){
-                    tracksNames[i] = tracks.get(i).getFormat(0).sampleMimeType;
-                }
-                RecyclerView mRecyclerView = (RecyclerView) findViewById(R.id.recyclerView);
-                TracksAdapter tracksAdapter = new TracksAdapter(DecoderActivity.this, tracksNames);
-                mRecyclerView.setLayoutManager(new LinearLayoutManager(DecoderActivity.this));
-                mRecyclerView.setAdapter(tracksAdapter);
-
-                DecodeLoadable decodeLoadable = new DecodeLoadable(DecoderActivity.this.surface,  tracks.get(0), samples[0]);
-                Loader loader = new Loader("decoder");
-                loader.startLoading(
-                        decodeLoadable, DecoderActivity.this, loadErrorHandlingPolicy.getMinimumLoadableRetryCount(C.TRACK_TYPE_VIDEO));
-
-
-            }
-
-            @Override
-            public void onContinueLoadingRequested(MediaSource source) {
-                Log.e(TAG, "onContinueLoading: " + allocator.getTotalBytesAllocated());
-
-                if( allocator.getTotalBytesAllocated() < 32833536)
-                    source.continueLoading(0);
-
-            }
-        };
-        mediaSource = new MediaSource(Uri.parse(PATH), dataSource, new DefaultExtractorsFactory().createExtractors(), allocator, MediaSource.DEFAULT_LOADING_CHECK_INTERVAL_BYTES, loadErrorHandlingPolicy);
-        mediaSource.prepare(callback,0);*/
         Transcoder.Callback callback = new Transcoder.Callback() {
 
 
@@ -135,14 +96,14 @@ public class DecoderActivity  extends AppCompatActivity implements SurfaceHolder
 
                 /* TODO: the user should be the one selecting this: */
                 // VideoFormat:
-                MediaFormat format = MediaFormat.createVideoFormat("video/avc", 1280, 720);
+                MediaFormat format = MediaFormat.createVideoFormat("video/avc", 720, 480);
 
                 // Set some properties.  Failing to specify some of these can cause the MediaCodec
                 // configure() call to throw an unhelpful exception.
                 format.setInteger(MediaFormat.KEY_COLOR_FORMAT,
                         MediaCodecInfo.CodecCapabilities.COLOR_FormatSurface);
-                format.setInteger(MediaFormat.KEY_BIT_RATE, 4388608);
-                format.setInteger(MediaFormat.KEY_FRAME_RATE, 50);
+                format.setInteger(MediaFormat.KEY_BIT_RATE, 1888608);
+                format.setInteger(MediaFormat.KEY_FRAME_RATE, 25);
                 format.setInteger(MediaFormat.KEY_I_FRAME_INTERVAL, 1);
 
 
@@ -160,7 +121,7 @@ public class DecoderActivity  extends AppCompatActivity implements SurfaceHolder
 
 
                 TrackGroup[] trackGroups = new TrackGroup[] { tracks.get(0)};
-                TrackGroup[] discardTracks = new TrackGroup[] {/*tracks.get(0),*/ tracks.get(1), tracks.get(2),  tracks.get(3), tracks.get(4), tracks.get(5)};
+                TrackGroup[] discardTracks = new TrackGroup[] {/*tracks.get(0),*/ tracks.get(1), tracks.get(2),  /*tracks.get(3), tracks.get(4), tracks.get(5), tracks.get(6)*/};
                 MediaFormat[] mediaFormats = new MediaFormat[] {format , formatAudio };
                 transcoder.setSelectedTracks(trackGroups, discardTracks,  mediaFormats);
 
@@ -179,7 +140,7 @@ public class DecoderActivity  extends AppCompatActivity implements SurfaceHolder
 
         MediaOutput mediaOutput = new DefaultMediaOutput(allocator);
 
-        DefaultTranscoder df = new DefaultTranscoder(callback, PATH, "udp://239.239.239.239:1234?pkt_size=1316"); //"udp://239.239.239.239:1234?pkt_size=1316"
+        DefaultTranscoder df = new DefaultTranscoder(callback, PATH, "udp://239.239.239.239:1234?pkt_size=1316" ); //"udp://239.239.239.239:1234?pkt_size=1316"
         df.start();
         df.setDataSource(dataSource);
         df.setOutputSource(mediaOutput);

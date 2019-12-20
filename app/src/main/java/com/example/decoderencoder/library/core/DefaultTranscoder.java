@@ -52,11 +52,11 @@ public class DefaultTranscoder  extends HandlerThread implements Transcoder, Ren
     LoadErrorHandlingPolicy loadErrorHandlingPolicy;
     MediaSource mediaSource;
     MediaManagement mediaManagement;
-    MediaOutput mediaOutput;
+    MediaOutput mediaOutput = null;
     OutputManagement outputManagement;
 
     /* DefaultTranscoder Variables */
-    Handler transcoderHandler;
+    Handler transcoderHandler = null;
     Handler uiHandler;
     MediaSource.PreparedState preparedState = null;
     SampleStream[] sampleStreams = null;
@@ -71,6 +71,7 @@ public class DefaultTranscoder  extends HandlerThread implements Transcoder, Ren
     boolean tracksSelectedUpdated = false;
     boolean prepareWhenReady = false;
     boolean transcoderRunning = false;
+    Boolean outputPrepared = false;
 
     /* Encoders/Decoders */
     DecodeEncodeStreams decodeEncodeStreams;
@@ -111,7 +112,12 @@ public class DefaultTranscoder  extends HandlerThread implements Transcoder, Ren
         *
         * */
         this.mediaOutput = mediaOutput;
-        mediaOutput.prepare(outputManagement, outputUri);
+        synchronized (outputPrepared) {
+            if(transcoderHandler != null && !outputPrepared) {
+                outputPrepared = true;
+                mediaOutput.prepare(outputManagement, outputUri, transcoderHandler);
+            }
+        }
         return true;
     }
 
@@ -170,12 +176,29 @@ public class DefaultTranscoder  extends HandlerThread implements Transcoder, Ren
 
     @Override
     public boolean stopTranscoder() {   // Thread : UI
-        return false;
+        decodeEncodeStreams.stopTranscoding();
+        decodeEncodeStreams = null;
+        return true;
     }
 
     @Override
     public void getStats() {    // Thread : UI
 
+    }
+
+    @Override
+    public void release() {
+        // release mediasource
+    }
+
+    // Internals
+
+
+    public void releaseRenderersAndCodifications() {
+        for(Renderer renderer : renderers)
+            renderer.stop();
+        for(Codification codification : codifications)
+            codification.stop();
     }
 
     public void initCodecs() {
@@ -189,15 +212,21 @@ public class DefaultTranscoder  extends HandlerThread implements Transcoder, Ren
         }
     }
 
-    // Internals
     /**
-     *
+     * Inicializes mediaSource and mediaOutput by calling its prepare() method. Since mediaOutput requires
+     * DefaultTranscoder handler to process output, we must check if the handler is already inicialized, if it
+     * is not, onLooperPrepared() will handle the mediaOutput.prepare call
      */
-
     public void onPrepare() {
         DefaultTranscoder.this.mediaManagement = new MediaManagement();
         DefaultTranscoder.this.outputManagement = new OutputManagement();
         mediaSource.prepare(DefaultTranscoder.this.mediaManagement,0);   // Thread : DefaultTranscoder
+        synchronized (outputPrepared) {
+            if(mediaOutput != null && !outputPrepared ) {
+                outputPrepared = true;
+                mediaOutput.prepare(outputManagement, outputUri, transcoderHandler);
+            }
+        }
     }
 
     private void reallyStartTranscoding() {
@@ -284,9 +313,7 @@ public class DefaultTranscoder  extends HandlerThread implements Transcoder, Ren
     }
 
 
-    final class DecodeEncodeStreams extends HandlerThread {
-
-        Handler thisHandler;
+    final class DecodeEncodeStreams extends Thread {
         final Handler transcoderHandler;
         final Renderer[] renderers;
         final Codification[] codifications;
@@ -305,8 +332,7 @@ public class DefaultTranscoder  extends HandlerThread implements Transcoder, Ren
         }
 
         @Override
-        protected void onLooperPrepared() {
-            thisHandler = new Handler();
+        public void run() {
             isReady = true;
             initCodecs();
             startTranscoding();
@@ -329,36 +355,63 @@ public class DefaultTranscoder  extends HandlerThread implements Transcoder, Ren
             boolean nothingToRead = false;
             /*  Basic Idea:
              *   1. Drain encoder
-             *   2. Feed Decoder
-             *   3. Drain decoder
-             *   4. Feed Encoder
+             *   2. Feed Encoder
+             *   3. Feed Decoder
+             *   4. Drain decoder
+             *
+             *   How to improve this idea:
+             *
+             *   Foreach renderer, codification in renderers, codifications:
+             *      while codification(i).drainOutputBuffer != TRY_AGAIN_LATER
+             *      do
+             *          long res = codification(i).feedInputBuffer();
+             *      while res != NO_INPUT_BUFFER_AVAILABLE || res < minimum_pts_so_far + OFFSET
+             *      renderers(i).drainOutputBuffer
+             *      renderers(i).feedInputBuffer
+             *
              */
+
+
             long counter = 0;
-            while (counter++ < 15000) {
-                for (int i = 0; i < renderers.length; i++) {
-                    codifications[i].drainOutputBuffer();
+            int ret = 1;
+
+            while (!canceled) {
+                for (int i = 0; i < renderers.length; i++, ret = 1) {
+
+                    while(ret == 1) {
+                        ret &= codifications[i].drainOutputBuffer();
+                    }
                     codifications[i].feedInputBuffer();
                     renderers[i].drainOutputBuffer();
                     renderers[i].feedInputBuffer();
                     if(transcoderRunning && allocator.getTotalBytesAllocated() < 42833536)
                         DefaultTranscoder.this.mediaSource.continueLoading(0);
-
                 }
             }
 
+            signalEndOfStreamAndDrainEncoders();
+        }
+
+        public void signalEndOfStreamAndDrainEncoders() {
             for (int i = 0; i < renderers.length; i++) {
                 renderers[i].signalEndOfStream();
             }
-
-            while (counter++ < 15030) {
+            int bool = 1;
+            int counter = 0;
+            while (counter++ < 30) {
+                bool = 0;
                 for (int i = 0; i < renderers.length; i++) {
-                    codifications[i].drainOutputBuffer();
+                    bool += codifications[i].drainOutputBuffer();
                     codifications[i].feedInputBuffer();
                     renderers[i].drainOutputBuffer();
-                    nothingToRead &= !(renderers[i].feedInputBuffer());
+                    renderers[i].feedInputBuffer();
                 }
             }
             mediaOutput.stopMuxer();
+            mediaOutput.release();
+
+            releaseRenderersAndCodifications();
+            release();
         }
 
         public void stopTranscoding() {
