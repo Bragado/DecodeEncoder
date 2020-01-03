@@ -144,10 +144,6 @@ public class DefaultMediaOutput implements MediaOutput {
 
     public class EncoderOutput implements MuxerInput {
         int trackId;
-        long smallestTimeStamp;
-        long biggestTimeStamp;
-        int trackType = 0;
-
         LinkedList<EncoderBuffer> pendingEncoderOutputBuffers = new LinkedList<EncoderBuffer>();
 
 
@@ -157,6 +153,7 @@ public class DefaultMediaOutput implements MediaOutput {
 
         @Override
         public int sampleData(EncoderBuffer outputBuffer) throws IOException, InterruptedException {
+
             transcoderHandler.post(() -> {
                 if(numOfMuxingStreams > currentNumOfStreams) {
                     pendingEncoderOutputBuffers.add(outputBuffer);

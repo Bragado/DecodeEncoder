@@ -15,12 +15,12 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.PriorityQueue;
 
 public class MediaCodecMuxer implements MediaMuxer {
 
     private static final String TAG = "MediaCodecMuxer";
-    private final int MAX_BUFFERING = 50;
 
     android.media.MediaMuxer muxer;
     boolean started = false;
@@ -47,6 +47,7 @@ public class MediaCodecMuxer implements MediaMuxer {
     public int addTrack(MediaFormat newFormat) {
         last_pts = Arrays.copyOf(last_pts, last_pts.length + 1);
         last_pts[last_pts.length - 1] = 0;
+
         return muxer.addTrack(newFormat);
     }
 
@@ -89,5 +90,8 @@ public class MediaCodecMuxer implements MediaMuxer {
         bf.size = encoderBuffer.size;
         muxer.writeSampleData(trackIndex, encoderBuffer.data, bf);
     }
+
+
+
 
 }

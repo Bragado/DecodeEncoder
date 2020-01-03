@@ -62,7 +62,7 @@ public class DecoderActivity  extends AppCompatActivity implements SurfaceHolder
     SurfaceHolder surfaceHolder;
     Renderer renderer;
     //String PATH = "/storage/emulated/0/Download/3sat.ts";
-    String PATH = "udp://239.192.2.61:1234";
+    String PATH = "udp://239.192.1.103:1234";
     Surface surface;
 
 
@@ -96,14 +96,14 @@ public class DecoderActivity  extends AppCompatActivity implements SurfaceHolder
 
                 /* TODO: the user should be the one selecting this: */
                 // VideoFormat:
-                MediaFormat format = MediaFormat.createVideoFormat("video/avc", 720, 480);
+                MediaFormat format = MediaFormat.createVideoFormat("video/hevc", 1280, 720);
 
                 // Set some properties.  Failing to specify some of these can cause the MediaCodec
                 // configure() call to throw an unhelpful exception.
                 format.setInteger(MediaFormat.KEY_COLOR_FORMAT,
                         MediaCodecInfo.CodecCapabilities.COLOR_FormatSurface);
-                format.setInteger(MediaFormat.KEY_BIT_RATE, 1888608);
-                format.setInteger(MediaFormat.KEY_FRAME_RATE, 25);
+                format.setInteger(MediaFormat.KEY_BIT_RATE, 2888608);
+                format.setInteger(MediaFormat.KEY_FRAME_RATE, 50);
                 format.setInteger(MediaFormat.KEY_I_FRAME_INTERVAL, 1);
 
 
@@ -121,7 +121,7 @@ public class DecoderActivity  extends AppCompatActivity implements SurfaceHolder
 
 
                 TrackGroup[] trackGroups = new TrackGroup[] { tracks.get(0)};
-                TrackGroup[] discardTracks = new TrackGroup[] {/*tracks.get(0),*/ tracks.get(1), tracks.get(2),  /*tracks.get(3), tracks.get(4), tracks.get(5), tracks.get(6)*/};
+                TrackGroup[] discardTracks = new TrackGroup[] {/*tracks.get(0),*/ tracks.get(1), tracks.get(2),  tracks.get(3), tracks.get(4), tracks.get(5), tracks.get(6)};
                 MediaFormat[] mediaFormats = new MediaFormat[] {format , formatAudio };
                 transcoder.setSelectedTracks(trackGroups, discardTracks,  mediaFormats);
 
@@ -140,7 +140,7 @@ public class DecoderActivity  extends AppCompatActivity implements SurfaceHolder
 
         MediaOutput mediaOutput = new DefaultMediaOutput(allocator);
 
-        DefaultTranscoder df = new DefaultTranscoder(callback, PATH, "udp://239.239.239.239:1234?pkt_size=1316" ); //"udp://239.239.239.239:1234?pkt_size=1316"
+        DefaultTranscoder df = new DefaultTranscoder(callback, PATH, "/storage/emulated/0/Download/3satts265.ts" ); //"udp://239.239.239.239:1234?pkt_size=1316"
         df.start();
         df.setDataSource(dataSource);
         df.setOutputSource(mediaOutput);

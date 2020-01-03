@@ -15,6 +15,7 @@
  */
 package com.example.decoderencoder.library.core;
 
+import android.media.MediaFormat;
 import android.os.Handler;
 
 import androidx.annotation.Nullable;
@@ -39,9 +40,10 @@ public interface RenderersFactory {
    *
    * @param sampleStreams All streams available.
    * @param preparedState All the information about the tracks and the ones selected
+   * @param formats
    * @return The {@link Renderer} instances.
    */
-  Renderer[] createRenderers(SampleStream[] sampleStreams, MediaSource.PreparedState preparedState);
+  Renderer[] createRenderers(SampleStream[] sampleStreams, MediaSource.PreparedState preparedState, MediaFormat[] formats);
 
   /**
    * Builds the {@link Renderer} instances for a {@link com.example.decoderencoder.library.core.decoder.Decoder} by trying to reuse the ones in currentRenderers

@@ -252,7 +252,7 @@ public class DefaultTranscoder  extends HandlerThread implements Transcoder, Ren
                 DefaultTranscoder.this.defaultRenderFactory = new DefaultRenderFactory(DefaultTranscoder.this);
 
                 /*2. Create Renderers */
-                DefaultTranscoder.this.renderers = defaultRenderFactory.createRenderers(sampleStreams, preparedState);
+                DefaultTranscoder.this.renderers = defaultRenderFactory.createRenderers(sampleStreams, preparedState, DefaultTranscoder.this.formats);
 
                 /* Create Codifications */
                 DefaultTranscoder.this.codifications = defaultCodificationFactory.createCodification(DefaultTranscoder.this.formats, preparedState, DefaultTranscoder.this.renderers, mediaOutput);
@@ -294,6 +294,8 @@ public class DefaultTranscoder  extends HandlerThread implements Transcoder, Ren
         @Override
         public void onContinueLoadingRequested(MediaSource source) {        // TODO
             if(transcoderRunning && allocator.getTotalBytesAllocated() < 42833536)
+                source.continueLoading(0);
+            else if(!transcoderRunning)             // too high bitrate??
                 source.continueLoading(0);
 
         }

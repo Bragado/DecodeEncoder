@@ -1,11 +1,15 @@
 package com.example.decoderencoder.library.muxer;
 
+import android.media.MediaCodec;
 import android.media.MediaFormat;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Handler;
 
 import java.nio.ByteBuffer;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Map;
 
 import androidx.annotation.Keep;
@@ -13,11 +17,23 @@ import androidx.annotation.RequiresApi;
 
 import com.example.decoderencoder.library.core.encoder.EncoderBuffer;
 import com.example.decoderencoder.library.source.Media;
+import com.example.decoderencoder.library.util.Log;
 
 public class FFmpegMuxer implements MediaMuxer {
 
     Uri uri;
     boolean started = false;        // TODO: create a proper "state machine"
+    boolean buffer_ready = false;
+    final Handler handler = new Handler();
+
+    private final int MAX_BUFFERING = 1000;        // ms
+
+    private LinkedList<EncoderBuffer>[] buffer_data = new LinkedList[0];
+
+
+    private LinkedList<EncoderBuffer>[] pts_diffs = new LinkedList[0];
+
+    private long current_ms = -1;
 
     @Keep
     private Long nativePointer = new Long(0);
@@ -37,6 +53,8 @@ public class FFmpegMuxer implements MediaMuxer {
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
     @Override
     public int addTrack(MediaFormat newFormat) {
+        buffer_data = Arrays.copyOf(buffer_data, buffer_data.length+1);
+        buffer_data[buffer_data.length - 1] = new LinkedList<>();
         // Convert the MediaFormat into key-value pairs and send to the native.
         // Video keys: streamType ; codec_tag ; codec_id ; bit_rate ; width ; height ; fps
         String[] keys = null;
@@ -48,7 +66,7 @@ public class FFmpegMuxer implements MediaMuxer {
             keys[6] = "streamType";
             values[6] = "0";
             keys[0] = "codecID";
-            values[0] = "0";
+            values[0] = newFormat.getString(MediaFormat.KEY_MIME).contains("hevc") ? "4" : "0";
             keys[1] = "bit_rate";
             values[1] = newFormat.getInteger(MediaFormat.KEY_BIT_RATE) + "";
             keys[2] = "width";
@@ -111,9 +129,14 @@ public class FFmpegMuxer implements MediaMuxer {
 
     @Override
     public void writeSampleData(int trackIndex, EncoderBuffer bf) {
-        if(bf.size > 0)
-        nativeWriteSampleData(nativePointer, trackIndex, bf.data, bf.offset, bf.size, bf.flags, bf.presentationTimeUs);
+
+        if (bf.size > 0)
+            nativeWriteSampleData(nativePointer, 0, bf.data, bf.offset, bf.size, bf.flags, bf.presentationTimeUs);
+
     }
+
+
+
 
     private native long nativeInit(String path, String container);
 

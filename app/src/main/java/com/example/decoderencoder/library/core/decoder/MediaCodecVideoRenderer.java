@@ -19,11 +19,25 @@ public class MediaCodecVideoRenderer extends MediaCodecRenderer {
 
     MediaCodecRenderer.Callback callback;
 
+    /* In order to reduce frame resolution */
+    int intended_fps = -1;
+    int observed_fps = -1;
+    int racio = -1;
+    long last_observed_pts = -1;
+    long decodedFrames = 0;
+
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
-    public MediaCodecVideoRenderer(MediaCodecRenderer.Callback callback, int trackType, Decoder decoder) {
+    public MediaCodecVideoRenderer(MediaCodecRenderer.Callback callback, int trackType, Decoder decoder, int intended_fps) {
         super(trackType);
         this.decoder = decoder;
         this.callback = callback;
+        this.intended_fps = intended_fps;
+    }
+
+
+    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
+    public MediaCodecVideoRenderer(MediaCodecRenderer.Callback callback, int trackType, Decoder decoder) {
+        this(callback, trackType, decoder, -1);
     }
 
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
@@ -46,7 +60,30 @@ public class MediaCodecVideoRenderer extends MediaCodecRenderer {
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
     @Override
     protected void onReleaseOutputBuffer(MediaCodec.BufferInfo info, int outputBufferIndex) {
-        decoder.releaseOutputBuffer(outputBufferIndex, true);
+        if(intended_fps > 0) {
+            if(last_observed_pts < 0) {
+                last_observed_pts = info.presentationTimeUs;
+            }else {
+                observed_fps = (int) (1000000 / (info.presentationTimeUs - last_observed_pts));
+                float aux = (float)intended_fps/observed_fps;
+                aux = 1 - aux;
+                if( aux < 0.1) {
+                    racio = 1;
+                }else {
+                    aux = 1/aux;
+                    racio = (int)aux;
+                }
+                intended_fps = -1;
+            }
+        }
+
+        if(racio <= 1 || decodedFrames++ % racio == 0) {
+            decoder.releaseOutputBuffer(outputBufferIndex, true);
+        }else {
+            decoder.releaseOutputBuffer(outputBufferIndex, false);
+            return;
+        }
+
         if(inputSurface != null && outputSurface != null) {
             /* If we are using OpenGL surfaces, there's some extra work */
             try {

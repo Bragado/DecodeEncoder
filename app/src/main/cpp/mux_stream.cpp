@@ -107,7 +107,7 @@ void writeFrame(OutputStream * video_st, jint trackIndex, jbyte* framedata, jint
 	packet.pts = (int64_t)presentationTimeUs;		// 90 khz
 	packet.dts = AV_NOPTS_VALUE;		// FIXME: not correct
 	packet.flags |= AV_PKT_FLAG_KEY;
-	LOGI("NativeWriteFrame: video_st: %p, trackIndex: %d, offset: %d, size: %d, presentationTime: %ld", video_st, trackIndex, offset, size, (int64_t)presentationTimeUs);
+	LOGI("NativeWriteFrame: video_st: %p, trackIndex: %d, offset: %d, size: %d, presentationTime: %lld", video_st, trackIndex, offset, size, (int64_t)presentationTimeUs);
 	LOGI("NativeWriteFrame: path: %s", video_st->path);
 	packet.pts = av_rescale_q(packet.pts, *videoSourceTimeBase, (video_st->ofmt_ctx->streams[packet.stream_index]->time_base));
 
@@ -160,8 +160,8 @@ int addVideoStream(OutputStream * video_st, std::map<std::string, const char *>&
 
 	LOGI("trying to add stream with: [bit_rate, width, height, fps] = [%d, %d, %d, %d]", bitrate, width, height, fps);
 
-
-	codec = avcodec_find_encoder(AV_CODEC_ID_H264);
+    AVCodecID codecId = getCodecByID(atoi(format["codecID"]));
+	codec = avcodec_find_encoder(codecId);
 	if(!codec) {
 		LOGI("add_video_stream codec not found, as expected. No encoding necessary");
 	}
@@ -175,7 +175,7 @@ int addVideoStream(OutputStream * video_st, std::map<std::string, const char *>&
     c = avcodec_alloc_context3(codec);
 	avcodec_get_context_defaults3(c, codec);        // this is a problem, is c being initialized?
 
-	c->codec_id = AV_CODEC_ID_H264;
+	c->codec_id = codecId;
 
 	/* Sample Parameters */
 	c->width    = width;
@@ -268,7 +268,8 @@ AVCodecID getCodecByID(int ID) {
 		return AV_CODEC_ID_DVB_TELETEXT;
 
 	case 4:
-		break;
+		return AV_CODEC_ID_H265;
+
 	}
 
 }

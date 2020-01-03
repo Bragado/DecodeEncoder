@@ -1,5 +1,6 @@
 package com.example.decoderencoder.library.core.decoder;
 
+import android.media.MediaFormat;
 import android.os.Build;
 import android.view.Surface;
 
@@ -30,7 +31,7 @@ public class DefaultRenderFactory implements RenderersFactory, Renderer.Callback
 
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
     @Override
-    public Renderer[] createRenderers(SampleStream[] sampleStreams, MediaSource.PreparedState preparedState) {
+    public Renderer[] createRenderers(SampleStream[] sampleStreams, MediaSource.PreparedState preparedState, MediaFormat[] formats) {
 
         Log.d(TAG, "createRenderers");
         Renderer[] renderers = new Renderer[sampleStreams.length];
@@ -45,7 +46,7 @@ public class DefaultRenderFactory implements RenderersFactory, Renderer.Callback
 
                 if(mimeType.startsWith("video/")) {
                     decoders[i] = new DefaultDecoder(preparedState.tracks.get(i));
-                    renderers[numOfRenderers] = new MediaCodecVideoRenderer(this, C.TRACK_TYPE_VIDEO, decoders[i]);
+                    renderers[numOfRenderers] = new MediaCodecVideoRenderer(this, C.TRACK_TYPE_VIDEO, decoders[i], formats[numOfRenderers].getInteger(MediaFormat.KEY_FRAME_RATE));
                     renderers[numOfRenderers].enable(preparedState.tracks.get(i).getFormat(), sampleStreams[i], 0,0);
                 }else if(mimeType.startsWith("audio/")) {
                     decoders[i] = new DefaultDecoder(preparedState.tracks.get(i));

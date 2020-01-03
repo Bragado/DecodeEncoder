@@ -7,6 +7,7 @@ import android.os.Build;
 import androidx.annotation.RequiresApi;
 
 import com.example.decoderencoder.OpenGL.InputSurface;
+import com.example.decoderencoder.library.audio.AacUtil;
 import com.example.decoderencoder.library.core.decoder.MediaCodecVideoRenderer;
 import com.example.decoderencoder.library.core.decoder.Renderer;
 import com.example.decoderencoder.library.muxer.MediaMuxer;
