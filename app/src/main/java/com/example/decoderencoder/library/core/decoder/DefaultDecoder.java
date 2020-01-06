@@ -4,19 +4,12 @@ import android.media.MediaCodec;
 import android.media.MediaCrypto;
 import android.media.MediaFormat;
 import android.os.Build;
-import android.util.Log;
-import android.util.Pair;
 import android.view.Surface;
 
 import androidx.annotation.RequiresApi;
 
-import com.example.decoderencoder.OpenGL.InputSurface;
-import com.example.decoderencoder.OpenGL.OutputSurface;
 import com.example.decoderencoder.library.Format;
 import com.example.decoderencoder.library.source.TrackGroup;
-import com.example.decoderencoder.library.util.C;
-import com.example.decoderencoder.library.util.MimeTypes;
-import com.example.decoderencoder.library.util.Util;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;

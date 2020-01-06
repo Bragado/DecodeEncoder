@@ -2,7 +2,6 @@ package com.example.decoderencoder.library.core.decoder;
 
 
 import android.media.MediaCodec;
-import android.media.MediaCodecInfo;
 import android.media.MediaFormat;
 import android.os.Build;
 import android.util.Log;
@@ -10,7 +9,7 @@ import android.view.Surface;
 
 import androidx.annotation.RequiresApi;
 
-import com.example.decoderencoder.OpenGL.InputSurface;
+import com.example.decoderencoder.openGL.InputSurface;
 import com.example.decoderencoder.library.Format;
 import com.example.decoderencoder.library.FormatHolder;
 import com.example.decoderencoder.library.source.SampleStream;
@@ -18,8 +17,6 @@ import com.example.decoderencoder.library.util.C;
 
 import java.nio.ByteBuffer;
 import java.util.LinkedList;
-
-import static com.example.decoderencoder.library.util.C.BUFFER_FLAG_DECODE_ONLY;
 
 // For passthrough
 public class EmptyRenderer extends BaseRenderer {
@@ -109,8 +106,8 @@ public class EmptyRenderer extends BaseRenderer {
     }
 
     @Override
-    public boolean drainOutputBuffer() {
-        return false;
+    public int drainOutputBuffer() {
+        return 0;
     }
 
     @Override

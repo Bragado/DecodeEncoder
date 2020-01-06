@@ -6,7 +6,6 @@ import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
-import com.example.decoderencoder.library.support.VCodec;
 
 public class DecoderEncoderActivity extends AppCompatActivity implements SurfaceHolder.Callback {
 

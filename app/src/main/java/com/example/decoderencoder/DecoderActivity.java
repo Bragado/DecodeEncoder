@@ -2,7 +2,6 @@ package com.example.decoderencoder;
 
 import android.media.MediaCodecInfo;
 import android.media.MediaFormat;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -17,31 +16,22 @@ import androidx.annotation.RequiresApi;
 
 import com.example.decoderencoder.library.core.DefaultTranscoder;
 import com.example.decoderencoder.library.core.Transcoder;
-import com.example.decoderencoder.library.core.decoder.Decoder;
-import com.example.decoderencoder.library.core.decoder.DefaultDecoder;
-import com.example.decoderencoder.library.core.decoder.DefaultRenderFactory;
-import com.example.decoderencoder.library.core.decoder.MediaCodecAudioRenderer;
-import com.example.decoderencoder.library.core.decoder.MediaCodecVideoRenderer;
 import com.example.decoderencoder.library.core.decoder.Renderer;
-import com.example.decoderencoder.library.extractor.DefaultExtractorsFactory;
 import com.example.decoderencoder.library.network.Allocator;
 import com.example.decoderencoder.library.network.DataSource;
 import com.example.decoderencoder.library.network.DefaultAllocator;
 import com.example.decoderencoder.library.network.DefaultDataSourceFactory;
 import com.example.decoderencoder.library.network.DefaultLoadErrorHandlingPolicy;
 import com.example.decoderencoder.library.network.LoadErrorHandlingPolicy;
-import com.example.decoderencoder.library.network.Loader;
 import com.example.decoderencoder.library.output.DefaultMediaOutput;
 import com.example.decoderencoder.library.output.MediaOutput;
-import com.example.decoderencoder.library.source.Media;
 import com.example.decoderencoder.library.source.MediaSource;
-import com.example.decoderencoder.library.source.SampleStream;
 import com.example.decoderencoder.library.source.TrackGroup;
 import com.example.decoderencoder.library.source.TrackGroupArray;
 import com.example.decoderencoder.library.util.C;
 import com.example.decoderencoder.library.util.Stats;
+import com.example.decoderencoder.ui.TracksAdapter;
 
-import java.io.IOException;
 import java.nio.ByteBuffer;
 
 public class DecoderActivity  extends AppCompatActivity implements SurfaceHolder.Callback {
@@ -61,8 +51,9 @@ public class DecoderActivity  extends AppCompatActivity implements SurfaceHolder
     SurfaceView surfaceView;
     SurfaceHolder surfaceHolder;
     Renderer renderer;
-    //String PATH = "/storage/emulated/0/Download/3sat.ts";
-    String PATH = "udp://239.192.1.103:1234";
+    //String PATH = "/storage/emulated/0/Download/kika.ts";
+    //String PATH = "udp://239.192.1.103:1234";     // 3 sat hg
+    String PATH = "udp://239.192.2.61:1234";      // mcm 4k
     Surface surface;
 
 
@@ -96,14 +87,14 @@ public class DecoderActivity  extends AppCompatActivity implements SurfaceHolder
 
                 /* TODO: the user should be the one selecting this: */
                 // VideoFormat:
-                MediaFormat format = MediaFormat.createVideoFormat("video/hevc", 1280, 720);
+                MediaFormat format = MediaFormat.createVideoFormat("video/avc", 720, 480);
 
                 // Set some properties.  Failing to specify some of these can cause the MediaCodec
                 // configure() call to throw an unhelpful exception.
                 format.setInteger(MediaFormat.KEY_COLOR_FORMAT,
                         MediaCodecInfo.CodecCapabilities.COLOR_FormatSurface);
                 format.setInteger(MediaFormat.KEY_BIT_RATE, 2888608);
-                format.setInteger(MediaFormat.KEY_FRAME_RATE, 50);
+                format.setInteger(MediaFormat.KEY_FRAME_RATE, 25);
                 format.setInteger(MediaFormat.KEY_I_FRAME_INTERVAL, 1);
 
 
@@ -121,7 +112,7 @@ public class DecoderActivity  extends AppCompatActivity implements SurfaceHolder
 
 
                 TrackGroup[] trackGroups = new TrackGroup[] { tracks.get(0)};
-                TrackGroup[] discardTracks = new TrackGroup[] {/*tracks.get(0),*/ tracks.get(1), tracks.get(2),  tracks.get(3), tracks.get(4), tracks.get(5), tracks.get(6)};
+                TrackGroup[] discardTracks = new TrackGroup[] {/*tracks.get(0), tracks.get(1),*/ tracks.get(1),  tracks.get(2)/*,  tracks.get(3), tracks.get(4), tracks.get(5), tracks.get(6)*/};
                 MediaFormat[] mediaFormats = new MediaFormat[] {format , formatAudio };
                 transcoder.setSelectedTracks(trackGroups, discardTracks,  mediaFormats);
 
@@ -140,7 +131,7 @@ public class DecoderActivity  extends AppCompatActivity implements SurfaceHolder
 
         MediaOutput mediaOutput = new DefaultMediaOutput(allocator);
 
-        DefaultTranscoder df = new DefaultTranscoder(callback, PATH, "/storage/emulated/0/Download/3satts265.ts" ); //"udp://239.239.239.239:1234?pkt_size=1316"
+        DefaultTranscoder df = new DefaultTranscoder(callback, PATH, "udp://239.239.239.238:1234?pkt_size=1316"); //"udp://239.239.239.239:1234?pkt_size=1316"
         df.start();
         df.setDataSource(dataSource);
         df.setOutputSource(mediaOutput);

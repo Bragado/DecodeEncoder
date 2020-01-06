@@ -37,12 +37,16 @@ public class MainActivity extends AppCompatActivity  {
     public final String TAG = "ACTIVITY MAIN";
     Context This;
 
+    public static final boolean TESTING = false;
+    public static final boolean FORCE_GPU_RENDER = false;
+
+
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        final ListView listView = (ListView) findViewById(R.id.list);
+        //final ListView listView = (ListView) findViewById(R.id.list);
        // Button decoderEncoder = findViewById(R.id.button3);
        /* final Intent intent = new Intent(this, DecoderEncoderActivity.class);
         final Intent decodeIntent = new Intent(this, DecoderActivity.class);
@@ -58,38 +62,7 @@ public class MainActivity extends AppCompatActivity  {
         });
 */
 
-        Button listCodecs = (Button) findViewById(R.id.button2);
 
-        listCodecs.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                int numCodecs = MediaCodecList.getCodecCount();
-                ArrayList<String> codecs = new ArrayList<>();
-
-                for (int i = 0; i < numCodecs; i++) {
-                    MediaCodecInfo codecInfo = MediaCodecList.getCodecInfoAt(i);
-
-
-                    String name =  "" ;
-
-
-                    if (codecInfo.isEncoder()) {
-                        name = "encoder : " + codecInfo.getName();
-                    }else
-                        name = "decoder : "  + codecInfo.getName();
-                    Log.d(TAG, "codec: " + name);
-                    codecs.add(name);
-                }
-
-                String[] codecsArr = new String[codecs.size()];
-                codecsArr = codecs.toArray(codecsArr);
-                ArrayAdapter<String> adapter = new ArrayAdapter<String>(This,
-                        android.R.layout.simple_list_item_1, android.R.id.text1, codecsArr);
-
-                listView.setAdapter(adapter);
-            }
-        });
        final Intent decodeIntent = new Intent(this, DecoderActivity.class);
         Button decode = (Button) findViewById(R.id.decode_only);
         startActivity(decodeIntent);

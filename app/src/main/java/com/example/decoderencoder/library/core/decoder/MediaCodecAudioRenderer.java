@@ -3,20 +3,14 @@ package com.example.decoderencoder.library.core.decoder;
 import android.media.MediaCodec;
 import android.media.MediaFormat;
 import android.os.Build;
-import android.view.Surface;
 
 import androidx.annotation.RequiresApi;
 
-import com.example.decoderencoder.OpenGL.InputSurface;
-import com.example.decoderencoder.OpenGL.OutputSurface;
 import com.example.decoderencoder.library.Format;
-import com.example.decoderencoder.library.core.encoder.EncoderBuffer;
 import com.example.decoderencoder.library.source.SampleStream;
-import com.example.decoderencoder.library.util.C;
 import com.example.decoderencoder.library.util.MimeTypes;
 import com.example.decoderencoder.library.util.Util;
 
-import java.nio.ByteBuffer;
 import java.util.LinkedList;
 
 @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
@@ -72,7 +66,7 @@ public class MediaCodecAudioRenderer extends MediaCodecRenderer {
     }
 
     @Override
-    public boolean drainOutputBuffer() {
+    public int drainOutputBuffer() {
         return super.drainOutputBuffer(false);
     }
 

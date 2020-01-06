@@ -1,21 +1,17 @@
 package com.example.decoderencoder.library.core.decoder;
 
 import android.media.MediaCodec;
-import android.media.MediaCodecInfo;
 import android.media.MediaCrypto;
-import android.media.MediaFormat;
 import android.os.Build;
-import android.support.annotation.NonNull;
 import android.util.Log;
 import android.view.Surface;
 
 import androidx.annotation.RequiresApi;
 
-import com.example.decoderencoder.OpenGL.InputSurface;
-import com.example.decoderencoder.OpenGL.OutputSurface;
+import com.example.decoderencoder.openGL.InputSurface;
+import com.example.decoderencoder.openGL.OutputSurface;
 import com.example.decoderencoder.library.Format;
 import com.example.decoderencoder.library.FormatHolder;
-import com.example.decoderencoder.library.source.SampleStream;
 import com.example.decoderencoder.library.util.C;
 import com.example.decoderencoder.library.util.Util;
 
@@ -301,7 +297,8 @@ public abstract class MediaCodecRenderer extends BaseRenderer {
      *
      * @return Whether it may be possible to drain more output data.
      */
-    protected boolean drainOutputBuffer(boolean render) {
+    protected int drainOutputBuffer(boolean render) {
+        int ret = 2;
         MediaCodec.BufferInfo bufferInfo = new MediaCodec.BufferInfo();
 
         int outputBufferIndex = decoder.dequeueOutputBuffer(bufferInfo, 0);
@@ -316,14 +313,15 @@ public abstract class MediaCodecRenderer extends BaseRenderer {
                 break;
             default:            // in case index is correct
                 onReleaseOutputBuffer(bufferInfo, outputBufferIndex);           // let the child of this class handle the data
+                ret = 1;
                 Log.i(TAG, "DATA WAS READ FROM DECODER for stream: " + codecFormat.sampleMimeType);
                 break;
         }
         boolean isEndOfStream = (bufferInfo.flags & MediaCodec.BUFFER_FLAG_END_OF_STREAM) != 0;
         if(isEndOfStream) {
-            return false;
+            ret = 0;
         }
-        return true;
+        return ret;
     }
 
     /* Methods called  by MediaCodecRenderer before execute the action */

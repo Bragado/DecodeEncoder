@@ -4,8 +4,7 @@ import android.media.MediaCodec;
 import android.media.MediaFormat;
 import android.view.Surface;
 
-import com.example.decoderencoder.OpenGL.InputSurface;
-import com.example.decoderencoder.OpenGL.OutputSurface;
+import com.example.decoderencoder.openGL.InputSurface;
 import com.example.decoderencoder.library.Format;
 import com.example.decoderencoder.library.source.SampleStream;
 import com.example.decoderencoder.library.util.C;
@@ -107,7 +106,7 @@ public interface Renderer {
      * Fetchs data into the decoder
      * @return  false if end of stream, true otherwise
      */
-    boolean drainOutputBuffer();
+    int drainOutputBuffer();
 
 
     /**

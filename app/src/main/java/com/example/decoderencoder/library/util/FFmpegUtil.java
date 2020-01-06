@@ -2,7 +2,21 @@ package com.example.decoderencoder.library.util;
 
 public class FFmpegUtil {
 
+    public static String getCodecIdByMimeType(String mimetype) {
+        switch(mimetype) {
+            case "video/avc":
+                return "0";
+            case "video/hevc":
+                return "1";
+            case "audio/mp4a-latm":
+                return "2";
+            case "audio/flac":
+                return "3";
+            default:
+                return -1 + "";
 
+        }
+    }
 
 
   /*  public static String[] AVCodecID = new String[] {         // only for reference, this does not have to be in memory

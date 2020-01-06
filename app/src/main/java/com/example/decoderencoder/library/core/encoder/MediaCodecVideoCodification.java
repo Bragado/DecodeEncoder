@@ -6,16 +6,11 @@ import android.os.Build;
 
 import androidx.annotation.RequiresApi;
 
-import com.example.decoderencoder.OpenGL.InputSurface;
-import com.example.decoderencoder.library.audio.AacUtil;
-import com.example.decoderencoder.library.core.decoder.MediaCodecVideoRenderer;
+import com.example.decoderencoder.MainActivity;
+import com.example.decoderencoder.openGL.InputSurface;
 import com.example.decoderencoder.library.core.decoder.Renderer;
-import com.example.decoderencoder.library.muxer.MediaMuxer;
-import com.example.decoderencoder.library.muxer.MuxerInput;
 import com.example.decoderencoder.library.output.MediaOutput;
-import com.example.decoderencoder.library.source.Media;
 
-import java.io.IOException;
 import java.nio.ByteBuffer;
 
 public class MediaCodecVideoCodification extends MediaCodecCodification {
@@ -34,7 +29,7 @@ public class MediaCodecVideoCodification extends MediaCodecCodification {
         this.encoder.makeCodecReady(this.format);
         this.encoderSurface = this.encoder.createInputSurface();
 
-        if(openGLSurfaceIsNecessary()) {        // openGL adds an overload, it is necessary only when we need to change frame resolution
+        if(MainActivity.FORCE_GPU_RENDER || openGLSurfaceIsNecessary()) {        // openGL adds an overload, it is necessary only when we need to change frame resolution
             // inicialize inputSurface
             this.inputSurface = new InputSurface(this.encoderSurface);
             this.inputSurface.makeCurrent();
@@ -59,8 +54,15 @@ public class MediaCodecVideoCodification extends MediaCodecCodification {
      * @param encoderBuffer contains the extra data for the muxer, built in {@link #onCodecConfigAvailable}
      */
     @Override
-    public void onKeyFrameReady(EncoderBuffer encoderBuffer) {
-        super.onDataReady(encoderBuffer);
+    public void onKeyFrameReady(EncoderBuffer encoderBuffer, ByteBuffer outputBuffer, MediaCodec.BufferInfo bufferInfo) {
+        ByteBuffer pps_sps_data = ByteBuffer.allocateDirect(encoderBuffer.size + bufferInfo.size);
+        encoderBuffer.data.position(0);
+        pps_sps_data.put(encoderBuffer.data);
+        pps_sps_data.put(outputBuffer);
+
+        bufferInfo.size += encoderBuffer.size;
+        bufferInfo.offset = 0;
+        super.onDataReady(pps_sps_data, bufferInfo);
     }
 
 

@@ -3,16 +3,11 @@ package com.example.decoderencoder.library.core.decoder;
 import android.media.MediaCodec;
 import android.media.MediaFormat;
 import android.os.Build;
-import android.view.Surface;
 
 import androidx.annotation.RequiresApi;
 
-import com.example.decoderencoder.DecoderActivity;
-import com.example.decoderencoder.OpenGL.InputSurface;
-import com.example.decoderencoder.OpenGL.OutputSurface;
 import com.example.decoderencoder.library.Format;
 import com.example.decoderencoder.library.source.SampleStream;
-import com.example.decoderencoder.library.util.Log;
 import com.example.decoderencoder.library.util.Util;
 
 public class MediaCodecVideoRenderer extends MediaCodecRenderer {
@@ -113,7 +108,7 @@ public class MediaCodecVideoRenderer extends MediaCodecRenderer {
 
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
     @Override
-    public boolean drainOutputBuffer() {
+    public int drainOutputBuffer() {
         return super.drainOutputBuffer(true);
     }
 

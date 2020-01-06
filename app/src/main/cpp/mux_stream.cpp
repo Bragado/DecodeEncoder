@@ -22,7 +22,13 @@ AVRational * audioTime;
 int64_t pts = 0;
 
 
+/* TODO: erase the next 2 functions */
+static void *thread_func(void*);
+int start_logger(const char *app_name);
+
 OutputStream * init(const char * url, const char * container) {
+	
+	start_logger("FFMPEG");
 
 	avformat_network_init();
 //	avcodec_register_all();
@@ -48,7 +54,7 @@ OutputStream * init(const char * url, const char * container) {
 	video_st->ofmt_ctx->debug = 1;
 //	strcpy( video_st->ofmt_ctx->filename, video_st->path );
 	return video_st;
-
+		
 }
 
 void prepareStart(OutputStream * video_st) {
@@ -105,12 +111,15 @@ void writeFrame(OutputStream * video_st, jint trackIndex, jbyte* framedata, jint
 	packet.data = (uint8_t*)framedata + offset;	// check this out
 	packet.size = (int)size;
 	packet.pts = (int64_t)presentationTimeUs;		// 90 khz
-	packet.dts = AV_NOPTS_VALUE;		// FIXME: not correct
+	packet.dts = AV_NOPTS_VALUE;
 	packet.flags |= AV_PKT_FLAG_KEY;
 	LOGI("NativeWriteFrame: video_st: %p, trackIndex: %d, offset: %d, size: %d, presentationTime: %lld", video_st, trackIndex, offset, size, (int64_t)presentationTimeUs);
 	LOGI("NativeWriteFrame: path: %s", video_st->path);
 	packet.pts = av_rescale_q(packet.pts, *videoSourceTimeBase, (video_st->ofmt_ctx->streams[packet.stream_index]->time_base));
 
+    /*LOGI("PACKET PTS DIFF: %lld", packet.pts - pts);
+    pts = packet.pts;
+*/
    	ret = av_interleaved_write_frame( video_st->ofmt_ctx, &packet);
 	if (ret < 0) {
 		LOGE("Error muxing packet\n");
@@ -256,23 +265,72 @@ int addUnknownStream(OutputStream * video_st, const std::map<std::string, const 
 
 
 
-AVCodecID getCodecByID(int ID) {
+AVCodecID getCodecByID(int ID) {            // must be the same as FFmpegUtil.java
 	switch(ID) {
 	case 0:
 		return AV_CODEC_ID_H264;
 	case 1:
-		return AV_CODEC_ID_AAC;
+        return AV_CODEC_ID_H265;
 	case 2:
-		return AV_CODEC_ID_DVB_SUBTITLE;
+        return AV_CODEC_ID_AAC;
 	case 3:
-		return AV_CODEC_ID_DVB_TELETEXT;
-
-	case 4:
-		return AV_CODEC_ID_H265;
+        return AV_CODEC_ID_FLAC;
+	case 6:
+        break;
+    case 7:
+        return AV_CODEC_ID_DVB_TELETEXT;
+    case 8:
+        return AV_CODEC_ID_DVB_SUBTITLE;
 
 	}
 
 }
+
+static int pfd[2];
+static pthread_t thr;
+static const char *tag = "ffmpeg";
+
+int start_logger(const char *app_name)
+{
+    tag = app_name;
+
+    /* make stdout line-buffered and stderr unbuffered */
+    setvbuf(stdout, 0, _IOLBF, 0);
+    setvbuf(stderr, 0, _IONBF, 0);
+
+    /* create the pipe and redirect stdout and stderr */
+    pipe(pfd);
+    dup2(pfd[1], 1);
+    dup2(pfd[1], 2);
+
+    /* spawn the logging thread */
+    if(pthread_create(&thr, 0, thread_func, 0) == -1)
+        return -1;
+    pthread_detach(thr);
+    return 0;
+}
+
+static void *thread_func(void*)
+{
+    ssize_t rdsz;
+    char buf[128];
+    while((rdsz = read(pfd[0], buf, sizeof buf - 1)) > 0) {
+        if(buf[rdsz - 1] == '\n') --rdsz;
+        buf[rdsz] = 0;  /* add null-terminator */
+        __android_log_write(ANDROID_LOG_DEBUG, tag, buf);
+    }
+    return 0;
+}
+
+
+/**
+ * Usefull information about ffmpeg:
+ *
+ * AVCodecParameters : https://ffmpeg.org/doxygen/trunk/structAVCodecParameters.html
+ *
+ *
+ *
+ */
 
 
 

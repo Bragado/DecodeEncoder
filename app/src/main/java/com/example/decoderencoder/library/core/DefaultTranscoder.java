@@ -9,6 +9,7 @@ import android.os.HandlerThread;
 
 import androidx.annotation.RequiresApi;
 
+import com.example.decoderencoder.MainActivity;
 import com.example.decoderencoder.library.core.decoder.DefaultRenderFactory;
 import com.example.decoderencoder.library.core.decoder.Renderer;
 import com.example.decoderencoder.library.core.encoder.Codification;
@@ -323,6 +324,10 @@ public class DefaultTranscoder  extends HandlerThread implements Transcoder, Ren
         boolean canceled;
         boolean isReady = false;
 
+        long numOfEncodedFrames = 0;
+        long numOfDecodedFrames = 0;
+        long timeElapsed = 0;
+
         public DecodeEncodeStreams(String name,
                             Handler transcoderHandler,
                             Renderer[] renderer,
@@ -360,36 +365,36 @@ public class DefaultTranscoder  extends HandlerThread implements Transcoder, Ren
              *   2. Feed Encoder
              *   3. Feed Decoder
              *   4. Drain decoder
-             *
-             *   How to improve this idea:
-             *
-             *   Foreach renderer, codification in renderers, codifications:
-             *      while codification(i).drainOutputBuffer != TRY_AGAIN_LATER
-             *      do
-             *          long res = codification(i).feedInputBuffer();
-             *      while res != NO_INPUT_BUFFER_AVAILABLE || res < minimum_pts_so_far + OFFSET
-             *      renderers(i).drainOutputBuffer
-             *      renderers(i).feedInputBuffer
-             *
              */
 
+            // for testing purposes only :
+            if(MainActivity.TESTING)
+                timeElapsed = System.currentTimeMillis();
 
-            long counter = 0;
             int ret = 1;
-
+            int aux;
             while (!canceled) {
                 for (int i = 0; i < renderers.length; i++, ret = 1) {
-
                     while(ret == 1) {
-                        ret &= codifications[i].drainOutputBuffer();
+                        aux  = codifications[i].drainOutputBuffer();
+                        ret = ret & aux;
+                        if(aux == 1 && MainActivity.TESTING)
+                            numOfEncodedFrames++;
                     }
                     codifications[i].feedInputBuffer();
-                    renderers[i].drainOutputBuffer();
+                    aux = renderers[i].drainOutputBuffer();
+                    if(aux == 1 && MainActivity.TESTING)
+                        numOfDecodedFrames++;
                     renderers[i].feedInputBuffer();
                     if(transcoderRunning && allocator.getTotalBytesAllocated() < 42833536)
                         DefaultTranscoder.this.mediaSource.continueLoading(0);
+                    else
+                        Log.d(TAG, "Buffers are full with information");
                 }
             }
+
+            if(MainActivity.TESTING)
+                timeElapsed = System.currentTimeMillis() - timeElapsed;
 
             signalEndOfStreamAndDrainEncoders();
         }
@@ -400,7 +405,7 @@ public class DefaultTranscoder  extends HandlerThread implements Transcoder, Ren
             }
             int bool = 1;
             int counter = 0;
-            while (counter++ < 30) {
+            while (counter++ < 30) {   // FIXME: while(bool != 0)
                 bool = 0;
                 for (int i = 0; i < renderers.length; i++) {
                     bool += codifications[i].drainOutputBuffer();
