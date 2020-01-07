@@ -37,7 +37,7 @@ public class MainActivity extends AppCompatActivity  {
     public final String TAG = "ACTIVITY MAIN";
     Context This;
 
-    public static final boolean TESTING = false;
+    public static final boolean TESTING = true;
     public static final boolean FORCE_GPU_RENDER = false;
 
 

@@ -35,5 +35,6 @@ void writeFrame(OutputStream * video_st, jint trackIndex, jbyte* framedata, jint
 
 int addTrack(OutputStream * video_st, std::map<std::string, const char *> & mymap);
 
+void queueData2Mux(OutputStream * video_st, jint trackIndex, jbyte* framedata, jint offset, jint size, jint flags, jlong presentationTimeUs);
 
 #endif //ENCODERDECODER_MUX_STREAM_H

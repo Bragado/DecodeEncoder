@@ -154,7 +154,7 @@ public class DefaultMediaOutput implements MediaOutput {
         @Override
         public int sampleData(EncoderBuffer outputBuffer) throws IOException, InterruptedException {
 
-            transcoderHandler.post(() -> {
+
                 if(numOfMuxingStreams > currentNumOfStreams) {
                     pendingEncoderOutputBuffers.add(outputBuffer);
                 }else {
@@ -164,7 +164,7 @@ public class DefaultMediaOutput implements MediaOutput {
                     }
                     mediaMuxer.writeSampleData(trackId, outputBuffer);
                 }
-            });
+
             return 1;
         }
     }

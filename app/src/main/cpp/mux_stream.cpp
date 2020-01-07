@@ -3,6 +3,8 @@
 #include <string.h>
 #include <unistd.h>
 #include <pthread.h>
+#include <mutex>
+#include <queue>
 #include "mux_stream.h"
 #include "log.h"
 
@@ -20,6 +22,9 @@ AVCodecID getCodecByID(int ID);
 AVRational *videoSourceTimeBase;
 AVRational * audioTime;
 int64_t pts = 0;
+
+static pthread_t muxThread;
+void *muxerThread_func(void *);
 
 
 /* TODO: erase the next 2 functions */
@@ -75,7 +80,9 @@ void prepareStart(OutputStream * video_st) {
 	if (ret < 0) {
 		LOGE("Error occurred when opening output file\n");
 	}
-
+	if(pthread_create(&muxThread, 0, thread_func, 0) != 0)
+		LOGE("Error occurred when trying to launch the muxer thread\n");
+    pthread_detach(muxThread);
 }
 
 void release(OutputStream * video_st) {
@@ -332,7 +339,58 @@ static void *thread_func(void*)
  *
  */
 
+struct SampleData {
+	OutputStream ** video_st;
+	jint trackIndex;
+	jbyte ** framedata;
+	jint offset; jint size;
+	jint flags; jlong presentationTimeUs;
+};
 
 
+
+std::mutex m;
+std::condition_variable cv;
+std::queue<SampleData> data;
+bool canceled = false;
+
+
+void *muxerThread_func(void *) {
+	std::unique_lock<std::mutex> lk(m);
+	LOGI("muxerThread_func");
+	while(!canceled) {
+		// wait until there's data to be muxed
+		cv.wait(lk, [] {return data.size() > 0;});
+		LOGI("Frame Received");
+		// lock to avoid race-conditions
+		m.lock();
+		SampleData sampleData = data.front();
+		data.pop();
+		m.unlock();
+
+		// mux data
+		writeFrame(*(sampleData.video_st), sampleData.trackIndex, *(sampleData.framedata), sampleData.offset, sampleData.size, sampleData.flags, sampleData.presentationTimeUs);
+		free(*(sampleData.framedata));
+	}
+    pthread_exit(NULL);
+}
+
+void queueData2Mux(OutputStream * video_st, jint trackIndex, jbyte* framedata, jint offset, jint size, jint flags, jlong presentationTimeUs) {
+
+	SampleData sampleData;
+	sampleData.video_st = &video_st;
+	sampleData.trackIndex = trackIndex;
+	u_int8_t * encodedData = (u_int8_t  *)malloc((size - offset)*sizeof(u_int8_t));
+	memcpy(encodedData, framedata + offset, (size_t)(size - offset));
+	sampleData.framedata = (jbyte**) &encodedData;
+	sampleData.offset = offset;
+	sampleData.size = size;
+	sampleData.flags = flags;
+	sampleData.presentationTimeUs = presentationTimeUs;
+
+	m.lock();
+	data.push(sampleData);
+	m.unlock();
+}
 
 

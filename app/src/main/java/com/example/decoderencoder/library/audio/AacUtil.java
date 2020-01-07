@@ -27,7 +27,7 @@ public class AacUtil {
     }
 
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
-    private static int getFreqIndex(MediaFormat mediaFormat) {
+    public static int getFreqIndex(MediaFormat mediaFormat) {
         int sampleRate = mediaFormat.getInteger(MediaFormat.KEY_SAMPLE_RATE);
         switch(sampleRate) {
             case 96000:

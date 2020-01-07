@@ -3,10 +3,11 @@ package com.example.decoderencoder.ui;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
+import android.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 
 import com.example.decoderencoder.R;
 
@@ -15,8 +16,8 @@ import com.example.decoderencoder.R;
  */
 public class RunningTranscoder extends Fragment {
 
-    UrisSelected mCallback;
-
+    Callback callback;
+    Button button;
     public RunningTranscoder() {
         // Required empty public constructor
     }
@@ -26,7 +27,7 @@ public class RunningTranscoder extends Fragment {
         super.onAttach(context);
 
         try {
-            mCallback = (UrisSelected) context;
+            callback = (RunningTranscoder.Callback) context;
         } catch (ClassCastException e) {
             throw new ClassCastException(context.toString()
                     + " must implement UrisSelected");
@@ -37,12 +38,20 @@ public class RunningTranscoder extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_running_transcoder, container, false);
+        View view = inflater.inflate(R.layout.fragment_running_transcoder, container, false);
+        button = (Button)view.findViewById(R.id.buttonStop);
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                callback.stopTranscoder();
+            }
+        });
+        return view;
     }
 
 
-    public interface UrisSelected {
-        public void userSelectedUris(String input, String output);
+    public interface Callback {
+        public void stopTranscoder();
     }
 
 }
