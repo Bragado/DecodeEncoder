@@ -45,7 +45,7 @@ public class FFmpegMuxer implements MediaMuxer {
         // Video keys: streamType ; codec_tag ; codec_id ; bit_rate ; width ; height ; fps
         String[] keys = null;
         String[] values = null;
-
+        byte[] pps_sps = new byte[1000];
         if(newFormat.getString(MediaFormat.KEY_MIME).startsWith("video/")) {
             keys = new String[7];
             values = new String[7];
@@ -60,13 +60,19 @@ public class FFmpegMuxer implements MediaMuxer {
             keys[3] = "height";
             values[3] = newFormat.getInteger(MediaFormat.KEY_HEIGHT) + "";
             keys[4] = "fps";
-            values[4] = /* newFormat.getInteger(MediaFormat.KEY_FRAME_RATE)*/50 + ""; // FIXME: sometimes this is null, what to do in those cases ?? passthrough the configuration??
+            values[4] = newFormat.getInteger(MediaFormat.KEY_FRAME_RATE) + ""; // FIXME: sometimes this is null, what to do in those cases ?? passthrough the configuration??
             keys[5] = "mimeType";
             values[5] = newFormat.getString(MediaFormat.KEY_MIME);
 
+           /* ByteBuffer csd_1 = newFormat.getByteBuffer("csd-1");
+            ByteBuffer csd_0 = newFormat.getByteBuffer("csd-0");
+            pps_sps = new byte[csd_0.limit() + csd_1.limit()];
+            csd_0.get(pps_sps);
+            csd_1.get(pps_sps, csd_0.limit(), csd_1.limit());*/
+
         }else if(newFormat.getString(MediaFormat.KEY_MIME).startsWith("audio/")) {
-            keys = new String[5];
-            values = new String[5];
+            keys = new String[6];
+            values = new String[6];
             keys[3] = "streamType";
             values[3] = "1";
             keys[0] = "codecID";
@@ -77,6 +83,8 @@ public class FFmpegMuxer implements MediaMuxer {
             values[2] = newFormat.getInteger(MediaFormat.KEY_CHANNEL_COUNT) + "";
             keys[4] = "bitrate";
             values[4] = newFormat.getInteger(MediaFormat.KEY_BIT_RATE) + "";
+            keys[5] = "profile";
+            values[5] = /*newFormat.getInteger(MediaFormat.KEY_AAC_PROFILE)*/ 2 + "";       // TODO!!
         }else if(newFormat.getString(MediaFormat.KEY_MIME).startsWith("text/")) {
             keys = new String[3];
             values = new String[3];
@@ -90,7 +98,9 @@ public class FFmpegMuxer implements MediaMuxer {
             keys[0] = "streamType";
             values[0] = "-1";
         }
-        return nativeAddTrack(nativePointer, keys, values);
+        int ret = nativeAddTrack(nativePointer, keys, values);
+
+        return ret;
     }
 
     @Override
@@ -112,14 +122,16 @@ public class FFmpegMuxer implements MediaMuxer {
     }
 
 
-
     @Override
     public void writeSampleData(int trackIndex, EncoderBuffer bf) {
         if(bf.size > 0)
         nativeWriteSampleData(nativePointer, trackIndex, bf.data, bf.offset, bf.size, bf.flags, bf.presentationTimeUs);
     }
 
-
+    @Override
+    public void addConfigBuffer(int trackId, byte[] content, int size) {
+        nativeRegistVideoExtraData(nativePointer, trackId, content, size);
+    }
 
 
     private native long nativeInit(String path, String container);
@@ -131,6 +143,8 @@ public class FFmpegMuxer implements MediaMuxer {
     private native void nativeStop(long nativePointer);
 
     private native void nativeWriteSampleData(long nativePointer, int trackIndex, ByteBuffer byteBuf, int offset, int size, int flags, long presentationTimeUs);
+
+    private native void nativeRegistVideoExtraData(long nativePointer, int trackId, byte[]  buffer, int size);
 
     static{
         System.loadLibrary("avutil");

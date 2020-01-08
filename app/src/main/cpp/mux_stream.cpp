@@ -18,6 +18,8 @@ int addVideoStream(OutputStream * video_st, std::map<std::string, const char *>&
 int addAudioStream(OutputStream * video_st, std::map<std::string, const char *>& format);
 int addSubtitleStream(OutputStream * video_st, const std::map<std::string, const char *>& format);
 int addUnknownStream(OutputStream * video_st, const std::map<std::string, const char *>& format);
+int maybeProcessPacket(OutputStream * video_st, AVPacket * packet, uint8_t * data, int size, int flags , int trackIndex);
+
 AVCodecID getCodecByID(int ID);
 AVRational *videoSourceTimeBase;
 AVRational * audioTime;
@@ -45,6 +47,10 @@ OutputStream * init(const char * url, const char * container) {
 	video_st->out_streams = (AVStream**)malloc(DEFAULT_NO_STREAMS*sizeof(AVStream*));
 	video_st->path = url;
 	video_st->avcodecs = (AVCodecContext**)malloc(DEFAULT_NO_STREAMS*sizeof(AVCodec*));
+	video_st->audioStreamInfo = (AudioStreamInfo**)malloc(DEFAULT_NO_STREAMS*sizeof(AudioStreamInfo*));
+	video_st->videoStreamInfo = (VideoStreamInfo**)malloc(DEFAULT_NO_STREAMS*sizeof(VideoStreamInfo*));
+	video_st->numOfAudioStreams = 0;
+	video_st->numOfVideoStreams = 0;
 	videoSourceTimeBase = (AVRational*)av_malloc(sizeof(AVRational));
 	videoSourceTimeBase->num = 1;
 	videoSourceTimeBase->den = 1000000;
@@ -80,7 +86,7 @@ void prepareStart(OutputStream * video_st) {
 	if (ret < 0) {
 		LOGE("Error occurred when opening output file\n");
 	}
-	if(pthread_create(&muxThread, 0, thread_func, 0) != 0)
+	if(pthread_create(&muxThread, 0, muxerThread_func, 0) != 0)
 		LOGE("Error occurred when trying to launch the muxer thread\n");
     pthread_detach(muxThread);
 }
@@ -101,6 +107,19 @@ void release(OutputStream * video_st) {
 
 	avformat_free_context(video_st->ofmt_ctx);
 	free(video_st->out_streams);
+	int numOfVideoStreams = video_st->numOfVideoStreams;
+	for(int i = 0; i < numOfVideoStreams; i++) {
+        free(video_st->videoStreamInfo[i]->sps_pps_data);
+	    free(video_st->videoStreamInfo[i]);
+	}
+	int numOfAudioStreams = video_st->numOfAudioStreams;
+	for(int i = 0; i < numOfAudioStreams; i++)
+	    free(video_st->audioStreamInfo[i]);
+
+	free(video_st->audioStreamInfo);
+	free(video_st->videoStreamInfo);
+
+
 	free(video_st);
 	video_st = NULL;
 }
@@ -115,27 +134,138 @@ void writeFrame(OutputStream * video_st, jint trackIndex, jbyte* framedata, jint
 	if(DEBUG)
 		LOGI("new packet created");
 	packet.stream_index = (int)trackIndex;
-	packet.data = (uint8_t*)framedata + offset;	// check this out
-	packet.size = (int)size;
-	packet.pts = (int64_t)presentationTimeUs;		// 90 khz
+	//packet.data = (uint8_t*)framedata + offset;	// check this out
+	//packet.size = (int)size;
+
+	// TODO: test this approach
+	int new_buffer_allocated = maybeProcessPacket(video_st, &packet, (uint8_t*)framedata, size, flags , trackIndex);
+
+
+    packet.pts = (int64_t)presentationTimeUs;		// 90 khz
 	packet.dts = AV_NOPTS_VALUE;
 	packet.flags |= AV_PKT_FLAG_KEY;
 	LOGI("NativeWriteFrame: video_st: %p, trackIndex: %d, offset: %d, size: %d, presentationTime: %lld", video_st, trackIndex, offset, size, (int64_t)presentationTimeUs);
-	LOGI("NativeWriteFrame: path: %s", video_st->path);
 	packet.pts = av_rescale_q(packet.pts, *videoSourceTimeBase, (video_st->ofmt_ctx->streams[packet.stream_index]->time_base));
 
-    /*LOGI("PACKET PTS DIFF: %lld", packet.pts - pts);
-    pts = packet.pts;
-*/
    	ret = av_interleaved_write_frame( video_st->ofmt_ctx, &packet);
 	if (ret < 0) {
 		LOGE("Error muxing packet\n");
 	}
+	if(new_buffer_allocated)
+	    free(packet.data);
 
 	av_packet_unref(&packet);	// wipe the packet
 	if(DEBUG)
 		LOGI("frame was written to output");
 }
+
+void addPPSAndSPSBuffer(OutputStream * video_st, jint trackIndex, jbyte* framedata, jint size) {
+	for(int i = 0; i < video_st->numOfVideoStreams; i++) {
+		if(video_st->videoStreamInfo[i]->trackIndex == (int)trackIndex) {
+			video_st->videoStreamInfo[i]->sps_pps_data = (uint8_t *)malloc(size*sizeof(uint8_t));
+
+			video_st->videoStreamInfo[i]->sps_pps_data_size = size;
+			memcpy(video_st->videoStreamInfo[i]->sps_pps_data, (uint8_t *)framedata, size);
+			return;
+		}
+	}
+}
+
+
+int getFreqIndex(int sampleRate) {
+	switch(sampleRate) {
+		case 96000:
+			return 0;
+		case 88200:
+			return 1;
+		case 64000:
+			return 2;
+		case 48000:
+			return 3;
+		case 44100:
+			return 4;
+		case 32000:
+			return 5;
+		case 24000:
+			return 6;
+		case 22050:
+			return 7;
+		case 16000:
+			return 8;
+		case 12000:
+			return 9;
+		case 11025:
+			return 10;
+		case 8000:
+			return 11;
+		case 7350:
+			return 12;
+		default:
+			return -1;
+
+	}
+}
+
+uint8_t  * addAdtsPacket(OutputStream * video_st, uint8_t* data , int dataLen,  int trackIndex) {
+	AudioStreamInfo ** audioStreamInfos = video_st->audioStreamInfo;
+	AudioStreamInfo * audioStreamInfo;
+	for(int i = 0; i < video_st->numOfAudioStreams; i++) {
+		if(audioStreamInfos[i]->trackIndex == trackIndex) {
+			audioStreamInfo = audioStreamInfos[i];
+			break;
+		}
+	}
+	uint8_t * adts_packet = (uint8_t *)malloc(sizeof(uint8_t)*(dataLen + 7));
+	int freqIdx = getFreqIndex(audioStreamInfo->sample_rate);
+
+	adts_packet[0] = 0xFF;
+	adts_packet[1] = 0xF9;	// 1111 1 00 1  = syncword MPEG-2 Layer CRC
+	adts_packet[2] = ((audioStreamInfo->profile-1)<<6) + (freqIdx<<2) +(audioStreamInfo->channel_count>>2);
+	adts_packet[3] = ((audioStreamInfo->channel_count&3)<<6) + (dataLen>>11);
+	adts_packet[4] = (dataLen&0x7FF) >> 3;
+	adts_packet[5] = ((dataLen&7)<<5) + 0x1F;
+	adts_packet[6] = 0xFC;
+
+	memcpy(adts_packet + 7, data, dataLen);
+	LOGI("dataLen: %d, trackIndex: %d", dataLen, trackIndex);
+
+	return adts_packet;
+}
+
+int maybeProcessPacket(OutputStream * video_st, AVPacket * packet, uint8_t * data, int size, int flags , int trackIndex) {
+	AVStream * avStream = video_st->ofmt_ctx->streams[trackIndex];
+	int ret = 0;
+	switch(avStream->codecpar->codec_id) {
+		case AV_CODEC_ID_AAC:
+			packet->data = addAdtsPacket(video_st, data, size, trackIndex);
+			packet->size = size + 7;
+            ret = 1;
+			break;
+		case AV_CODEC_ID_H264:
+		case AV_CODEC_ID_H265:
+			if((flags & 1) != 0) {
+				for(int i = 0; i < video_st->numOfVideoStreams; i++) {
+					if(video_st->videoStreamInfo[i]->trackIndex == trackIndex) {
+						packet->data = (uint8_t *)malloc(sizeof(uint8_t)*(size + video_st->videoStreamInfo[i]->sps_pps_data_size));
+                        memcpy(packet->data, video_st->videoStreamInfo[i]->sps_pps_data, video_st->videoStreamInfo[i]->sps_pps_data_size);
+						memcpy(packet->data + video_st->videoStreamInfo[i]->sps_pps_data_size, data, size);
+						packet->size = size + video_st->videoStreamInfo[i]->sps_pps_data_size;
+
+					}
+				}
+				ret = 1;
+                break;
+			}
+
+		default:
+			packet->data = data;
+			packet->size = size;
+			break;
+	}
+	return ret;
+}
+
+
 
 int addTrack(OutputStream * video_st, std::map<std::string, const char *>& format) {
 	LOGI("native addTrack called");
@@ -187,7 +317,6 @@ int addVideoStream(OutputStream * video_st, std::map<std::string, const char *>&
 	}
 	streamIndex = st->index;   // ok
 	LOGI("addVideoStream at index %d", streamIndex);
-//	c = st->codec;
     c = avcodec_alloc_context3(codec);
 	avcodec_get_context_defaults3(c, codec);        // this is a problem, is c being initialized?
 
@@ -201,8 +330,25 @@ int addVideoStream(OutputStream * video_st, std::map<std::string, const char *>&
 
 	c->pix_fmt = AV_PIX_FMT_YUV420P;
     video_st->avcodecs[streamIndex] =  c;
+
+
+    AVCodecParameters * avCodecParameters = st->codecpar;
+    avCodecParameters->codec_id = codecId;
+    avCodecParameters->width =  width;
+    avCodecParameters->height = height;
+    avCodecParameters->bit_rate = bitrate;
+
+    // TODO: test if there's any improvement
+   /* uint8_t * extradata = (uint8_t *)format["csd-0"];
+    int extradata_size = atoi(format["csd-0_size"]);
+    c->extradata_size = extradata_size;
+    memcpy(c->extradata, extradata, extradata_size);*/
+
 	/*if (dest->oformat->flags & AVFMT_GLOBALHEADER)
 			c->flags |= CODEC_FLAG_GLOBAL_HEADER;*/
+	video_st->videoStreamInfo[video_st->numOfVideoStreams] = (VideoStreamInfo *)malloc(sizeof(VideoStreamInfo));
+	video_st->videoStreamInfo[video_st->numOfVideoStreams]->trackIndex = streamIndex;
+	video_st->numOfVideoStreams += 1;
 
 	return streamIndex;
 }
@@ -254,6 +400,15 @@ int addAudioStream(OutputStream * video_st, std::map<std::string, const char *>&
     if (formatContext->oformat->flags & AVFMT_GLOBALHEADER)
         c->flags |= AV_CODEC_FLAG_GLOBAL_HEADER;
 
+	AudioStreamInfo ** audioStreams = video_st->audioStreamInfo;
+	audioStreams[video_st->numOfAudioStreams] = (AudioStreamInfo *)malloc(sizeof(AudioStreamInfo));
+	audioStreams[video_st->numOfAudioStreams]->trackIndex = audioStreamIndex;
+
+	audioStreams[video_st->numOfAudioStreams]->sample_rate = codecId == AV_CODEC_ID_AAC ? avCodecParameters->sample_rate : -1;
+	audioStreams[video_st->numOfAudioStreams]->channel_count = codecId == AV_CODEC_ID_AAC ? avCodecParameters->channels : -1;
+	audioStreams[video_st->numOfAudioStreams]->profile = codecId == AV_CODEC_ID_AAC ? atoi(format["profile"]) : -1;
+
+	video_st->numOfAudioStreams += 1;
 	return audioStreamIndex;
 }
 
@@ -340,9 +495,9 @@ static void *thread_func(void*)
  */
 
 struct SampleData {
-	OutputStream ** video_st;
+	OutputStream * video_st;
 	jint trackIndex;
-	jbyte ** framedata;
+	jbyte * framedata;
 	jint offset; jint size;
 	jint flags; jlong presentationTimeUs;
 };
@@ -351,7 +506,7 @@ struct SampleData {
 
 std::mutex m;
 std::condition_variable cv;
-std::queue<SampleData> data;
+std::queue<SampleData *> data;
 bool canceled = false;
 
 
@@ -363,34 +518,36 @@ void *muxerThread_func(void *) {
 		cv.wait(lk, [] {return data.size() > 0;});
 		LOGI("Frame Received");
 		// lock to avoid race-conditions
-		m.lock();
-		SampleData sampleData = data.front();
+
+		SampleData * sampleData = data.front();
 		data.pop();
 		m.unlock();
 
 		// mux data
-		writeFrame(*(sampleData.video_st), sampleData.trackIndex, *(sampleData.framedata), sampleData.offset, sampleData.size, sampleData.flags, sampleData.presentationTimeUs);
-		free(*(sampleData.framedata));
+		writeFrame(sampleData->video_st, sampleData->trackIndex, sampleData->framedata, sampleData->offset, sampleData->size, sampleData->flags, sampleData->presentationTimeUs);
+		free(sampleData->framedata);
+		free(sampleData);
 	}
     pthread_exit(NULL);
 }
 
 void queueData2Mux(OutputStream * video_st, jint trackIndex, jbyte* framedata, jint offset, jint size, jint flags, jlong presentationTimeUs) {
 
-	SampleData sampleData;
-	sampleData.video_st = &video_st;
-	sampleData.trackIndex = trackIndex;
+	SampleData* sampleData = (SampleData *)malloc(sizeof(SampleData));
+	sampleData->video_st = video_st;
+	sampleData->trackIndex = trackIndex;
 	u_int8_t * encodedData = (u_int8_t  *)malloc((size - offset)*sizeof(u_int8_t));
 	memcpy(encodedData, framedata + offset, (size_t)(size - offset));
-	sampleData.framedata = (jbyte**) &encodedData;
-	sampleData.offset = offset;
-	sampleData.size = size;
-	sampleData.flags = flags;
-	sampleData.presentationTimeUs = presentationTimeUs;
+	sampleData->framedata = (jbyte*) encodedData;
+	sampleData->offset = 0;
+	sampleData->size = size;
+	sampleData->flags = flags;
+	sampleData->presentationTimeUs = presentationTimeUs;
 
-	m.lock();
+    std::lock_guard<std::mutex> lk(m);
 	data.push(sampleData);
 	m.unlock();
+    cv.notify_one();
 }
 
 

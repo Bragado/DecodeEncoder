@@ -167,6 +167,11 @@ public class DefaultMediaOutput implements MediaOutput {
 
             return 1;
         }
+
+        @Override
+        public void addConfigBuffer(byte[] content, int size) {
+            mediaMuxer.addConfigBuffer(trackId, content, size);
+        }
     }
 
 

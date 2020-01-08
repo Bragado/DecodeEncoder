@@ -85,25 +85,26 @@ public abstract class MediaCodecCodification extends BaseCodification {
 
                 if ((bufferInfo.flags & MediaCodec.BUFFER_FLAG_CODEC_CONFIG) != 0) {
                                       // if video:      h264 / h265 requires sps and pps values, those values can be obtained here
-                    onCodecConfigAvailable(outputBuffer, bufferInfo);
+                    //onCodecConfigAvailable(outputBuffer, bufferInfo);
+                    byte[] content = new byte[bufferInfo.size];
+                    outputBuffer.get(content);
                     encoder.releaseOutputBuffer(encoderStatus, false);
+                    super.addConfigBuffer(content, content.length);
+
                     return ret;
                 }
 
                 outputBuffer.position(bufferInfo.offset);
                 outputBuffer.limit(bufferInfo.offset + bufferInfo.size);
 
-                ByteBuffer frameData = maybeProccessOutputData(outputBuffer, bufferInfo);
+               /* ByteBuffer frameData = maybeProccessOutputData(outputBuffer, bufferInfo);
 
                 if((bufferInfo.flags & MediaCodec.BUFFER_FLAG_SYNC_FRAME) != 0) {
                     onKeyFrameReady(extraData, frameData, bufferInfo);
-                }else {
-                    onDataReady(frameData, bufferInfo);
-                }                Log.i(TAG, "Encoder presentation time: " + bufferInfo.presentationTimeUs);
-
-
-                Log.i(TAG, "PACKET PTS DIFF ENCODER:" + (bufferInfo.presentationTimeUs - pts));
-                pts = bufferInfo.presentationTimeUs;
+                }
+              else {*/
+                    onDataReady(outputBuffer, bufferInfo);
+                //}
 
                 encoder.releaseOutputBuffer(encoderStatus, false);
         }

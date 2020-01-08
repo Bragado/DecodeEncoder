@@ -32,9 +32,16 @@ Java_com_example_decoderencoder_library_muxer_FFmpegMuxer_nativeWriteSampleData(
 	queueData2Mux((OutputStream *)stream, trackIndex, buf_in, offset, size, flags, presentationTimeUs);
 }
 
+JNIEXPORT void JNICALL
+Java_com_example_decoderencoder_library_muxer_FFmpegMuxer_nativeRegistVideoExtraData(JNIEnv * env, jobject instance, jlong stream, jint trackIndex, jbyteArray array, jint size) {
+    jbyte* buf_in = (jbyte*)env->GetByteArrayElements(array, 0);
+    jsize lengthOfArray = env->GetArrayLength( array);
+    addPPSAndSPSBuffer((OutputStream *)stream, trackIndex, buf_in, size);
+}
+
+
 JNIEXPORT jint JNICALL
-Java_com_example_decoderencoder_library_muxer_FFmpegMuxer_nativeAddTrack(JNIEnv * env, jobject instance, jlong stream, jobjectArray keys,
-        jobjectArray values) {
+Java_com_example_decoderencoder_library_muxer_FFmpegMuxer_nativeAddTrack(JNIEnv * env, jobject instance, jlong stream, jobjectArray keys, jobjectArray values) {
 	int index = -1;
     std::map<std::string, const char *> mymap;
     int stringCount = env->GetArrayLength(keys);

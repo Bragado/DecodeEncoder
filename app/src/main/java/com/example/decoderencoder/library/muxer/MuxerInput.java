@@ -19,4 +19,7 @@ public interface MuxerInput {
      */
     int sampleData(EncoderBuffer outputBuffer)
             throws IOException, InterruptedException;
+
+
+    void addConfigBuffer(byte[] content, int size);
 }

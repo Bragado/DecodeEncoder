@@ -50,4 +50,5 @@ public interface MediaMuxer {
      */
     public void writeSampleData(int trackIndex, EncoderBuffer outputBuffer);
 
+    void addConfigBuffer(int trackId, byte[] content, int size);
 }

@@ -91,6 +91,10 @@ public class MediaCodecMuxer implements MediaMuxer {
         muxer.writeSampleData(trackIndex, encoderBuffer.data, bf);
     }
 
+    @Override
+    public void addConfigBuffer(int trackId, byte[] content, int size) {
+
+    }
 
 
 

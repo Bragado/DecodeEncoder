@@ -91,4 +91,7 @@ public abstract class BaseCodification implements Codification {
 
     public abstract void onStop();
 
+    protected void addConfigBuffer(byte[] content, int size) {
+        muxerInput.addConfigBuffer(content, size);
+    }
 }
