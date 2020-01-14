@@ -21,6 +21,7 @@ import com.example.decoderencoder.library.util.ConditionVariable;
 import com.example.decoderencoder.library.util.Log;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.LinkedList;
 
@@ -154,16 +155,17 @@ public class DefaultMediaOutput implements MediaOutput {
         @Override
         public int sampleData(EncoderBuffer outputBuffer) throws IOException, InterruptedException {
 
-
+            ByteBuffer buffer = ByteBuffer.allocateDirect(outputBuffer.size);
+            buffer.put(outputBuffer.data);
+            outputBuffer.data = buffer;
+            transcoderHandler.post(() -> {
                 if(numOfMuxingStreams > currentNumOfStreams) {
-                    pendingEncoderOutputBuffers.add(outputBuffer);
+                    return;
                 }else {
-                    while(pendingEncoderOutputBuffers.size() > 0) {                 // TODO
-                        EncoderBuffer bf = pendingEncoderOutputBuffers.poll();
-                        mediaMuxer.writeSampleData(trackId, outputBuffer);
-                    }
                     mediaMuxer.writeSampleData(trackId, outputBuffer);
                 }
+            });
+
 
             return 1;
         }

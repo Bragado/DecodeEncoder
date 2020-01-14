@@ -8,6 +8,7 @@ import android.media.MediaFormat;
 import android.os.Build;
 import android.os.Bundle;
 import android.app.Fragment;
+import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -42,6 +43,8 @@ import com.example.decoderencoder.ui.UrisInsertation;
 
 import java.nio.ByteBuffer;
 import java.util.Arrays;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class DecoderActivity  extends AppCompatActivity implements UrisInsertation.Callback, RunningTranscoder.Callback, SelectOutputFormats.Callback {
 
@@ -53,6 +56,7 @@ public class DecoderActivity  extends AppCompatActivity implements UrisInsertati
     DataSource dataSource;
     Allocator allocator;
     LoadErrorHandlingPolicy loadErrorHandlingPolicy;
+    Fragment current_fragment = null;
 
     //String PATH = "/storage/emulated/0/Download/kika.ts";
     //String PATH = "udp://239.192.1.103:1234";     // 3 sat hg
@@ -66,6 +70,7 @@ public class DecoderActivity  extends AppCompatActivity implements UrisInsertati
     private String outputUri = null;
 
 
+    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -81,8 +86,11 @@ public class DecoderActivity  extends AppCompatActivity implements UrisInsertati
 
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
     private void inicializeVariablesAndStartTranscoding() {
-        inputUri = "/storage/emulated/0/Download/kika.ts";
-        outputUri = "/storage/emulated/0/Download/kikats.ts";
+        /*inputUri = "udp://239.192.1.103:1234";
+        outputUri = "udp://239.239.239.238:1234?pkt_size=1316";*/
+        inputUri = "/storage/emulated/0/Download/FHD.ts";
+        outputUri = "/storage/emulated/0/Download/FHD7Mbit.ts";
+        //outputUri = "/storage/emulated/0/Download/3satts.ts";
         formatAudio = MediaFormat.createAudioFormat("audio/mp4a-latm", 48000, 2);   // AAC Low Overhead Audio Transport Multiplex
         formatAudio.setInteger(MediaFormat.KEY_AAC_PROFILE, MediaCodecInfo.CodecProfileLevel.AACObjectLC);
         formatAudio.setInteger(MediaFormat.KEY_BIT_RATE, 64000);
@@ -94,17 +102,21 @@ public class DecoderActivity  extends AppCompatActivity implements UrisInsertati
         csd.put(1, (byte)((3 & 0x01) << 7 | 2 << 3));
         formatAudio.setByteBuffer("csd-0", csd);
 
-        MediaFormat format = MediaFormat.createVideoFormat("video/avc", 720, 480);
+        MediaFormat format = MediaFormat.createVideoFormat("video/avc", 1920, 1080);
 
         // Set some properties.  Failing to specify some of these can cause the MediaCodec
         // configure() call to throw an unhelpful exception.
         format.setInteger(MediaFormat.KEY_COLOR_FORMAT,
                 MediaCodecInfo.CodecCapabilities.COLOR_FormatSurface);
-        format.setInteger(MediaFormat.KEY_BIT_RATE, 2888608);
+        format.setInteger(MediaFormat.KEY_BIT_RATE, 6848510);
         format.setInteger(MediaFormat.KEY_FRAME_RATE, 25);
         format.setInteger(MediaFormat.KEY_I_FRAME_INTERVAL, 1);
 
         formatVideo = format;
+        formatAudio = null;
+
+        current_fragment = new RunningTranscoder();
+        loadFragment(current_fragment);
         startTranscoding();
     }
 
@@ -174,6 +186,22 @@ public class DecoderActivity  extends AppCompatActivity implements UrisInsertati
         df.setOutputSource(mediaOutput);
         df.prepare();
 
+        /*final Handler handler = new Handler();
+        Timer timer = new Timer();
+        TimerTask doAsynchronousTask = new TimerTask() {
+            @Override
+            public void run() {
+                handler.post(new Runnable() {
+                    public void run() {
+                        try {
+                            updateStats();
+                        } catch (Exception e) {
+                        }
+                    }
+                });
+            }
+        };
+        timer.schedule(doAsynchronousTask, 0, 1000*60);*/
 
         Log.e(TAG, "Path : " + inputUri);
     }
@@ -181,6 +209,8 @@ public class DecoderActivity  extends AppCompatActivity implements UrisInsertati
     private boolean supportedAudioTrack(String sampleMimeType) {
         switch (sampleMimeType) {
             case "audio/mpeg-L2":
+                return true;
+            case "audio/mp4a-latm":
                 return true;
         }
         return false;
@@ -237,15 +267,19 @@ public class DecoderActivity  extends AppCompatActivity implements UrisInsertati
 
 
         startTranscoding();
-        Fragment fragment = new RunningTranscoder();
-        loadFragment(fragment);
+        current_fragment = new RunningTranscoder();
+        loadFragment(current_fragment);
     }
 
     @Override
     public void urisSelected(String inputUri, String outputUri) {
         this.inputUri = inputUri;
         this.outputUri = outputUri;
-        Fragment fragment = new SelectOutputFormats();
-        loadFragment(fragment);
+        current_fragment = new SelectOutputFormats();
+        loadFragment(current_fragment);
+    }
+
+    public void updateStats() {
+        ((RunningTranscoder)current_fragment).updateStats(df.getStats());
     }
 }

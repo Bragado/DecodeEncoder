@@ -65,6 +65,7 @@ public abstract class MediaCodecCodification extends BaseCodification {
         int encoderStatus = this.encoder.dequeueOutputBuffer(bufferInfo, 0);
         switch(encoderStatus) {
             case MediaCodec.INFO_TRY_AGAIN_LATER:
+                ret = 0;
                 break;
             case MediaCodec.INFO_OUTPUT_BUFFERS_CHANGED:
                 mayUpdateOutputBuffer();

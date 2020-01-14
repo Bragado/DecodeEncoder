@@ -37,11 +37,13 @@ public abstract class MediaCodecRenderer extends BaseRenderer {
     private long largestQueuedPresentationTimeUs;
     private boolean reconfigurationStateWritePending = false;
     private boolean endOfStreamSignaled = false;
+    private boolean endOfStreamReached = false;
 
 
     /* Audio Renderers */
     LinkedList<Integer> pendingDecoderOutputBufferIndices;
     LinkedList<MediaCodec.BufferInfo> pendingDecoderOutputBufferInfos;
+    public static final int MAX_SIZE_AUDIO_BUFFERING = 10;
 
     /* Video Renderers */
     InputSurface inputSurface = null;
@@ -208,6 +210,8 @@ public abstract class MediaCodecRenderer extends BaseRenderer {
         if(this.endOfStreamSignaled) {
             return false;
         }
+       /* if(pendingDecoderOutputBufferIndices != null && pendingDecoderOutputBufferInfos.size() > MAX_SIZE_AUDIO_BUFFERING)
+            return true;*/
 
         if(!initCodec()) {
             return true;
@@ -259,6 +263,11 @@ public abstract class MediaCodecRenderer extends BaseRenderer {
             codecFormat = formatHolder.format;
             return true;
         }
+        if(result == C.RESULT_END_OF_INPUT) {
+            Log.d(TAG, "RESULT_END_OF_INPUT ");
+            this.endOfStreamSignaled = true;
+            buffer.addFlag(C.RESULT_END_OF_INPUT);
+        }
 
 
         if (waitingForFirstSyncSample && !buffer.isKeyFrame()) {
@@ -275,6 +284,7 @@ public abstract class MediaCodecRenderer extends BaseRenderer {
             if(buffer.isEndOfStream()) {
                 decoder.queueInputBuffer(inputIndex, 0, 0, presentationTimeUs, MediaCodec.BUFFER_FLAG_END_OF_STREAM);
                 resetInputBuffer();
+                return true;
             }
 
             largestQueuedPresentationTimeUs =
@@ -298,6 +308,8 @@ public abstract class MediaCodecRenderer extends BaseRenderer {
      * @return Whether it may be possible to drain more output data.
      */
     protected int drainOutputBuffer(boolean render) {
+        if(endOfStreamReached)
+            return 0;
         int ret = 2;
         MediaCodec.BufferInfo bufferInfo = new MediaCodec.BufferInfo();
 
@@ -320,6 +332,7 @@ public abstract class MediaCodecRenderer extends BaseRenderer {
         boolean isEndOfStream = (bufferInfo.flags & MediaCodec.BUFFER_FLAG_END_OF_STREAM) != 0;
         if(isEndOfStream) {
             ret = 0;
+            endOfStreamReached = true;
         }
         return ret;
     }

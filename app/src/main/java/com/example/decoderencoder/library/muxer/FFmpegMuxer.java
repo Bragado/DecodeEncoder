@@ -45,7 +45,6 @@ public class FFmpegMuxer implements MediaMuxer {
         // Video keys: streamType ; codec_tag ; codec_id ; bit_rate ; width ; height ; fps
         String[] keys = null;
         String[] values = null;
-        byte[] pps_sps = new byte[1000];
         if(newFormat.getString(MediaFormat.KEY_MIME).startsWith("video/")) {
             keys = new String[7];
             values = new String[7];
@@ -54,13 +53,13 @@ public class FFmpegMuxer implements MediaMuxer {
             keys[0] = "codecID";
             values[0] = FFmpegUtil.getCodecIdByMimeType(newFormat.getString(MediaFormat.KEY_MIME));
             keys[1] = "bit_rate";
-            values[1] = newFormat.getInteger(MediaFormat.KEY_BIT_RATE) + "";
+            values[1] = /*newFormat.getInteger(MediaFormat.KEY_BIT_RATE) */6848510 + "";
             keys[2] = "width";
             values[2] = newFormat.getInteger(MediaFormat.KEY_WIDTH) + "";
             keys[3] = "height";
             values[3] = newFormat.getInteger(MediaFormat.KEY_HEIGHT) + "";
             keys[4] = "fps";
-            values[4] = newFormat.getInteger(MediaFormat.KEY_FRAME_RATE) + ""; // FIXME: sometimes this is null, what to do in those cases ?? passthrough the configuration??
+            values[4] = /*newFormat.getInteger(MediaFormat.KEY_FRAME_RATE)*/25 + ""; // FIXME: sometimes this is null, what to do in those cases ?? passthrough the configuration??
             keys[5] = "mimeType";
             values[5] = newFormat.getString(MediaFormat.KEY_MIME);
 

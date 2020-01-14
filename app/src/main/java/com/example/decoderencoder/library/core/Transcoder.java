@@ -93,7 +93,7 @@ public interface Transcoder {
     /*
      * Requests the current transcoder stats
      */
-    public void getStats();
+    public Stats getStats();
 
 
 

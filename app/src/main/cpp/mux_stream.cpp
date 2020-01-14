@@ -11,7 +11,8 @@
 
 
 #define DEFAULT_NO_STREAMS 10
-#define DEBUG 1
+#define DEBUG 0
+#define ADTS_LENGTH 7
 
 /* local functions */
 int addVideoStream(OutputStream * video_st, std::map<std::string, const char *>& format);
@@ -34,8 +35,9 @@ static void *thread_func(void*);
 int start_logger(const char *app_name);
 
 OutputStream * init(const char * url, const char * container) {
-	
-	start_logger("FFMPEG");
+
+    if(DEBUG)
+	    start_logger("FFMPEG");
 
 	avformat_network_init();
 //	avcodec_register_all();
@@ -86,9 +88,7 @@ void prepareStart(OutputStream * video_st) {
 	if (ret < 0) {
 		LOGE("Error occurred when opening output file\n");
 	}
-	if(pthread_create(&muxThread, 0, muxerThread_func, 0) != 0)
-		LOGE("Error occurred when trying to launch the muxer thread\n");
-    pthread_detach(muxThread);
+
 }
 
 void release(OutputStream * video_st) {
@@ -141,10 +141,12 @@ void writeFrame(OutputStream * video_st, jint trackIndex, jbyte* framedata, jint
 	int new_buffer_allocated = maybeProcessPacket(video_st, &packet, (uint8_t*)framedata, size, flags , trackIndex);
 
 
-    packet.pts = (int64_t)presentationTimeUs;		// 90 khz
+    	packet.pts = (int64_t)presentationTimeUs;		// 90 khz
 	packet.dts = AV_NOPTS_VALUE;
 	packet.flags |= AV_PKT_FLAG_KEY;
-	LOGI("NativeWriteFrame: video_st: %p, trackIndex: %d, offset: %d, size: %d, presentationTime: %lld", video_st, trackIndex, offset, size, (int64_t)presentationTimeUs);
+
+	if(DEBUG)
+	    LOGI("NativeWriteFrame: video_st: %p, trackIndex: %d, offset: %d, size: %d, presentationTime: %lld", video_st, trackIndex, offset, size, (int64_t)presentationTimeUs);
 	packet.pts = av_rescale_q(packet.pts, *videoSourceTimeBase, (video_st->ofmt_ctx->streams[packet.stream_index]->time_base));
 
    	ret = av_interleaved_write_frame( video_st->ofmt_ctx, &packet);
@@ -155,8 +157,9 @@ void writeFrame(OutputStream * video_st, jint trackIndex, jbyte* framedata, jint
 	    free(packet.data);
 
 	av_packet_unref(&packet);	// wipe the packet
-	if(DEBUG)
+	//if(DEBUG)
 		LOGI("frame was written to output");
+
 }
 
 void addPPSAndSPSBuffer(OutputStream * video_st, jint trackIndex, jbyte* framedata, jint size) {
@@ -215,9 +218,9 @@ uint8_t  * addAdtsPacket(OutputStream * video_st, uint8_t* data , int dataLen,  
 			break;
 		}
 	}
-	uint8_t * adts_packet = (uint8_t *)malloc(sizeof(uint8_t)*(dataLen + 7));
+    unsigned char * adts_packet = (uint8_t *)malloc(sizeof(uint8_t)*(dataLen + ADTS_LENGTH));
 	int freqIdx = getFreqIndex(audioStreamInfo->sample_rate);
-
+    dataLen += ADTS_LENGTH;
 	adts_packet[0] = 0xFF;
 	adts_packet[1] = 0xF9;	// 1111 1 00 1  = syncword MPEG-2 Layer CRC
 	adts_packet[2] = ((audioStreamInfo->profile-1)<<6) + (freqIdx<<2) +(audioStreamInfo->channel_count>>2);
@@ -226,8 +229,7 @@ uint8_t  * addAdtsPacket(OutputStream * video_st, uint8_t* data , int dataLen,  
 	adts_packet[5] = ((dataLen&7)<<5) + 0x1F;
 	adts_packet[6] = 0xFC;
 
-	memcpy(adts_packet + 7, data, dataLen);
-	LOGI("dataLen: %d, trackIndex: %d", dataLen, trackIndex);
+	memcpy(adts_packet + ADTS_LENGTH, data, dataLen);
 
 	return adts_packet;
 }
@@ -268,7 +270,8 @@ int maybeProcessPacket(OutputStream * video_st, AVPacket * packet, uint8_t * dat
 
 
 int addTrack(OutputStream * video_st, std::map<std::string, const char *>& format) {
-	LOGI("native addTrack called");
+    if(DEBUG)
+        LOGI("native addTrack called");
 	if(video_st == 0) {
 		LOGE("FFmpeg muxer was not initialized when trying to add a track");
 	}
@@ -304,6 +307,7 @@ int addVideoStream(OutputStream * video_st, std::map<std::string, const char *>&
 	int height = atoi(format["height"]);
 	int fps = atoi(format["fps"]);
 
+    if(DEBUG)
 	LOGI("trying to add stream with: [bit_rate, width, height, fps] = [%d, %d, %d, %d]", bitrate, width, height, fps);
 
     AVCodecID codecId = getCodecByID(atoi(format["codecID"]));
