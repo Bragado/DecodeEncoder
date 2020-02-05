@@ -76,7 +76,7 @@ public class MediaSource implements ExtractorOutput, SampleQueue.UpstreamFormatC
     private final ExtractorOutput extractorOutput = this;
     private int dataType;
     private SeekMap seekMap;
-
+    private boolean loadCompleted = false;
 
     public MediaSource(
             Uri uri,
@@ -144,8 +144,8 @@ public class MediaSource implements ExtractorOutput, SampleQueue.UpstreamFormatC
         }
         boolean continuedLoading = loadCondition.open();
         if (!loader.isLoading()) {
-            startLoading();
-            continuedLoading = true;
+            //startLoading();
+            //continuedLoading = true;
         }
         return continuedLoading;
     }
@@ -221,6 +221,7 @@ public class MediaSource implements ExtractorOutput, SampleQueue.UpstreamFormatC
     @Override
     public void onLoadCompleted(ExtractingLoadable loadable, long elapsedRealtimeMs, long loadDurationMs) {     // End of the stream callback (ex. reached the end of the file)
         Log.d(TAG, "onLoadCompleted");
+        loadCompleted = true;
     }
 
     @Override
@@ -437,8 +438,9 @@ public class MediaSource implements ExtractorOutput, SampleQueue.UpstreamFormatC
         int result =
                 sampleQueues[track].read(
                         formatHolder, buffer, formatRequired, loadingFinished, lastSeekPositionUs);
-        if (result == C.RESULT_NOTHING_READ) {
-            maybeStartDeferredRetry(track);
+        if (result == C.RESULT_NOTHING_READ && loadCompleted) {
+            result = C.RESULT_END_OF_INPUT;
+            //maybeStartDeferredRetry(track);
         }
         return result;
     }

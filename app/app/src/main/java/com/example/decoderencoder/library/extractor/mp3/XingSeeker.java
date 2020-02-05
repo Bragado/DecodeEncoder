@@ -28,7 +28,7 @@ import com.example.decoderencoder.library.util.Util;
 /**
  * MP3 seeker that uses metadata from a Xing header.
  */
-/* package */ final class XingSeeker implements Mp3Extractor.Seeker {
+/* package */ public final class XingSeeker implements Mp3Extractor.Seeker {
 
   private static final String TAG = "XingSeeker";
 

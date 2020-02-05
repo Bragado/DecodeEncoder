@@ -52,13 +52,20 @@ public class EmptyCodification extends BaseCodification {
                 addTrack(mediaFormat);
                 format_registered = true;
             }else {
-                return 2;
+                return 0;
             }
         }
         ByteBuffer data = renderer.pollFrameData();
         MediaCodec.BufferInfo bf = renderer.pollBufferInfo();
         if(data == null || bf == null)
             return 0;
+      //  byte[] data_array = new byte[bf.size];
+     //           data.get(data_array);
+        data.position(0);
+        // jni_data_compatible = ByteBuffer.allocateDirect(bf.size);
+        //jni_data_compatible.put(data);
+       // jni_data_compatible.position(0);
+
         onDataReady(data, bf);
         return 1;
 

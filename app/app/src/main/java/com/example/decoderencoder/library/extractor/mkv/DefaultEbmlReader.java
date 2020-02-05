@@ -32,7 +32,7 @@ import java.util.ArrayDeque;
 /**
  * Default implementation of {@link EbmlReader}.
  */
-/* package */ final class DefaultEbmlReader implements EbmlReader {
+/* package */ public final class DefaultEbmlReader implements EbmlReader {
 
   @Documented
   @Retention(RetentionPolicy.SOURCE)

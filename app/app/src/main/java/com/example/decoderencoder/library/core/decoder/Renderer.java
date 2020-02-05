@@ -4,7 +4,7 @@ import android.media.MediaCodec;
 import android.media.MediaFormat;
 import android.view.Surface;
 
-import com.example.decoderencoder.openGL.InputSurface;
+import com.example.decoderencoder.library.video.openGL.InputSurface;
 import com.example.decoderencoder.library.Format;
 import com.example.decoderencoder.library.source.SampleStream;
 import com.example.decoderencoder.library.util.C;
@@ -98,9 +98,9 @@ public interface Renderer {
 
     /**
      * Feeds data into the decoder
-     * @return  false if end of stream, true otherwise
+     * @return  the pts value of the sample feed to the decoder
      */
-    boolean feedInputBuffer();
+    long feedInputBuffer(long stream_highest_pts);
 
     /**
      * Fetchs data into the decoder

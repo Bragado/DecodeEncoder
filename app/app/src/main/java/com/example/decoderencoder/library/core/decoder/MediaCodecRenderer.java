@@ -3,21 +3,21 @@ package com.example.decoderencoder.library.core.decoder;
 import android.media.MediaCodec;
 import android.media.MediaCrypto;
 import android.os.Build;
-import android.util.Log;
 import android.view.Surface;
 
-import androidx.annotation.RequiresApi;
-
-import com.example.decoderencoder.openGL.InputSurface;
-import com.example.decoderencoder.openGL.OutputSurface;
 import com.example.decoderencoder.library.Format;
 import com.example.decoderencoder.library.FormatHolder;
 import com.example.decoderencoder.library.util.C;
+import com.example.decoderencoder.library.util.Log;
 import com.example.decoderencoder.library.util.Util;
+import com.example.decoderencoder.library.video.openGL.InputSurface;
+import com.example.decoderencoder.library.video.openGL.OutputSurface;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.LinkedList;
+
+import androidx.annotation.RequiresApi;
 
 @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
 public abstract class MediaCodecRenderer extends BaseRenderer {
@@ -37,6 +37,7 @@ public abstract class MediaCodecRenderer extends BaseRenderer {
     private long largestQueuedPresentationTimeUs;
     private boolean reconfigurationStateWritePending = false;
     private boolean endOfStreamSignaled = false;
+    private boolean endOfStreamReached = false;
 
 
     /* Audio Renderers */
@@ -205,15 +206,15 @@ public abstract class MediaCodecRenderer extends BaseRenderer {
      * @return Whether it may be possible to feed more input data.
      */
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
-    public boolean feedInputBuffer() {
+    public long feedInputBuffer(long stream_highest_pts) {
         if(this.endOfStreamSignaled) {
-            return false;
+            return -1;
         }
        /* if(pendingDecoderOutputBufferIndices != null && pendingDecoderOutputBufferInfos.size() > MAX_SIZE_AUDIO_BUFFERING)
             return true;*/
 
         if(!initCodec()) {
-            return true;
+            return -1;
         }
         if(inputIndex < 0) {
             inputIndex = decoder.dequeueInputBuffer(10);
@@ -223,7 +224,7 @@ public abstract class MediaCodecRenderer extends BaseRenderer {
 
         if(buffer.data == null) {
             Log.d(TAG, "Codec Input Buffer is null");
-            return true;
+            return -1;
         }
         // For adaptive reconfiguration OMX decoders expect all reconfiguration data to be supplied
         // at the start of the buffer that also contains the first frame in the new format.
@@ -241,17 +242,17 @@ public abstract class MediaCodecRenderer extends BaseRenderer {
                 resetInputBuffer();
                 this.endOfStreamSignaled = true;
             }
-            return false;
+            return -1;
         }
 
         int result = readSource(formatHolder, buffer, false);
         if(buffer.getFlag(C.BUFFER_FLAG_DECODE_ONLY) ) {
-            return true;
+            return -1;
         }
 
         if (result == C.RESULT_NOTHING_READ) {
             Log.d(TAG, "RESULT_NOTHING_READ");
-            return false;
+            return -1;
         }
         if (result == C.RESULT_FORMAT_READ) {
             Log.d(TAG, "RESULT_FORMAT_READ");
@@ -260,24 +261,30 @@ public abstract class MediaCodecRenderer extends BaseRenderer {
             // associated with the first format.
             buffer.clear();
             codecFormat = formatHolder.format;
-            return true;
+            return -1;
+        }
+        if(result == C.RESULT_END_OF_INPUT) {
+            Log.d(TAG, "RESULT_END_OF_INPUT ");
+            this.endOfStreamSignaled = true;
+            buffer.addFlag(C.RESULT_END_OF_INPUT);
         }
 
 
         if (waitingForFirstSyncSample && !buffer.isKeyFrame()) {
             buffer.clear();
-            return true;
+            return -1;
         }
         waitingForFirstSyncSample = false;
-
+        long presentationTimeUs = buffer.timeUs;
         try {
-            long presentationTimeUs = buffer.timeUs;
+
             /*if (buffer.isDecodeOnly()) {      // FIXME : this is used to regiter negative pts, check if we need this
                 decodeOnlyPresentationTimestamps.add(presentationTimeUs);
             }*/
             if(buffer.isEndOfStream()) {
                 decoder.queueInputBuffer(inputIndex, 0, 0, presentationTimeUs, MediaCodec.BUFFER_FLAG_END_OF_STREAM);
                 resetInputBuffer();
+                return -1;
             }
 
             largestQueuedPresentationTimeUs =
@@ -293,7 +300,7 @@ public abstract class MediaCodecRenderer extends BaseRenderer {
             throw e;
         }
         resetInputBuffer();
-        return true;
+        return presentationTimeUs;
     }
 
     /**
@@ -301,6 +308,8 @@ public abstract class MediaCodecRenderer extends BaseRenderer {
      * @return Whether it may be possible to drain more output data.
      */
     protected int drainOutputBuffer(boolean render) {
+        if(endOfStreamReached)
+            return 0;
         int ret = 2;
         MediaCodec.BufferInfo bufferInfo = new MediaCodec.BufferInfo();
 
@@ -323,6 +332,7 @@ public abstract class MediaCodecRenderer extends BaseRenderer {
         boolean isEndOfStream = (bufferInfo.flags & MediaCodec.BUFFER_FLAG_END_OF_STREAM) != 0;
         if(isEndOfStream) {
             ret = 0;
+            endOfStreamReached = true;
         }
         return ret;
     }

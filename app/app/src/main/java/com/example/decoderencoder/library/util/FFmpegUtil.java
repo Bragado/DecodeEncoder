@@ -12,6 +12,12 @@ public class FFmpegUtil {
                 return "2";
             case "audio/flac":
                 return "3";
+            case "audio/mpeg-L2":
+                return "4";
+            case "audio/ac3":
+                return "5";
+            case "application/dvbsubs":
+                return "6";
             default:
                 return -1 + "";
 

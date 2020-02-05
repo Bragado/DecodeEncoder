@@ -25,7 +25,7 @@ import java.util.Arrays;
 import java.util.List;
 
 @SuppressWarnings("ConstantField")
-/* package */ abstract class Atom {
+/* package */ public abstract class Atom {
 
   /**
    * Size of an atom header, in bytes.
@@ -396,7 +396,7 @@ import java.util.List;
   /**
    * An MP4 atom that is a leaf.
    */
-  /* package */ static final class LeafAtom extends Atom {
+  /* package */ public static final class LeafAtom extends Atom {
 
     /**
      * The atom data.

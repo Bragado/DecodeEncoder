@@ -7,7 +7,7 @@ import android.os.Build;
 import androidx.annotation.RequiresApi;
 
 import com.example.decoderencoder.MainActivity;
-import com.example.decoderencoder.openGL.InputSurface;
+import com.example.decoderencoder.library.video.openGL.InputSurface;
 import com.example.decoderencoder.library.core.decoder.Renderer;
 import com.example.decoderencoder.library.output.MediaOutput;
 
@@ -46,7 +46,8 @@ public class MediaCodecVideoCodification extends MediaCodecCodification {
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
     private boolean openGLSurfaceIsNecessary() {
         MediaFormat decoderFormat = renderer.getFormat();
-        return !(decoderFormat.getInteger(MediaFormat.KEY_WIDTH) == this.format.getInteger(MediaFormat.KEY_WIDTH) &&  decoderFormat.getInteger(MediaFormat.KEY_HEIGHT) == this.format.getInteger(MediaFormat.KEY_HEIGHT));
+        boolean ret = !(decoderFormat.getInteger(MediaFormat.KEY_WIDTH) == this.format.getInteger(MediaFormat.KEY_WIDTH) &&  decoderFormat.getInteger(MediaFormat.KEY_HEIGHT) == this.format.getInteger(MediaFormat.KEY_HEIGHT));
+        return (ret || MainActivity.FORCE_GPU_RENDER);
     }
 
     /**

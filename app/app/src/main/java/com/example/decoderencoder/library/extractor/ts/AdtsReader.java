@@ -453,9 +453,10 @@ public final class AdtsReader implements ElementaryStreamReader {
    */
   private void parseAdtsHeader() throws ParserException {
     adtsScratch.setPosition(0);
-
+    int original_profile = 2;   // default
     if (!hasOutputFormat) {
       int audioObjectType = adtsScratch.readBits(2) + 1;
+      original_profile = audioObjectType;
       if (audioObjectType != 2) {
         // The stream indicates AAC-Main (1), AAC-SSR (3) or AAC-LTP (4). When the stream indicates
         // AAC-Main it's more likely that the stream contains HE-AAC (5), which cannot be
@@ -481,7 +482,7 @@ public final class AdtsReader implements ElementaryStreamReader {
 
       Format format = Format.createAudioSampleFormat(formatId, MimeTypes.AUDIO_AAC, null,
           Format.NO_VALUE, Format.NO_VALUE, audioParams.second, audioParams.first,
-          Collections.singletonList(audioSpecificConfig), null, 0, language);
+          Collections.singletonList(audioSpecificConfig), null, 0, language, original_profile);
       // In this class a sample is an access unit, but the MediaFormat sample rate specifies the
       // number of PCM audio samples per second.
       sampleDurationUs = (C.MICROS_PER_SECOND * 1024) / format.sampleRate;

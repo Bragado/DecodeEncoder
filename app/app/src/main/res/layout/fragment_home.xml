@@ -1,0 +1,265 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent">
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:paddingLeft="16dp"
+        android:paddingTop="16dp"
+        android:paddingRight="16dp"
+        android:paddingBottom="16dp">
+        <!-- bla bla bla-->
+        <Spinner
+            android:id="@+id/input_type"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:id="@+id/input_uris"
+            android:visibility="gone"
+            >
+
+            <!-- bla bla bla-->
+            <TextView
+                android:id="@+id/textView6"
+                android:layout_width="16dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="UDP Input:"
+                android:textStyle="bold" />
+
+            <EditText
+                android:id="@+id/input_uri1"
+                android:layout_width="8dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:ems="10"
+                android:hint="239"
+                android:inputType="number"
+
+                />
+
+            <EditText
+                android:id="@+id/input_uri2"
+                android:layout_width="8dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:ems="10"
+                android:hint="239"
+                android:inputType="number" />
+
+            <EditText
+                android:id="@+id/input_uri3"
+                android:layout_width="8dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:ems="10"
+                android:hint="239"
+                android:inputType="number" />
+
+            <EditText
+                android:id="@+id/input_uri4"
+                android:layout_width="8dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:ems="10"
+                android:hint="239"
+                android:inputType="number" />
+
+            <EditText
+                android:id="@+id/input_uri5"
+                android:layout_width="8dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:ems="10"
+                android:hint="port"
+                android:inputType="number" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
+
+            <!-- bla bla bla-->
+            <TextView
+                android:id="@+id/output_uri"
+                android:layout_width="16dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="UDP Input:"
+                android:textStyle="bold" />
+
+            <EditText
+                android:id="@+id/output_uri1"
+                android:layout_width="8dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:ems="10"
+                android:hint="239"
+                android:inputType="number"
+
+                />
+
+            <EditText
+                android:id="@+id/output_uri2"
+                android:layout_width="8dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:ems="10"
+                android:hint="239"
+                android:inputType="number" />
+
+            <EditText
+                android:id="@+id/output_uri3"
+                android:layout_width="8dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:ems="10"
+                android:hint="239"
+                android:inputType="number" />
+
+            <EditText
+                android:id="@+id/output_uri4"
+                android:layout_width="8dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:ems="10"
+                android:hint="239"
+                android:inputType="number" />
+
+            <EditText
+                android:id="@+id/output_uri5"
+                android:layout_width="8dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:ems="10"
+                android:hint="port"
+                android:inputType="number" />
+
+        </LinearLayout>
+
+        <View
+            style="@style/Divider"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp" />
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="64dp"
+            android:orientation="vertical"
+            android:layout_marginBottom="16dp">
+
+            <TextView
+                android:id="@+id/video_codecs"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Video Codec:"
+                android:textStyle="bold" />
+
+            <Spinner
+                android:id="@+id/video_codec_spinner"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="64dp"
+            android:orientation="vertical"
+            android:layout_marginBottom="16dp">
+
+            <!-- bla bla bla-->
+            <TextView
+                android:id="@+id/video_bitrates"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Video Bitrate:"
+                android:textStyle="bold" />
+
+            <Spinner
+                android:id="@+id/video_bitrate_spinner"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="64dp"
+            android:orientation="vertical"
+            android:layout_marginBottom="16dp"
+            >
+
+            <TextView
+                android:id="@+id/textView3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Video Size:"
+                android:textStyle="bold" />
+
+            <Spinner
+                android:id="@+id/video_size_spinner"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+
+
+        <View
+            android:id="@+id/view3"
+            style="@style/Divider"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"/>
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="64dp"
+            android:orientation="vertical"
+            android:layout_marginBottom="16dp">
+
+            <!-- bla bla bla-->
+            <TextView
+                android:id="@+id/textView4"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Audio Codec:"
+                android:textStyle="bold" />
+
+            <Spinner
+                android:id="@+id/audio_codec_spinner"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/startTranscoding"
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:background="@android:color/background_dark"
+            android:text="Start"
+            android:textColor="@android:color/background_light"
+
+            />
+
+
+    </LinearLayout>
+
+
+
+</ScrollView>
+

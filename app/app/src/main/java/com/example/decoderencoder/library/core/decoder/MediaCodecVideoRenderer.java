@@ -163,6 +163,7 @@ public class MediaCodecVideoRenderer extends MediaCodecRenderer {
             mediaFormat.setInteger("no-post-process", 1);
             mediaFormat.setInteger("auto-frc", 0);
         }
+        mediaFormat.setString(MediaFormat.KEY_TRACK_ID, format.id);
         return mediaFormat;
     }
 

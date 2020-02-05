@@ -29,7 +29,7 @@ Java_com_example_decoderencoder_library_muxer_FFmpegMuxer_nativeStop(JNIEnv * en
 JNIEXPORT void JNICALL
 Java_com_example_decoderencoder_library_muxer_FFmpegMuxer_nativeWriteSampleData(JNIEnv * env, jobject instance, jlong stream, jint trackIndex, jobject byteBuffer, jint offset, jint size, jint flags, jlong presentationTimeUs) {
 	jbyte* buf_in = (jbyte*)env->GetDirectBufferAddress(byteBuffer);
-    writeFrame((OutputStream *)stream, trackIndex, buf_in, offset, size, flags, presentationTimeUs);
+    queueData2Mux((OutputStream *)stream, trackIndex, buf_in, offset, size, flags, presentationTimeUs);
 }
 
 JNIEXPORT void JNICALL

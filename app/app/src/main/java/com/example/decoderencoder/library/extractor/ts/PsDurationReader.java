@@ -38,7 +38,7 @@ import java.io.IOException;
  *
  * <p>Note: See ISO/IEC 13818-1, Table 2-33 for details of the SCR field in pack_header.
  */
-/* package */ final class PsDurationReader {
+  public final class PsDurationReader {
 
   private static final int TIMESTAMP_SEARCH_BYTES = 20000;
 
@@ -53,7 +53,8 @@ import java.io.IOException;
   private long lastScrValue;
   private long durationUs;
 
-  /* package */ PsDurationReader() {
+  /* package */
+  public PsDurationReader() {
     scrTimestampAdjuster = new TimestampAdjuster(/* firstSampleTimestampUs= */ 0);
     firstScrValue = C.TIME_UNSET;
     lastScrValue = C.TIME_UNSET;

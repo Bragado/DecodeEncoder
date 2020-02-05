@@ -3,4 +3,37 @@
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+
+    <string-array name="video_codecs">
+        <item>video/avc</item>
+        <item>video/hevc</item>
+    </string-array>
+    <string-array name="audio_codecs">
+        <item>audio/aac</item>
+        <item>passthrough</item>
+    </string-array>
+    <string-array name="video_bitrates">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>5</item>
+        <item>7</item>
+        <item>10</item>
+        <item>12</item>
+        <item>15</item>
+    </string-array>
+    <string-array name="video_res">
+        <item>1920x1080 30Hz</item>
+        <item>1920x1080 25Hz</item>
+        <item>1280x720 30Hz</item>
+        <item>1280x720 25Hz</item>
+        <item>720x480 30Hz</item>
+        <item>720x480 25Hz</item>
+    </string-array>
+    <string-array name="input_sources">
+        <item>HDMI</item>
+        <item>UDP</item>
+    </string-array>
+
+
 </resources>

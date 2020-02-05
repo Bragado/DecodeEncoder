@@ -24,6 +24,7 @@ public class FFmpegMuxer implements MediaMuxer {
 
     boolean started = false;        // TODO: create a proper "state machine"
 
+
     @Keep
     private Long nativePointer = new Long(0);
 
@@ -45,7 +46,6 @@ public class FFmpegMuxer implements MediaMuxer {
         // Video keys: streamType ; codec_tag ; codec_id ; bit_rate ; width ; height ; fps
         String[] keys = null;
         String[] values = null;
-        byte[] pps_sps = new byte[1000];
         if(newFormat.getString(MediaFormat.KEY_MIME).startsWith("video/")) {
             keys = new String[7];
             values = new String[7];
@@ -60,32 +60,36 @@ public class FFmpegMuxer implements MediaMuxer {
             keys[3] = "height";
             values[3] = newFormat.getInteger(MediaFormat.KEY_HEIGHT) + "";
             keys[4] = "fps";
-            values[4] = /*newFormat.getInteger(MediaFormat.KEY_FRAME_RATE)*/25 + ""; // FIXME: sometimes this is null, what to do in those cases ?? passthrough the configuration??
+            values[4] =  newFormat.getInteger(MediaFormat.KEY_FRAME_RATE) + ""; // FIXME: sometimes this is null, what to do in those cases ?? passthrough the configuration??
             keys[5] = "mimeType";
             values[5] = newFormat.getString(MediaFormat.KEY_MIME);
 
-           /* ByteBuffer csd_1 = newFormat.getByteBuffer("csd-1");
-            ByteBuffer csd_0 = newFormat.getByteBuffer("csd-0");
-            pps_sps = new byte[csd_0.limit() + csd_1.limit()];
-            csd_0.get(pps_sps);
-            csd_1.get(pps_sps, csd_0.limit(), csd_1.limit());*/
-
         }else if(newFormat.getString(MediaFormat.KEY_MIME).startsWith("audio/")) {
-            keys = new String[6];
-            values = new String[6];
+            keys = new String[7];
+            values = new String[7];
             keys[3] = "streamType";
             values[3] = "1";
             keys[0] = "codecID";
             values[0] = FFmpegUtil.getCodecIdByMimeType(newFormat.getString(MediaFormat.KEY_MIME));
             keys[1] = "sampleRate";
-            values[1] = newFormat.getInteger(MediaFormat.KEY_SAMPLE_RATE) + "";
+            values[1] =  newFormat.getInteger(MediaFormat.KEY_SAMPLE_RATE) + "";
             keys[2] = "channels";
             values[2] = newFormat.getInteger(MediaFormat.KEY_CHANNEL_COUNT) + "";
             keys[4] = "bitrate";
-            values[4] = newFormat.getInteger(MediaFormat.KEY_BIT_RATE) + "";
+            try {
+                values[4] =  newFormat.getInteger(MediaFormat.KEY_BIT_RATE) + "";
+            }catch(Exception e) {
+                values[4] = "96000";
+            }
             keys[5] = "profile";
-            values[5] = /*newFormat.getInteger(MediaFormat.KEY_AAC_PROFILE)*/ 2 + "";       // TODO!!
-        }else if(newFormat.getString(MediaFormat.KEY_MIME).startsWith("text/")) {
+            try {
+                values[5] = newFormat.getInteger(MediaFormat.KEY_AAC_PROFILE) + "";
+            }catch(Exception e) {
+                values[5] =  "2";
+            }
+            keys[6] = "language";
+            values[6] = newFormat.getString(MediaFormat.KEY_LANGUAGE);
+        }else if(newFormat.getString(MediaFormat.KEY_MIME).startsWith("application/dvbsubs")) {
             keys = new String[3];
             values = new String[3];
             keys[2] = "streamType";

@@ -24,7 +24,7 @@ import java.io.IOException;
 /**
  * Reads EBML variable-length integers (varints) from an {@link ExtractorInput}.
  */
-/* package */ final class VarintReader {
+/* package */ public final class VarintReader {
 
   private static final int STATE_BEGIN_READING = 0;
   private static final int STATE_READ_CONTENTS = 1;

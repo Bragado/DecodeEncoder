@@ -17,21 +17,19 @@ package com.example.decoderencoder.library.extractor.mp4;
 
 import android.util.Pair;
 
-import androidx.annotation.Nullable;
-
-import com.example.decoderencoder.library.util.C;
 import com.example.decoderencoder.library.Format;
-import com.example.decoderencoder.library.util.ParserException;
 import com.example.decoderencoder.library.audio.Ac3Util;
 import com.example.decoderencoder.library.audio.Ac4Util;
 import com.example.decoderencoder.library.drm.DrmInitData;
 import com.example.decoderencoder.library.extractor.GaplessInfoHolder;
 import com.example.decoderencoder.library.metadata.Metadata;
 import com.example.decoderencoder.library.util.Assertions;
+import com.example.decoderencoder.library.util.C;
 import com.example.decoderencoder.library.util.CodecSpecificDataUtil;
 import com.example.decoderencoder.library.util.Log;
 import com.example.decoderencoder.library.util.MimeTypes;
 import com.example.decoderencoder.library.util.ParsableByteArray;
+import com.example.decoderencoder.library.util.ParserException;
 import com.example.decoderencoder.library.util.Util;
 import com.example.decoderencoder.library.video.AvcConfig;
 import com.example.decoderencoder.library.video.DolbyVisionConfig;
@@ -42,11 +40,13 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import androidx.annotation.Nullable;
+
 import static com.example.decoderencoder.library.util.MimeTypes.getMimeTypeFromMp4ObjectType;
 
 /** Utility methods for parsing MP4 format atom payloads according to ISO 14496-12. */
 @SuppressWarnings({"ConstantField", "ConstantCaseForConstants"})
-/* package */ final class AtomParsers {
+/* package */ public final class AtomParsers {
 
   private static final String TAG = "AtomParsers";
 
@@ -1176,7 +1176,7 @@ import static com.example.decoderencoder.library.util.MimeTypes.getMimeTypeFromM
       out.format = Format.createAudioSampleFormat(Integer.toString(trackId), mimeType, null,
           Format.NO_VALUE, Format.NO_VALUE, channelCount, sampleRate, pcmEncoding,
           initializationData == null ? null : Collections.singletonList(initializationData),
-          drmInitData, 0, language);
+          drmInitData, 0, language,0);
     }
   }
 
@@ -1268,8 +1268,8 @@ import static com.example.decoderencoder.library.util.MimeTypes.getMimeTypeFromM
     return null;
   }
 
-  /* package */ static Pair<Integer, TrackEncryptionBox> parseCommonEncryptionSinfFromParent(
-      ParsableByteArray parent, int position, int size) {
+  /* package */ public static Pair<Integer, TrackEncryptionBox> parseCommonEncryptionSinfFromParent(
+          ParsableByteArray parent, int position, int size) {
     int childPosition = position + Atom.HEADER_SIZE;
     int schemeInformationBoxPosition = C.POSITION_UNSET;
     int schemeInformationBoxSize = 0;
@@ -1532,7 +1532,7 @@ import static com.example.decoderencoder.library.util.MimeTypes.getMimeTypeFromM
   /**
    * An stz2 sample size box.
    */
-  /* package */ static final class Stz2SampleSizeBox implements SampleSizeBox {
+  /* package */ public static final class Stz2SampleSizeBox implements SampleSizeBox {
 
     private final ParsableByteArray data;
     private final int sampleCount;

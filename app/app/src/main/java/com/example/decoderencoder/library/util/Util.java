@@ -30,6 +30,7 @@ import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.Point;
 import android.media.AudioFormat;
+import android.media.MediaFormat;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
@@ -1827,7 +1828,6 @@ public final class Util {
     return displaySize;
   }
 
-
   @Nullable
   private static String getSystemProperty(String name) {
     try {
@@ -1943,7 +1943,7 @@ public final class Util {
         "chi", "zh",
         "cze", "cs",
         "dut", "nl",
-        "ger", "de",
+        "ger", "deu",
         "gre", "el",
         "fre", "fr",
         "geo", "ka",

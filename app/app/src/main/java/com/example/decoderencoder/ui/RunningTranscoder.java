@@ -4,6 +4,7 @@ package com.example.decoderencoder.ui;
 import android.content.Context;
 import android.os.Bundle;
 import android.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -55,7 +56,8 @@ public class RunningTranscoder extends Fragment {
 
 
     public void updateStats(Stats stats) {
-        String s = "BufferCapacity: " + stats.bufferCapacity*100 + "\nNumber Of Encoded Frames: " + stats.numOfEncodedFrames + "\nNumber Of Decoded Frames: " + stats.numOfDecodedFrames + "\nTimeElapsed: " + stats.timeElapsed;
+        String s = "Buffer free Capacity: " + stats.bufferCapacity*100 + "%\nNumber Of Encoded Frames: " + stats.numOfEncodedFrames + "\nNumber Of Decoded Frames: " + stats.numOfDecodedFrames + "\nTimeElapsed: " + stats.timeElapsed;
+        Log.d("STATS", s);
         textView.setText(s);
     }
 

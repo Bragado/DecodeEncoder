@@ -4,26 +4,19 @@ import android.media.MediaFormat;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Handler;
-import android.os.HandlerThread;
-
-import androidx.annotation.RequiresApi;
 
 import com.example.decoderencoder.library.core.encoder.EncoderBuffer;
 import com.example.decoderencoder.library.muxer.FFmpegMuxer;
-import com.example.decoderencoder.library.muxer.MediaCodecMuxer;
 import com.example.decoderencoder.library.muxer.MediaMuxer;
 import com.example.decoderencoder.library.muxer.MuxerInput;
 import com.example.decoderencoder.library.network.Allocator;
-import com.example.decoderencoder.library.network.DataOutput;
-import com.example.decoderencoder.library.source.Media;
-import com.example.decoderencoder.library.source.MediaSource;
-import com.example.decoderencoder.library.util.ConditionVariable;
+import com.example.decoderencoder.library.util.Assertions;
 import com.example.decoderencoder.library.util.Log;
 
-import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
-import java.util.LinkedList;
+
+import androidx.annotation.RequiresApi;
 
 
 /**
@@ -42,16 +35,16 @@ public class DefaultMediaOutput implements MediaOutput {
 
     MediaMuxer mediaMuxer;
     ArrayList<MuxerInput> muxerInputs = new ArrayList<>();
-    ArrayList<MediaFormat> mediaFormats = new ArrayList<>();        // TODO: do we need this?
+    ArrayList<MediaFormat> mediaFormats = new ArrayList<>();
+
 
 
     long maxPTS = Long.MIN_VALUE;
     long minPTS = Long.MAX_VALUE;
 
     boolean muxerStarted = false;
-    int numOfMuxingStreams = -1;     // FIXME
+    int numOfMuxingStreams = -1;
     int currentNumOfStreams = 0;
-    //final ConditionVariable loadCondition;
 
 
 
@@ -61,20 +54,36 @@ public class DefaultMediaOutput implements MediaOutput {
     ) {
         this.allocator = allocator;
         this.transcoderHandler = transcoderHandler;
-        //loadCondition = new ConditionVariable();
-        //this.transcoderHandler = transcoderHandler;
     }
 
 
+
+
+    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
     @Override
     public MuxerInput newTrackDiscovered(MediaFormat trackFormat) {
-        mediaFormats.add(trackFormat);
-        int trackId = mediaMuxer.addTrack(trackFormat);
-        EncoderOutput encoderOutput = new EncoderOutput(trackId);
-        muxerInputs.add(encoderOutput);
-        currentNumOfStreams++;
-        return encoderOutput;
+        Assertions.checkArgument(numOfMuxingStreams == mediaFormats.size());
+        for(int i = 0; i < mediaFormats.size(); i++ ) {
+            if(mediaFormats.get(i).getString(MediaFormat.KEY_TRACK_ID).equals(trackFormat.getString(MediaFormat.KEY_TRACK_ID))) {
+                currentNumOfStreams++;
+                return muxerInputs.get(i);
+            }
+        }
+
+        return null;
     }
+
+    @Override
+    public void prepareTracks(MediaFormat[] formats) {
+         for(int i = 0; i < formats.length; i++) {
+             MediaFormat f = formats[i];
+             mediaFormats.add(f);
+             int trackId = mediaMuxer.addTrack(f);
+             muxerInputs.add(new EncoderOutput(trackId));
+
+         }
+    }
+
 
     @Override
     public void setNumOfStreams(int streams) {
@@ -95,17 +104,8 @@ public class DefaultMediaOutput implements MediaOutput {
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
     @Override
     public void prepare(Callback callback, Uri uri, Handler transcoderHandler) {
-        //loadCondition.open();
-        //this.mediaMuxer = mediaMuxer;/* new MediaCodecMuxer(uri.getPath(),  android.media.MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4); */
-        this.callback = callback;
+       this.callback = callback;
         this.transcoderHandler = transcoderHandler;
-        /**
-         * TODO:
-         * mediamuxer factory
-         * based on the uri, check which muxer can handle it
-         */
-        //this.mediaMuxer = new MediaCodecMuxer(uri.getPath(),  android.media.MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4);
-        //this.mediaMuxer = new FFmpegMuxer(uri);
     }
 
     @Override
@@ -113,7 +113,14 @@ public class DefaultMediaOutput implements MediaOutput {
         this.transcoderHandler = transcoderHandler;
         this.callback = callback;
         this.mediaMuxer = new FFmpegMuxer(uri);
+        /**
+         * TODO:
+         * mediamuxer factory
+         * based on the uri, check which muxer can handle it
+         */
     }
+
+
 
     @Override
     public void maybeStartMuxer() {
@@ -145,28 +152,23 @@ public class DefaultMediaOutput implements MediaOutput {
 
     public class EncoderOutput implements MuxerInput {
         int trackId;
-        LinkedList<EncoderBuffer> pendingEncoderOutputBuffers = new LinkedList<EncoderBuffer>();
-
 
         public EncoderOutput(int trackId) {
             this.trackId = trackId;
         }
 
         @Override
-        public int sampleData(EncoderBuffer outputBuffer) throws IOException, InterruptedException {
+        public int sampleData(EncoderBuffer outputBuffer) {
 
-           /* ByteBuffer buffer = ByteBuffer.allocateDirect(outputBuffer.size);
+            ByteBuffer buffer = ByteBuffer.allocateDirect(outputBuffer.size);
             buffer.put(outputBuffer.data);
-            outputBuffer.data = buffer;*/
-            transcoderHandler.post(() -> {
-                if(numOfMuxingStreams > currentNumOfStreams) {
-                    return;
-                }else {
-                    mediaMuxer.writeSampleData(trackId, outputBuffer);
-                }
-            });
+            outputBuffer.data = buffer;
 
-
+            if(numOfMuxingStreams > currentNumOfStreams) {
+                return 0;
+            }else {
+                mediaMuxer.writeSampleData(trackId, outputBuffer);
+            }
             return 1;
         }
 

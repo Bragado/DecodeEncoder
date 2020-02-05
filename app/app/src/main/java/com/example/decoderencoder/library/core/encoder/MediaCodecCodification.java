@@ -2,23 +2,18 @@ package com.example.decoderencoder.library.core.encoder;
 
 import android.media.MediaCodec;
 import android.media.MediaFormat;
-import android.net.Uri;
 import android.os.Build;
-import android.util.Log;
 import android.view.Surface;
-
-import androidx.annotation.RequiresApi;
 
 import com.example.decoderencoder.library.core.decoder.Decoder;
 import com.example.decoderencoder.library.core.decoder.Renderer;
-import com.example.decoderencoder.library.muxer.FFmpegMuxer;
-import com.example.decoderencoder.library.muxer.MediaMuxer;
-import com.example.decoderencoder.library.muxer.MuxerInput;
 import com.example.decoderencoder.library.output.MediaOutput;
+import com.example.decoderencoder.library.util.Log;
 import com.example.decoderencoder.library.util.Util;
 
-import java.io.IOException;
 import java.nio.ByteBuffer;
+
+import androidx.annotation.RequiresApi;
 
 /**
  * Handles audio and video generic operations for enconding
@@ -65,13 +60,14 @@ public abstract class MediaCodecCodification extends BaseCodification {
         int encoderStatus = this.encoder.dequeueOutputBuffer(bufferInfo, 0);
         switch(encoderStatus) {
             case MediaCodec.INFO_TRY_AGAIN_LATER:
+                ret = 0;
                 break;
             case MediaCodec.INFO_OUTPUT_BUFFERS_CHANGED:
                 mayUpdateOutputBuffer();
                 break;
             case MediaCodec.INFO_OUTPUT_FORMAT_CHANGED:
                 MediaFormat newFormat = this.encoder.getOutputFormat();
-                onFormatChange(newFormat);
+                onFormatChange(this.format);
                 break;
             default:
                 if(encoderStatus < 0)

@@ -46,7 +46,7 @@ public final class Log {
   /** Log level to disable all logging. */
   public static final int LOG_LEVEL_OFF = Integer.MAX_VALUE;
 
-  private static int logLevel = LOG_LEVEL_ALL;
+  private static int logLevel = LOG_LEVEL_OFF;
   private static boolean logStackTraces = true;
 
   private Log() {}

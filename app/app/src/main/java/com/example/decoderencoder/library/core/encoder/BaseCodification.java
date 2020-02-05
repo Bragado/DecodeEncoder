@@ -4,18 +4,17 @@ import android.media.MediaCodec;
 import android.media.MediaFormat;
 import android.os.Build;
 
-import androidx.annotation.RequiresApi;
-
 import com.example.decoderencoder.library.core.decoder.Renderer;
-import com.example.decoderencoder.library.muxer.MediaMuxer;
 import com.example.decoderencoder.library.muxer.MuxerInput;
 import com.example.decoderencoder.library.output.MediaOutput;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
+import androidx.annotation.RequiresApi;
+
 /**
- * Handles the writing to MuxerInput
+ * Handles the writing of samples to MuxerInput
  */
 public abstract class BaseCodification implements Codification {
 
@@ -36,13 +35,18 @@ public abstract class BaseCodification implements Codification {
     @Override
     public int getTrackType() {
         return 0;
-    }
+    }       // FIXME
 
 
+    /**
+     * Stops the codec and propagates the signal to each child to release all kept resource
+     */
     @Override
     public void stop() {
-        encoder.stop();
-        encoder.release();
+        if(encoder != null) {
+            encoder.stop();
+            encoder.release();
+        }
         onStop();
     }
 
@@ -57,6 +61,10 @@ public abstract class BaseCodification implements Codification {
 
     }
 
+    /**
+     * Sets this Codification Renderer
+     * @param renderer The corresponding renderer from wich the encoder will encode data.
+     */
     @Override
     public void enable(Renderer renderer) {
         this.renderer = renderer;
@@ -68,6 +76,12 @@ public abstract class BaseCodification implements Codification {
     final void onDataReady(ByteBuffer outputBuffer, MediaCodec.BufferInfo bufferInfo) {
         onDataReady(new EncoderBuffer(outputBuffer, bufferInfo.offset, bufferInfo.size, bufferInfo.flags, bufferInfo.presentationTimeUs));
     }
+
+    /**
+     * Tries to start muxing and sends an encoded sample to its assigned muxerInput.
+     * In order to start muxing all codifications must call {@link #addTrack}
+     * @param buffer
+     */
     final void onDataReady(EncoderBuffer buffer) {
         mediaOutput.maybeStartMuxer();
         try {
@@ -79,7 +93,10 @@ public abstract class BaseCodification implements Codification {
         }
     }
 
-
+    /**
+     * Requests a muxerInput to write the encoded samples.
+     * @param trackFormat samples track format
+     */
     public void addTrack(MediaFormat trackFormat) {
         this.muxerInput = mediaOutput.newTrackDiscovered(trackFormat);
     }
@@ -91,6 +108,11 @@ public abstract class BaseCodification implements Codification {
 
     public abstract void onStop();
 
+    /**
+     * Used to add codec extra data
+     * @param content buffer returned by MediaCodec
+     * @param size of the buffer
+     */
     protected void addConfigBuffer(byte[] content, int size) {
         muxerInput.addConfigBuffer(content, size);
     }

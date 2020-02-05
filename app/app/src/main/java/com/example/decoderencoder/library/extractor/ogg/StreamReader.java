@@ -29,14 +29,14 @@ import java.io.IOException;
 
 /** StreamReader abstract class. */
 @SuppressWarnings("UngroupedOverloads")
-/* package */ abstract class StreamReader {
+/* package */ public abstract class StreamReader {
 
   private static final int STATE_READ_HEADERS = 0;
   private static final int STATE_SKIP_HEADERS = 1;
   private static final int STATE_READ_PAYLOAD = 2;
   private static final int STATE_END_OF_INPUT = 3;
 
-  static class SetupData {
+  public static class SetupData {
     Format format;
     OggSeeker oggSeeker;
   }

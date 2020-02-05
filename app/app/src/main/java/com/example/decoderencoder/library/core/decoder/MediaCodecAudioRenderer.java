@@ -99,6 +99,8 @@ public class MediaCodecAudioRenderer extends MediaCodecRenderer {
             // not sync frames. Set a format key to override this.
             mediaFormat.setInteger("ac4-is-sync", 1);
         }
+        mediaFormat.setString(MediaFormat.KEY_TRACK_ID, format.id);
+        mediaFormat.setString(MediaFormat.KEY_LANGUAGE, format.language);
         return mediaFormat;
     }
 }

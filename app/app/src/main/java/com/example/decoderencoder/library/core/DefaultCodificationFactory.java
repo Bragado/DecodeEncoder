@@ -4,15 +4,11 @@ import android.media.MediaFormat;
 import android.os.Build;
 import android.view.Surface;
 
-import androidx.annotation.RequiresApi;
-
-import com.example.decoderencoder.library.core.CodificationFactory;
 import com.example.decoderencoder.library.core.decoder.Renderer;
 import com.example.decoderencoder.library.core.encoder.Codification;
 import com.example.decoderencoder.library.core.encoder.DefaultEncoder;
 import com.example.decoderencoder.library.core.encoder.EmptyCodification;
 import com.example.decoderencoder.library.core.encoder.Encoder;
-import com.example.decoderencoder.library.core.encoder.EncoderBuffer;
 import com.example.decoderencoder.library.core.encoder.MediaCodecAudioCodification;
 import com.example.decoderencoder.library.core.encoder.MediaCodecVideoCodification;
 import com.example.decoderencoder.library.output.MediaOutput;
@@ -21,6 +17,11 @@ import com.example.decoderencoder.library.source.TrackGroupArray;
 
 import java.util.Arrays;
 
+import androidx.annotation.RequiresApi;
+
+/**
+ * Creates all the instances of Codification
+ */
 public class DefaultCodificationFactory implements CodificationFactory {
 
     Surface encoderInputSurface;
@@ -29,9 +30,6 @@ public class DefaultCodificationFactory implements CodificationFactory {
 
 
     public DefaultCodificationFactory() {};
-
-
-
 
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
     @Override
@@ -66,8 +64,9 @@ public class DefaultCodificationFactory implements CodificationFactory {
         return codifications;
     }
 
+
     @Override
-    public Surface getEncoderInputSurface() {
+    public Surface getEncoderInputSurface() {       // TODO: evaluate whether this method can be safely removed
         return this.encoderInputSurface;
     }
 

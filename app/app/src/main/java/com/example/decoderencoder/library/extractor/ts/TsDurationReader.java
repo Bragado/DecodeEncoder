@@ -35,7 +35,7 @@ import java.io.IOException;
  * end. This class can only be used once to read duration from a given stream, and the usage of the
  * class is not thread-safe, so all calls should be made from the same thread.
  */
-/* package */ final class TsDurationReader {
+/* package */ public final class TsDurationReader {
 
   private static final int TIMESTAMP_SEARCH_BYTES = 600 * TsExtractor.TS_PACKET_SIZE;
 
@@ -50,7 +50,8 @@ import java.io.IOException;
   private long lastPcrValue;
   private long durationUs;
 
-  /* package */ TsDurationReader() {
+  /* package */
+  public TsDurationReader() {
     pcrTimestampAdjuster = new TimestampAdjuster(/* firstSampleTimestampUs= */ 0);
     firstPcrValue = C.TIME_UNSET;
     lastPcrValue = C.TIME_UNSET;

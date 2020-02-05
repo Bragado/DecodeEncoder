@@ -25,7 +25,7 @@ import org.json.JSONObject;
 /**
  * Utility methods for ClearKey.
  */
-/* package */ final class ClearKeyUtil {
+/* package */ public final class ClearKeyUtil {
 
   private static final String TAG = "ClearKeyUtil";
 

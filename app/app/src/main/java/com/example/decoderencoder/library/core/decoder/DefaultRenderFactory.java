@@ -58,7 +58,15 @@ public class DefaultRenderFactory implements RenderersFactory, Renderer.Callback
                 }
                 numOfRenderers++;
             }else if(preparedState.trackEnabledStates[i] == MediaSource.PreparedState.TRACKSTATE.PASSTROUGH ) {
-                renderers[numOfRenderers] = new EmptyRenderer(C.TRACK_TYPE_UNKNOWN);       // FIXME: Renderer output
+                int track_type = C.TRACK_TYPE_UNKNOWN;
+                if(mimeType.startsWith("video/"))
+                    track_type = C.TRACK_TYPE_VIDEO;
+                else if(mimeType.startsWith("audio/"))
+                    track_type = C.TRACK_TYPE_AUDIO;
+                else
+                    track_type = C.TRACK_TYPE_TEXT;
+
+                renderers[numOfRenderers] = new EmptyRenderer(track_type);       // FIXME: Renderer output
                 renderers[numOfRenderers].enable(preparedState.tracks.get(i).getFormat(), sampleStreams[i], 0,0);
                 numOfRenderers++;
             }else {

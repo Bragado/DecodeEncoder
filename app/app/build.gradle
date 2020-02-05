@@ -1,17 +1,18 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 25
+    compileSdkVersion 28
     defaultConfig {
         applicationId "com.example.decoderencoder"
         minSdkVersion 15
-        targetSdkVersion 26
+        targetSdkVersion 28
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
         ndk {
             abiFilters 'x86', 'x86_64', 'armeabi-v7a', 'arm64-v8a'
+            moduleName "libhdmidemoutils"
         }
 
     }
@@ -27,8 +28,10 @@ android {
         main {
             // let gradle pack the shared library into apk
             jniLibs.srcDirs = ['../ffmpeg-android-maker/output/lib']
+            assets.srcDirs = ['src/main/assets', 'src/asset']
         }
     }
+
     externalNativeBuild {
         cmake {
             path "CMakeLists.txt"
@@ -44,10 +47,10 @@ android {
 dependencies {
     def annotation_version = "1.1.0"
     def annotation_experimental_version = "1.0.0-beta01"
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
+   // implementation fileTree(dir: 'libs', include: ['*.jar'])
     //noinspection GradleCompatible
-    implementation 'com.android.support:appcompat-v7:25.4.0'
-    implementation 'com.android.support:support-v4:25.4.0'
+    implementation 'com.android.support:appcompat-v7:28.0.0'
+    implementation 'com.android.support:support-v4:28.0.0'
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
@@ -57,15 +60,23 @@ dependencies {
     implementation "androidx.annotation:annotation:$annotation_version"
     // To use the Java-compatible @Experimental API annotation
     implementation "androidx.annotation:annotation-experimental:$annotation_experimental_version"
-    implementation 'com.android.support:recyclerview-v7:25.0.0'
+   //  implementation 'com.android.support:recyclerview-v7:25.0.0'
     // implementation 'com.google.android.material:material:1.0.0'
 
-    "junit:junit:4.12"
-    "org.robolectric:robolectric:4.2"
-    "androidx.test:core:1.1.0"
-    "androidx.test:runner:1.1.1"
-    "androidx.test.ext:junit:1.1.0"
-    "androidx.test.ext:truth:1.1.0"
-    "androidx.test.espresso:espresso-core:3.1.1"
-    "androidx.test.espresso:espresso-intents:3.1.1"
+    compileOnly files('libs/classes2.jar')
+    compileOnly files('libs/hdmin2.jar')
+
+    api 'org.mockito:mockito-core:2.25.0'
+    api 'androidx.test.ext:junit:1.1.0'
+    api 'androidx.test.ext:truth:1.1.0'
+    implementation 'androidx.annotation:annotation:1.0.2'
+
+
+    testImplementation 'androidx.test:core:1.1.0'
+    testImplementation 'androidx.test.ext:junit:1.1.0'
+    testImplementation 'androidx.test.ext:truth:1.1.0'
+    testImplementation 'org.mockito:mockito-core:2.25.0'
+    testImplementation 'org.robolectric:robolectric:4.2'
+    testImplementation 'com.google.auto.value:auto-value-annotations:1.6'
+    testAnnotationProcessor 'com.google.auto.value:auto-value:1.6'
 }

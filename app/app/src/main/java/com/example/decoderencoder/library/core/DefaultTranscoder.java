@@ -1,6 +1,7 @@
 package com.example.decoderencoder.library.core;
 
 
+import android.annotation.TargetApi;
 import android.media.MediaFormat;
 import android.net.Uri;
 import android.os.Build;
@@ -11,6 +12,7 @@ import androidx.annotation.RequiresApi;
 
 import com.example.decoderencoder.MainActivity;
 import com.example.decoderencoder.library.core.decoder.DefaultRenderFactory;
+import com.example.decoderencoder.library.core.decoder.EmptyRenderer;
 import com.example.decoderencoder.library.core.decoder.Renderer;
 import com.example.decoderencoder.library.core.encoder.Codification;
 import com.example.decoderencoder.library.core.encoder.MediaCodecCodification;
@@ -40,7 +42,8 @@ public class DefaultTranscoder  extends HandlerThread implements Transcoder, Ren
 
     public static final String TAG = "DEFAULT_TRANSCODER";
     private static final int BUFFER_MAX_SIZE = 82833536;        // Maximum bytes in memory
-
+    private static final int SAMPLE_PARSED = 1;
+    private static final int NO_SAMPLE_OR_END_OF_STREAM = 0;
 
     /*  Main Thread */
     private Transcoder.State currentState = Transcoder.State.INICIALIZED;
@@ -179,21 +182,26 @@ public class DefaultTranscoder  extends HandlerThread implements Transcoder, Ren
                 this.preparedState.trackEnabledStates[i] = MediaSource.PreparedState.TRACKSTATE.PASSTROUGH;
             }
         }
-        onSelectedTracks(tracksToDiscard);
+        onSelectedTracks(tracksToDiscard, formats);
         return true;
     }
 
 
     @Override
     public boolean stopTranscoder() {   // Thread : UI
-        decodeEncodeStreams.stopTranscoding();
+        if(decodeEncodeStreams != null)
+            decodeEncodeStreams.stopTranscoding();
         decodeEncodeStreams = null;
         return true;
     }
 
     @Override
     public Stats getStats() {    // Thread : UI
-        return new Stats(bufferCapacity, numOfEncodedFrames, numOfDecodedFrames, timeElapsed);
+        float bufOccupancy = (float)allocator.getTotalBytesAllocated()/BUFFER_MAX_SIZE;
+        return new Stats(bufOccupancy > 1.0f ? 1.0f : 1.0f - bufOccupancy,
+                numOfEncodedFrames,
+                numOfDecodedFrames,
+                System.currentTimeMillis() - timeElapsed);
     }
 
     @Override
@@ -211,6 +219,9 @@ public class DefaultTranscoder  extends HandlerThread implements Transcoder, Ren
             codification.stop();
     }
 
+    /**
+     * Starts all renders and codifications
+     */
     public void initCodecs() {
         for (Codification codification : codifications) {
             if(codification != null)
@@ -239,6 +250,7 @@ public class DefaultTranscoder  extends HandlerThread implements Transcoder, Ren
         }
     }
 
+
     private void reallyStartTranscoding() {
         transcoderRunning = true;
         readyToStart();
@@ -249,8 +261,10 @@ public class DefaultTranscoder  extends HandlerThread implements Transcoder, Ren
     /**
      * Inicialize the renderers and the encoders
      */
-    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
-    public void onSelectedTracks(int[] tracksToDiscard) {        // Thread : UI
+
+    @TargetApi(Build.VERSION_CODES.KITKAT)
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+    public void onSelectedTracks(int[] tracksToDiscard, MediaFormat[] newFormats) {        // Thread : UI
         tracksSelected = true;
         transcoderHandler.post(() -> {
             if(renderers == null) {
@@ -270,7 +284,19 @@ public class DefaultTranscoder  extends HandlerThread implements Transcoder, Ren
                  /* Tell the mediaOutput how many streams there is*/
                  mediaOutput.setNumOfStreams(this.preparedState.tracks.length - tracksToDiscard.length);
 
-            }else {         // TODO: change transcoding languages onDemand
+                 MediaFormat[] mediaFormats = new MediaFormat[this.preparedState.tracks.length - tracksToDiscard.length];
+                 int j, k;
+                 j = k = 0;
+                 for(int i = 0; i < preparedState.tracks.length; i++) {
+                     if(preparedState.trackEnabledStates[i] == MediaSource.PreparedState.TRACKSTATE.PASSTROUGH) {
+                         mediaFormats[j++] = EmptyRenderer.getFormat(preparedState.tracks.get(i).getFormat(0));
+                     }else if(preparedState.trackEnabledStates[i] == MediaSource.PreparedState.TRACKSTATE.SELECTED) {
+                         mediaFormats[j++] = newFormats[k++];
+                     }
+                 }
+                 mediaOutput.prepareTracks(mediaFormats);
+
+            }else {         // TODO: support update the tracks that are inteded to be transcoded
                 // 1. Evaluate which renderers will be maintained
                 // 2. Evaluate which renderers can be reused
                 // 3. Create the rest of the renderers
@@ -293,6 +319,7 @@ public class DefaultTranscoder  extends HandlerThread implements Transcoder, Ren
 
     final class MediaManagement implements Media.Callback {         // Thread : DefaultTranscoder
 
+        /* Called by MediaSource when all tracks have been discovered */
         @Override
         public void onPrepared(MediaSource source) {        // talk with the UI thread to
             Log.d(TAG, "onPrepared");
@@ -301,6 +328,7 @@ public class DefaultTranscoder  extends HandlerThread implements Transcoder, Ren
             uiHandler.post(() -> { callback.onPrepared(DefaultTranscoder.this, DefaultTranscoder.this.preparedState); });
         }
 
+        /* Tells MediaSource to continue fetching data from the source */
         @Override
         public void onContinueLoadingRequested(MediaSource source) {        // TODO
             if(transcoderRunning && allocator.getTotalBytesAllocated() < BUFFER_MAX_SIZE)
@@ -311,6 +339,7 @@ public class DefaultTranscoder  extends HandlerThread implements Transcoder, Ren
         }
     }
 
+    // TODO: output load control
     final class OutputManagement implements MediaOutput.Callback {
 
         @Override
@@ -324,16 +353,17 @@ public class DefaultTranscoder  extends HandlerThread implements Transcoder, Ren
         }
     }
 
-
+    /**
+     * Controls the flow of the renderers and codifications
+     */
     final class DecodeEncodeStreams extends Thread {
         final Handler transcoderHandler;
         final Renderer[] renderers;
         final Codification[] codifications;
 
+        long highest_pts;
         boolean canceled;
         boolean isReady = false;
-
-
 
         public DecodeEncodeStreams(String name,
                             Handler transcoderHandler,
@@ -343,6 +373,7 @@ public class DefaultTranscoder  extends HandlerThread implements Transcoder, Ren
             this.transcoderHandler = transcoderHandler;
             this.renderers = renderer;
             this.codifications = codification;
+            this.highest_pts = 0;
         }
 
         @Override
@@ -378,50 +409,93 @@ public class DefaultTranscoder  extends HandlerThread implements Transcoder, Ren
             if(MainActivity.TESTING)
                 timeElapsed = System.currentTimeMillis();
 
-            int ret = 1;
+            int decoder_response = NO_SAMPLE_OR_END_OF_STREAM;      // evaluates whether end of stream has been reached
+            int encoder_response = SAMPLE_PARSED;
             int aux;
-            while (!canceled) {
-                for (int i = 0; i < renderers.length; i++, ret = 1) {
-                    while(ret == 1) {
+            boolean reachedEndOfStream = false;
+
+            while (!canceled ) {
+                decoder_response = NO_SAMPLE_OR_END_OF_STREAM;
+
+                for (int i = 0; i < renderers.length; i++, encoder_response = SAMPLE_PARSED) {
+
+                    // drain encoder output buffer before feeding new samples
+                    while(encoder_response == SAMPLE_PARSED) {          // while samples are been read from output buffer
                         aux  = codifications[i].drainOutputBuffer();
-                        ret = ret & aux;
-                        if(aux == 1 && MainActivity.TESTING)
+                        decoder_response += aux;                        // if samples are being read from encoder we did not reached end of stream ,  0 means end of stream
+                        encoder_response = encoder_response & aux;
+                        if(aux == SAMPLE_PARSED)
                             numOfEncodedFrames++;
                     }
+
                     codifications[i].feedInputBuffer();
                     aux = renderers[i].drainOutputBuffer();
-                    if(aux == 1 && MainActivity.TESTING)
-                        numOfDecodedFrames++;
-                    renderers[i].feedInputBuffer();
-                    bufferCapacity = 1.0f - (float)allocator.getTotalBytesAllocated()/BUFFER_MAX_SIZE;
-                    if(transcoderRunning && allocator.getTotalBytesAllocated() < BUFFER_MAX_SIZE) {
 
+                    decoder_response += aux;                            // 0 means end of stream
+
+                    if(aux == SAMPLE_PARSED)
+                        numOfDecodedFrames++;
+
+                    long tmp = renderers[i].feedInputBuffer(highest_pts);
+                    highest_pts = tmp > highest_pts ? tmp : highest_pts;
+
+                    if(transcoderRunning && allocator.getTotalBytesAllocated() < BUFFER_MAX_SIZE) {
                         DefaultTranscoder.this.mediaSource.continueLoading(0);
-                    }else       // FIXME: remove this log
-                        Log.d(TAG, "Buffers are full with information");
+                    }
                 }
+                if(decoder_response == NO_SAMPLE_OR_END_OF_STREAM) {        // if decoders reached end of stream and encoders have no sample in its output buffer
+                    reachedEndOfStream = true;
+                    canceled = true;
+                }
+
             }
 
-            if(MainActivity.TESTING)
+            if(MainActivity.TESTING) {
                 timeElapsed = System.currentTimeMillis() - timeElapsed;
+                android.util.Log.d(TAG, "Time Elapsed For Transcoding: " + timeElapsed);
+            }
 
-            signalEndOfStreamAndDrainEncoders();
+            if(!reachedEndOfStream) // client demanded to stop
+                signalEndOfStreamAndDrainEncoders();
+            else
+                drainEncoders();
         }
 
+        /**
+         * Response to stopTranscoding.
+         * This functions signals the renderers of the end of stream and fetchs all the remain data from the encoder
+         */
         public void signalEndOfStreamAndDrainEncoders() {
             for (int i = 0; i < renderers.length; i++) {
                 renderers[i].signalEndOfStream();
             }
             int bool = 1;
-            int counter = 0;
-            while (counter++ < 30) {   // FIXME: while(bool != 0)
+            while (bool == 1) {   // FIXME: while(bool != 0)
                 bool = 0;
                 for (int i = 0; i < renderers.length; i++) {
                     bool += codifications[i].drainOutputBuffer();
                     codifications[i].feedInputBuffer();
                     renderers[i].drainOutputBuffer();
-                    renderers[i].feedInputBuffer();
+                    renderers[i].feedInputBuffer(highest_pts);
                 }
+            }
+            mediaOutput.stopMuxer();
+            mediaOutput.release();
+
+            releaseRenderersAndCodifications();
+            release();
+        }
+
+        /**
+         * Response to endOfStream - when the end of the file has been reached
+         * This method drains all the remain data from the encoder
+         */
+        public void drainEncoders() {
+            int bool = 1;
+            while(bool == 1) {
+                bool = 0;
+                for (int i = 0; i < codifications.length; i++)
+                    bool += codifications[i].drainOutputBuffer();
             }
             mediaOutput.stopMuxer();
             mediaOutput.release();

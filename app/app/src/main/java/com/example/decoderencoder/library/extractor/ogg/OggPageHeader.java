@@ -27,7 +27,7 @@ import java.io.IOException;
 /**
  * Data object to store header information.
  */
-/* package */  final class OggPageHeader {
+/* package */  public final class OggPageHeader {
 
   public static final int EMPTY_PAGE_HEADER_SIZE = 27;
   public static final int MAX_SEGMENT_COUNT = 255;

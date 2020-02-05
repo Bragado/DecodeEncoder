@@ -15,12 +15,7 @@
  */
 package com.example.decoderencoder.library.extractor.amr;
 
-import androidx.annotation.IntDef;
-import androidx.annotation.Nullable;
-
-import com.example.decoderencoder.library.util.C;
 import com.example.decoderencoder.library.Format;
-import com.example.decoderencoder.library.util.ParserException;
 import com.example.decoderencoder.library.extractor.ConstantBitrateSeekMap;
 import com.example.decoderencoder.library.extractor.Extractor;
 import com.example.decoderencoder.library.extractor.ExtractorInput;
@@ -29,7 +24,9 @@ import com.example.decoderencoder.library.extractor.ExtractorsFactory;
 import com.example.decoderencoder.library.extractor.PositionHolder;
 import com.example.decoderencoder.library.extractor.SeekMap;
 import com.example.decoderencoder.library.extractor.TrackOutput;
+import com.example.decoderencoder.library.util.C;
 import com.example.decoderencoder.library.util.MimeTypes;
+import com.example.decoderencoder.library.util.ParserException;
 import com.example.decoderencoder.library.util.Util;
 
 import java.io.EOFException;
@@ -38,6 +35,9 @@ import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.util.Arrays;
+
+import androidx.annotation.IntDef;
+import androidx.annotation.Nullable;
 
 /**
  * Extracts data from the AMR containers format (either AMR or AMR-WB). This follows RFC-4867,
@@ -112,8 +112,8 @@ public final class AmrExtractor implements Extractor {
     1 // No data
   };
 
-  private static final byte[] amrSignatureNb = Util.getUtf8Bytes("#!AMR\n");
-  private static final byte[] amrSignatureWb = Util.getUtf8Bytes("#!AMR-WB\n");
+  public static final byte[] amrSignatureNb = Util.getUtf8Bytes("#!AMR\n");
+  public static final byte[] amrSignatureWb = Util.getUtf8Bytes("#!AMR-WB\n");
 
   /** Theoretical maximum frame size for a AMR frame. */
   private static final int MAX_FRAME_SIZE_BYTES = frameSizeBytesByTypeWb[8];
@@ -201,19 +201,19 @@ public final class AmrExtractor implements Extractor {
     // Do nothing
   }
 
-  /* package */ static int frameSizeBytesByTypeNb(int frameType) {
+  public static int frameSizeBytesByTypeNb(int frameType) {
     return frameSizeBytesByTypeNb[frameType];
   }
 
-  /* package */ static int frameSizeBytesByTypeWb(int frameType) {
+  public static int frameSizeBytesByTypeWb(int frameType) {
     return frameSizeBytesByTypeWb[frameType];
   }
 
-  /* package */ static byte[] amrSignatureNb() {
+  public static byte[] amrSignatureNb() {
     return Arrays.copyOf(amrSignatureNb, amrSignatureNb.length);
   }
 
-  /* package */ static byte[] amrSignatureWb() {
+  public static byte[] amrSignatureWb() {
     return Arrays.copyOf(amrSignatureWb, amrSignatureWb.length);
   }
 
